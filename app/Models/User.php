@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'foto_profil',
+        'role'
     ];
 
     /**
@@ -44,5 +47,29 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    
+    public function pemesananOnline()
+    {
+        return $this->hasMany(Pemesanan::class, 'user_id')
+            ->where('jenis_pemesanan', 'online');
+    }
+
+    public function pemesananOffline()
+    {
+        return $this->hasMany(Pemesanan::class, 'kasir_id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+    public function isKasir()
+    {
+        return $this->role === 'kasir';
+    }
+    public function isPelanggan()
+    {
+        return $this->role === 'pelanggan';
     }
 }
