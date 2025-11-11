@@ -48,7 +48,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    
+
     public function pemesananOnline()
     {
         return $this->hasMany(Pemesanan::class, 'user_id')
@@ -71,5 +71,14 @@ class User extends Authenticatable
     public function isPelanggan()
     {
         return $this->role === 'pelanggan';
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (empty($user->role)) {
+                $user->role = 'pelanggan';
+            }
+        });
     }
 }
