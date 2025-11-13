@@ -26,16 +26,35 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $data = $request->validated();
+
+        $request->validate([
+            'phone' => ['nullable', 'string', 'max:20'],
+            'foto_profil' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+        ]);
+
+        if ($request->hasFile('foto_profil')) {
+            if ($user->foto_profil && \Storage::disk('public')->exists($user->foto_profil)) {
+                \Storage::disk('public')->delete($user->foto_profil);
+            }
+
+            $path = $request->file('foto_profil')->store('profile-photos', 'public');
+            $data['foto_profil'] = $path;
         }
 
-        $request->user()->save();
+        $user->fill($data);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
+
 
     /**
      * Delete the user's account.
@@ -56,5 +75,17 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function deletePhoto(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->foto_profil && \Storage::disk('public')->exists($user->foto_profil)) {
+            \Storage::disk('public')->delete($user->foto_profil);
+            $user->update(['foto_profil' => null]);
+        }
+
+        return response()->json(['status' => 'success']);
     }
 }

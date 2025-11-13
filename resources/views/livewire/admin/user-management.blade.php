@@ -34,7 +34,7 @@
             <!-- Filter Role -->
             <div class="flex items-center gap-4">
                 <select wire:model.live="roleFilter"
-                        class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        class="px-4 pe-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
                     <option value="">Semua Role</option>
                     <option value="admin">Admin</option>
                     <option value="kasir">Kasir</option>

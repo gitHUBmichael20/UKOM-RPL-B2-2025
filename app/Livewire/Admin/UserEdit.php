@@ -79,7 +79,7 @@ class UserEdit extends Component
         // Update foto profil jika ada
         if ($this->foto_profil) {
             // Hapus foto lama jika ada dan bukan default
-            if ($user->foto_profil && $user->foto_profil !== 'default-avatar.png') {
+            if ($user->foto_profil && $user->foto_profil !== 'default_profile.jpg') {
                 Storage::disk('public')->delete($user->foto_profil);
             }
             $data['foto_profil'] = $this->foto_profil->store('profile-photos', 'public');
