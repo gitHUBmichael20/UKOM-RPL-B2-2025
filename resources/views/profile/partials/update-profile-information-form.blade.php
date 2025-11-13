@@ -88,7 +88,6 @@
     </form>
 </section>
 
-<!-- Script Preview -->
 <script>
     function previewProfileImage(event) {
         const input = event.target;

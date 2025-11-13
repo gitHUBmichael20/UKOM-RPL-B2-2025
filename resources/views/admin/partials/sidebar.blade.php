@@ -56,7 +56,7 @@
         </a>
       </li>
 
-      @if(auth()->user()->role === 'admin')
+      @if(isRole('admin'))
         <!-- Divider -->
         <li class="pt-4 mt-4 space-y-2 border-t border-gray-700">
           <span class="text-xs text-gray-400 px-3 uppercase">Master Data</span>
@@ -107,7 +107,7 @@
       <!-- Profile -->
       <li>
         <a href="{{ route('profile.edit') }}"
-           class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+           class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('profile.edit') ? 'bg-gray-700' : '' }}">
           <i class="fa-solid fa-user w-5 text-gray-300"></i>
           <span class="ml-3">Profile</span>
         </a>
