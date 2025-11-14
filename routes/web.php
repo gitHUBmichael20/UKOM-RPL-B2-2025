@@ -5,6 +5,9 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Livewire\Admin\UserManagement;
 use App\Livewire\Admin\UserCreate;
 use App\Livewire\Admin\UserEdit;
+use App\Livewire\Admin\StudioManagement;
+use App\Livewire\Admin\StudioCreate;
+use App\Livewire\Admin\StudioEdit;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,12 +41,16 @@ Route::middleware('auth')->group(function () {
 // Admin & Kasir
 Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    // Studio Routes (accessible by both admin & kasir)
+    Route::get('/studio', StudioManagement::class)->name('studio.index');
+    Route::get('/studio/create', StudioCreate::class)->name('studio.create');
+    Route::get('/studio/{id}/edit', StudioEdit::class)->name('studio.edit');
 });
 
-// Admin Routes
+// Admin Only Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-
-    // User Management Routes (Livewire)
+    // Users Routes
     Route::get('/users', UserManagement::class)->name('users.index');
     Route::get('/users/create', UserCreate::class)->name('users.create');
     Route::get('/users/{id}/edit', UserEdit::class)->name('users.edit');

@@ -4,7 +4,9 @@
     <!-- Logo -->
     <div class="flex items-center justify-between mb-6 px-3">
       <div class="flex items-center space-x-3">
-        <img src="{{ asset('storage/logo.png') }}" width="60" alt="">
+        <img src="{{ asset('storage/logo.png') }}"
+             width="60"
+             alt="">
         <span class="text-xl font-bold text-white">Absolute Cinema</span>
       </div>
     </div>
@@ -40,8 +42,8 @@
 
       <!-- Studio -->
       <li>
-        <a href="#"
-           class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+        <a href="{{ route('admin.studio.index') }}"
+           class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.studio.*') ? 'bg-gray-700' : '' }}">
           <i class="fa-solid fa-video w-5 text-gray-300"></i>
           <span class="ml-3">Studio</span>
         </a>
