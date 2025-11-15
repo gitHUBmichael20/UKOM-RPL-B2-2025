@@ -81,7 +81,7 @@
                                         <img class="h-10 w-10 rounded-full object-cover"
                                              src="{{ $user->profile_photo_url }}"
                                              alt="{{ $user->name }}"
-                                             onerror="this.src='{{ asset('storage/profile-photos/default_profile.jpg') }}'; this.onerror=null;">
+                                             onerror="this.src='{{ asset('storage/default_profile.jpg') }}'; this.onerror=null;">
                                     </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">

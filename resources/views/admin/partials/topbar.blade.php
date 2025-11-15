@@ -28,7 +28,7 @@
                     <button @click="open = !open" type="button"
                         class="flex items-center space-x-3 text-sm bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200">
                         <div class="flex items-center space-x-2">
-                            <img class="w-8 h-8 rounded-full" src="{{ auth()->user()->profile_photo_url ?? asset('storage/profile-photos/default_profile.jpg') }}" alt="user photo">
+                            <img class="w-8 h-8 rounded-full" src="{{ auth()->user()->profile_photo_url ?? asset('storage/default_profile.jpg') }}" alt="user photo">
                             <div class="hidden md:block text-left">
                                 <div class="font-medium text-gray-900">{{ auth()->user()->name }}</div>
                                 <div class="text-xs text-gray-500 capitalize">{{ auth()->user()->role }}</div>

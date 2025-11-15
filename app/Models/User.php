@@ -56,7 +56,7 @@ class User extends Authenticatable
             return Storage::disk('public')->url($this->foto_profil);
         }
 
-        return asset('storage/profile-photos/default_profile.jpg');
+        return asset('storage/default_profile.jpg');
     }
 
     public function pemesananOnline()

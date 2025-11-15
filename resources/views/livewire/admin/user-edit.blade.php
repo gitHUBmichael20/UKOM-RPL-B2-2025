@@ -45,7 +45,7 @@
                             <img src="{{ asset('storage/' . $current_foto) }}"
                                  class="h-20 w-20 rounded-full object-cover">
                         @else
-                            <img src="{{ asset('storage/profile-photos/default_profile.jpg') }}"
+                            <img src="{{ asset('storage/default_profile.jpg') }}"
                                  class="h-20 w-20 rounded-full object-cover">
                         @endif
                     </div>
