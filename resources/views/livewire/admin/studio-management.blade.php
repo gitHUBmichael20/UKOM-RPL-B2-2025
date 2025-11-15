@@ -265,15 +265,17 @@
                 }
             });
         }
-
         document.addEventListener('livewire:init', () => {
             Livewire.on('studio-deleted', () => {
                 Swal.fire({
+                    icon: 'success',
                     title: 'Berhasil!',
                     text: 'Studio berhasil dihapus',
                     icon: 'success',
                     timer: 2000,
-                    showConfirmButton: false
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
                 });
             });
         });

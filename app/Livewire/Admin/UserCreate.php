@@ -63,7 +63,7 @@ class UserCreate extends Component
             'foto_profil' => $fotoPath,
         ]);
 
-        session()->flash('message', 'User berhasil ditambahkan.');
+        session()->flash('success', 'User berhasil ditambahkan.');
         return redirect()->route('admin.users.index');
     }
 

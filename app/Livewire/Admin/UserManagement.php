@@ -15,7 +15,7 @@ class UserManagement extends Component
 
     public $search = '';
     public $roleFilter = '';
-    
+
     protected $queryString = ['search', 'roleFilter'];
 
     public function updatingSearch()
@@ -31,17 +31,20 @@ class UserManagement extends Component
     public function deleteUser($id)
     {
         $user = User::find($id);
-        
+
         if ($user && $user->id !== auth()->id()) {
             // Hapus foto profil jika ada dan bukan default
             if ($user->foto_profil && $user->foto_profil !== 'default-avatar.png') {
                 Storage::disk('public')->delete($user->foto_profil);
             }
-            
+
             $user->delete();
-            session()->flash('message', 'User berhasil dihapus.');
+
+            // Dispatch event untuk SweetAlert
+            $this->dispatch('user-deleted', ['message' => 'User berhasil dihapus']);
         } else {
-            session()->flash('error', 'Tidak dapat menghapus user ini.');
+            // Dispatch event untuk error
+            $this->dispatch('user-delete-failed', ['message' => 'Tidak dapat menghapus user ini']);
         }
     }
 
@@ -51,8 +54,8 @@ class UserManagement extends Component
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%')
-                      ->orWhere('phone', 'like', '%' . $this->search . '%');
+                        ->orWhere('email', 'like', '%' . $this->search . '%')
+                        ->orWhere('phone', 'like', '%' . $this->search . '%');
                 });
             })
             ->when($this->roleFilter, function ($query) {

@@ -7,19 +7,6 @@
         <p class="text-gray-600">Kelola data pengguna sistem</p>
     </div>
 
-    <!-- Alert Messages -->
-    @if (session()->has('message'))
-        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-            {{ session('message') }}
-        </div>
-    @endif
-
-    @if (session()->has('error'))
-        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            {{ session('error') }}
-        </div>
-    @endif
-
     <!-- Filters & Actions -->
     <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -80,7 +67,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Terdaftar
                         </th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
                         </th>
                     </tr>
@@ -113,27 +100,30 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                        {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : '' }}
-                                        {{ $user->role === 'kasir' ? 'bg-blue-100 text-blue-800' : '' }}
-                                        {{ $user->role === 'pelanggan' ? 'bg-green-100 text-green-800' : '' }}">
+                                            {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : '' }}
+                                            {{ $user->role === 'kasir' ? 'bg-blue-100 text-blue-800' : '' }}
+                                            {{ $user->role === 'pelanggan' ? 'bg-green-100 text-green-800' : '' }}">
                                     {{ ucfirst($user->role) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $user->created_at->format('d M Y') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('admin.users.edit', $user->id) }}"
-                                   class="text-blue-600 hover:text-blue-900 mr-3">
-                                    Edit
-                                </a>
-                                @if($user->id !== auth()->id())
-                                    <button wire:click="deleteUser({{ $user->id }})"
-                                            wire:confirm="Apakah Anda yakin ingin menghapus user ini?"
-                                            class="text-red-600 hover:text-red-900">
-                                        Hapus
-                                    </button>
-                                @endif
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex gap-2">
+                                    <a href="{{ route('admin.users.edit', $user->id) }}"
+                                       class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
+                                        <i class="fa-solid fa-edit mr-1"></i>
+                                        Edit
+                                    </a>
+                                    @if($user->id !== auth()->id())
+                                        <button onclick="confirmDeleteUser({{ $user->id }}, '{{ $user->name }}')"
+                                                class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">
+                                            <i class="fa-solid fa-trash mr-1"></i>
+                                            Hapus
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -153,4 +143,48 @@
             {{ $users->links() }}
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            function confirmDeleteUser(userId, userName) {
+                Swal.fire({
+                    title: 'Konfirmasi Hapus',
+                    html: `Apakah Anda yakin ingin menghapus user <strong>${userName}</strong>?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        @this.call('deleteUser', userId);
+                    }
+                });
+            }
+
+            // Listen untuk event dari Livewire
+            window.addEventListener('user-deleted', event => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: event.detail.message || 'User berhasil dihapus',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            });
+
+            window.addEventListener('user-delete-failed', event => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: event.detail.message || 'Tidak dapat menghapus user ini',
+                    confirmButtonColor: '#dc2626'
+                });
+            });
+        </script>
+    @endpush
 </div>
