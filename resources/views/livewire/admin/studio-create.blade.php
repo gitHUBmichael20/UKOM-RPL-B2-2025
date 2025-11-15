@@ -8,7 +8,7 @@
             <span class="text-gray-900">Tambah Studio</span>
         </div>
         <h2 class="text-2xl font-bold text-gray-800">Tambah Studio Baru</h2>
-        <p class="text-gray-600 mt-1">Isi form di bawah untuk menambahkan studio dan kursi akan digenerate otomatis</p>
+        <p class="text-gray-600 mt-1">Tentukan layout kursi berdasarkan jumlah baris dan kolom</p>
     </div>
 
     <!-- Alert Messages -->
@@ -64,26 +64,67 @@
                     @enderror
                 </div>
 
-                <!-- Kapasitas Kursi -->
-                <div class="mb-6">
-                    <label for="kapasitas_kursi"
-                           class="block text-sm font-medium text-gray-700 mb-2">
-                        Kapasitas Kursi <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number"
-                           id="kapasitas_kursi"
-                           wire:model.live="kapasitas_kursi"
-                           min="20"
-                           max="200"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('kapasitas_kursi') border-red-500 @enderror"
-                           placeholder="Minimal 20, Maksimal 200">
-                    @error('kapasitas_kursi')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                    <p class="mt-2 text-sm text-gray-500">
-                        <i class="fa-solid fa-info-circle mr-1"></i>
-                        Kursi akan digenerate otomatis dengan format: [BARIS][NOMOR] (A1, A2, dst) dengan gang di tengah
-                    </p>
+                <!-- Layout Kursi -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fa-solid fa-border-all mr-2 text-blue-600"></i>
+                        Layout Kursi
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Jumlah Baris -->
+                        <div>
+                            <label for="jumlah_baris"
+                                   class="block text-sm font-medium text-gray-700 mb-2">
+                                Jumlah Baris <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number"
+                                   id="jumlah_baris"
+                                   wire:model.live="jumlah_baris"
+                                   min="2"
+                                   max="26"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('jumlah_baris') border-red-500 @enderror"
+                                   placeholder="2 - 26 baris">
+                            @error('jumlah_baris')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <p class="mt-1 text-xs text-gray-500">Huruf A-Z (max 26 baris)</p>
+                        </div>
+
+                        <!-- Jumlah Kolom -->
+                        <div>
+                            <label for="jumlah_kolom"
+                                   class="block text-sm font-medium text-gray-700 mb-2">
+                                Jumlah Kolom <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number"
+                                   id="jumlah_kolom"
+                                   wire:model.live="jumlah_kolom"
+                                   min="4"
+                                   max="20"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('jumlah_kolom') border-red-500 @enderror"
+                                   placeholder="4 - 20 kolom">
+                            @error('jumlah_kolom')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <p class="mt-1 text-xs text-gray-500">Gang otomatis di tengah (boleh ganjil)</p>
+                        </div>
+                    </div>
+
+                    <!-- Total Kapasitas -->
+                    @if($jumlah_baris && $jumlah_kolom)
+                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-blue-900">Total Kapasitas:</span>
+                                <span class="text-2xl font-bold text-blue-600">
+                                    {{ $this->kapasitasKursi }} kursi
+                                </span>
+                            </div>
+                            <p class="text-xs text-blue-700 mt-1">
+                                {{ $jumlah_baris }} baris × {{ $jumlah_kolom }} kolom
+                            </p>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Actions -->
@@ -115,44 +156,28 @@
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 sticky top-6">
                 <div class="flex items-center mb-4">
                     <i class="fa-solid fa-lightbulb text-blue-600 text-2xl mr-3"></i>
-                    <h3 class="text-lg font-semibold text-blue-900">Info Layout Kursi</h3>
+                    <h3 class="text-lg font-semibold text-blue-900">Info Layout</h3>
                 </div>
 
                 <div class="space-y-4 text-sm text-blue-800">
                     <div>
                         <p class="font-medium mb-1">📐 Format Nomor Kursi:</p>
-                        <p>[Huruf Baris][Nomor] - Contoh: A1, A2, B1</p>
+                        <p>[Huruf Baris][Nomor Kolom]</p>
+                        <p class="text-xs mt-1">Contoh: A1, A2, B1, B2</p>
                     </div>
 
                     <div>
-                        <p class="font-medium mb-1">🪑 Layout Per Baris:</p>
-                        <p>5 kursi (kiri) + Gang + 5 kursi (kanan)</p>
-                        <p class="text-xs mt-1">Total: 10 kursi per baris</p>
+                        <p class="font-medium mb-1">🪑 Layout dengan Gang:</p>
+                        <p>Kursi dibagi dua dengan gang di tengah</p>
+                        <p class="text-xs mt-1">Genap: A1-A5 [Gang] A6-A10</p>
+                        <p class="text-xs">Ganjil: A1-A4 [Gang] A5-A9</p>
                     </div>
 
                     <div>
-                        <p class="font-medium mb-1">🔤 Nama Baris:</p>
-                        <p>Menggunakan huruf A-Z secara berurutan</p>
+                        <p class="font-medium mb-1">🔤 Baris:</p>
+                        <p>Menggunakan huruf A-Z</p>
+                        <p class="text-xs mt-1">Maksimal 26 baris</p>
                     </div>
-
-                    @if($kapasitas_kursi)
-                        <div class="mt-4 pt-4 border-t border-blue-300">
-                            <p class="font-medium mb-2">Preview dengan {{ $kapasitas_kursi }} kursi:</p>
-                            @php
-                                $seatsPerRow = 10;
-                                $jumlahBaris = ceil($kapasitas_kursi / $seatsPerRow);
-                                $hurufBaris = range('A', 'Z');
-                            @endphp
-                            <div class="bg-white rounded p-3 text-xs">
-                                <p class="text-gray-600 mb-2">
-                                    • Jumlah baris: {{ $jumlahBaris }} baris<br>
-                                    • Baris terakhir: {{ $hurufBaris[min($jumlahBaris - 1, 25)] }}<br>
-                                    • Layout: {{ $hurufBaris[0] }}1-{{ $hurufBaris[0] }}5, Gang,
-                                    {{ $hurufBaris[0] }}6-{{ $hurufBaris[0] }}10
-                                </p>
-                            </div>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>

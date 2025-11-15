@@ -11,8 +11,8 @@ class StudioManagement extends Component
     use WithPagination;
 
     public $search = '';
-    public $deleteId;
     public $viewLayoutId;
+    public $showLayoutModal = false;
 
     protected $paginationTheme = 'tailwind';
 
@@ -21,29 +21,26 @@ class StudioManagement extends Component
         $this->resetPage();
     }
 
-    public function confirmDelete($id)
-    {
-        $this->deleteId = $id;
-        $this->dispatch('show-delete-modal');
-    }
-
     public function viewLayout($id)
     {
         $this->viewLayoutId = $id;
-        $this->dispatch('show-layout-modal');
+        $this->showLayoutModal = true;
     }
 
-    public function delete()
+    public function closeLayoutModal()
     {
-        $studio = Studio::find($this->deleteId);
-        
+        $this->showLayoutModal = false;
+        $this->viewLayoutId = null;
+    }
+
+    public function delete($id)
+    {
+        $studio = Studio::find($id);
+
         if ($studio) {
             $studio->delete();
-            session()->flash('success', 'Studio berhasil dihapus!');
+            $this->dispatch('studio-deleted');
         }
-
-        $this->deleteId = null;
-        $this->dispatch('hide-delete-modal');
     }
 
     public function render()
@@ -51,7 +48,7 @@ class StudioManagement extends Component
         $studio = Studio::query()
             ->when($this->search, function ($query) {
                 $query->where('nama_studio', 'like', '%' . $this->search . '%')
-                      ->orWhere('tipe_studio', 'like', '%' . $this->search . '%');
+                    ->orWhere('tipe_studio', 'like', '%' . $this->search . '%');
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);

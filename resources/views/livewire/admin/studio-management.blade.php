@@ -12,33 +12,6 @@
         </a>
     </div>
 
-    <!-- Alert Messages -->
-    @if (session()->has('success'))
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-r-lg"
-             role="alert">
-            <div class="flex">
-                <i class="fa-solid fa-check-circle mr-3 mt-0.5"></i>
-                <div>
-                    <p class="font-bold">Berhasil!</p>
-                    <p>{{ session('success') }}</p>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    @if (session()->has('error'))
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r-lg"
-             role="alert">
-            <div class="flex">
-                <i class="fa-solid fa-exclamation-circle mr-3 mt-0.5"></i>
-                <div>
-                    <p class="font-bold">Error!</p>
-                    <p>{{ session('error') }}</p>
-                </div>
-            </div>
-        </div>
-    @endif
-
     <!-- Search Bar -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="relative">
@@ -50,7 +23,7 @@
         </div>
     </div>
 
-    <!-- studio Table -->
+    <!-- Studio Table -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -116,7 +89,7 @@
                                         <i class="fa-solid fa-edit mr-1"></i>
                                         Edit
                                     </a>
-                                    <button wire:click="confirmDelete({{ $s->id }})"
+                                    <button onclick="confirmDelete({{ $s->id }}, '{{ $s->nama_studio }}')"
                                             class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">
                                         <i class="fa-solid fa-trash mr-1"></i>
                                         Hapus
@@ -138,7 +111,6 @@
             </table>
         </div>
 
-        <!-- Pagination -->
         @if($studio->hasPages())
             <div class="px-6 py-4 border-t border-gray-200">
                 {{ $studio->links() }}
@@ -146,99 +118,20 @@
         @endif
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div x-data="{ show: false }"
-         x-show="show"
-         @show-delete-modal.window="show = true"
-         @hide-delete-modal.window="show = false"
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto"
-         style="display: none;">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                 @click="show = false"></div>
-
-            <div x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="relative bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
-                <div class="bg-white px-6 pt-6 pb-4">
-                    <div class="flex items-center mb-4">
-                        <div
-                             class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                            <i class="fa-solid fa-exclamation-triangle text-red-600 text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">
-                            Hapus Studio
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                            Apakah Anda yakin ingin menghapus studio ini? Semua kursi yang terkait juga akan dihapus.
-                            Aksi ini tidak dapat dibatalkan.
-                        </p>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-6 py-4 flex flex-row-reverse gap-3">
-                    <button wire:click="delete"
-                            @click="show = false"
-                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
-                        Ya, Hapus
-                    </button>
-                    <button @click="show = false"
-                            class="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg border border-gray-300 transition-colors">
-                        Batal
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Layout View Modal -->
-    <div x-data="{ show: false }"
-         x-show="show"
-         @show-layout-modal.window="show = true"
-         @hide-layout-modal.window="show = false"
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto"
-         style="display: none;">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                 @click="show = false"></div>
+    @if($showLayoutModal && $layoutStudio)
+        <div class="fixed inset-0 z-50 overflow-y-auto"
+             wire:key="layout-modal">
+            <div class="flex items-center justify-center min-h-screen px-4 py-8">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                     wire:click="closeLayoutModal"></div>
 
-            <div x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="relative bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-4xl sm:w-full max-h-[90vh] overflow-y-auto">
-
-                @if($layoutStudio)
-                    <div class="bg-white px-6 pt-6 pb-4">
-                        <!-- Header -->
-                        <div class="flex items-center justify-between mb-6 pb-4 border-b">
+                <div
+                     class="relative bg-white rounded-lg overflow-hidden shadow-xl transform transition-all w-full max-w-6xl max-h-[90vh] flex flex-col">
+                    <div class="bg-white px-6 py-4 border-b sticky top-0 z-10">
+                        <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-2xl font-bold text-gray-900">
+                                <h3 class="text-xl font-bold text-gray-900">
                                     Layout {{ $layoutStudio->nama_studio }}
                                 </h3>
                                 <p class="text-sm text-gray-600 mt-1">
@@ -246,12 +139,14 @@
                                     <span class="uppercase">{{ $layoutStudio->tipe_studio }}</span>
                                 </p>
                             </div>
-                            <button @click="show = false"
-                                    class="text-gray-400 hover:text-gray-600">
+                            <button wire:click="closeLayoutModal"
+                                    class="text-gray-400 hover:text-gray-600 transition-colors">
                                 <i class="fa-solid fa-times text-2xl"></i>
                             </button>
                         </div>
+                    </div>
 
+                    <div class="overflow-y-auto flex-1 px-6 py-4">
                         <!-- Screen -->
                         <div class="mb-8">
                             <div
@@ -262,29 +157,36 @@
                         </div>
 
                         <!-- Seats Layout -->
-                        <div class="space-y-3">
+                        <div class="space-y-2">
                             @php
                                 $kursiByBaris = $layoutStudio->kursi->groupBy(function ($kursi) {
                                     return substr($kursi->nomor_kursi, 0, 1);
                                 })->sortKeys();
+
+                                $totalKolom = $layoutStudio->kursi->max(function ($kursi) {
+                                    return (int) substr($kursi->nomor_kursi, 1);
+                                });
+
+                                // Hitung posisi gang (setelah kursi ke berapa)
+                                $gangPosition = ceil($totalKolom / 2);
                             @endphp
 
                             @foreach($kursiByBaris as $baris => $kursiList)
-                                <div class="flex items-center gap-3">
-                                    <!-- Row Label -->
-                                    <div class="w-8 text-center font-bold text-gray-700 text-lg">
+                                <div class="flex items-center justify-center gap-2">
+                                    <!-- Row Label Left -->
+                                    <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
                                         {{ $baris }}
                                     </div>
 
-                                    <!-- Seats -->
-                                    <div class="flex-1 flex justify-center items-center gap-2">
+                                    <!-- Seats Container -->
+                                    <div class="flex items-center gap-1.5">
                                         @php
                                             $sortedKursi = $kursiList->sortBy(function ($kursi) {
                                                 return (int) substr($kursi->nomor_kursi, 1);
                                             });
                                         @endphp
 
-                                        @foreach($sortedKursi as $index => $kursi)
+                                        @foreach($sortedKursi as $kursi)
                                             @php
                                                 $nomorKolom = (int) substr($kursi->nomor_kursi, 1);
                                             @endphp
@@ -292,27 +194,26 @@
                                             <!-- Seat -->
                                             <div class="group relative">
                                                 <div
-                                                     class="w-10 h-10 bg-green-500 hover:bg-green-600 rounded-t-lg flex items-center justify-center text-white text-xs font-medium cursor-pointer transition-all shadow-sm">
+                                                     class="w-8 h-8 bg-green-500 hover:bg-green-600 rounded-t-lg flex items-center justify-center text-white text-xs font-medium cursor-pointer transition-all shadow-sm">
                                                     {{ $nomorKolom }}
                                                 </div>
-                                                <!-- Tooltip -->
                                                 <div
-                                                     class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                                     class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
                                                     {{ $kursi->nomor_kursi }}
                                                 </div>
                                             </div>
 
-                                            <!-- Aisle/Gang after seat 5 -->
-                                            @if($nomorKolom == 5)
-                                                <div class="w-8 flex items-center justify-center text-gray-400">
-                                                    <i class="fa-solid fa-grip-lines-vertical"></i>
+                                            <!-- Gang setelah kursi ke-gangPosition -->
+                                            @if($nomorKolom == $gangPosition)
+                                                <div class="w-6 flex items-center justify-center text-gray-400 flex-shrink-0">
+                                                    <i class="fa-solid fa-grip-lines-vertical text-sm"></i>
                                                 </div>
                                             @endif
                                         @endforeach
                                     </div>
 
-                                    <!-- Row Label (Right) -->
-                                    <div class="w-8 text-center font-bold text-gray-700 text-lg">
+                                    <!-- Row Label Right -->
+                                    <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
                                         {{ $baris }}
                                     </div>
                                 </div>
@@ -332,14 +233,49 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 px-6 py-4 flex justify-end">
-                        <button @click="show = false"
+                    <div class="bg-gray-50 px-6 py-4 flex justify-end border-t sticky bottom-0">
+                        <button wire:click="closeLayoutModal"
                                 class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
                             Tutup
                         </button>
                     </div>
-                @endif
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 </div>
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id, namaStudio) {
+            Swal.fire({
+                title: 'Hapus Studio?',
+                html: `Apakah Anda yakin ingin menghapus <strong>${namaStudio}</strong>?<br><small class="text-gray-600">Semua kursi terkait juga akan dihapus.</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    @this.call('delete', id);
+                }
+            });
+        }
+
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('studio-deleted', () => {
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: 'Studio berhasil dihapus',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+        });
+    </script>
+@endpush
