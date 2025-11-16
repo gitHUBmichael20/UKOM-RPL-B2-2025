@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.layouts.app')
 
 @section('title', 'Edit Sutradara')
 
@@ -23,7 +23,7 @@
 
         <div class="mb-4">
             <label class="block mb-1 font-medium text-gray-700">Foto Profil Saat Ini</label>
-            <img src="{{ $sutradara->foto_profil ? asset('storage/'.$sutradara->foto_profil) : asset('default_profile.png') }}"
+            <img src="{{ $sutradara->foto_profil ? asset('storage/'.$sutradara->foto_profil) : asset('storage/default_profile.jpg') }}"
                  class="h-20 w-20 rounded-full mb-3 object-cover">
 
             <input type="file" name="foto_profil" class="w-full border-gray-300 rounded-lg shadow-sm">

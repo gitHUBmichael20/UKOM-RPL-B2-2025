@@ -35,7 +35,7 @@ class SutradaraManagement extends Controller
 
         return redirect()
             ->route('admin.sutradara.index')
-            ->with('message', 'Sutradara berhasil ditambahkan');
+            ->with('success', 'Sutradara berhasil ditambahkan');
     }
 
     public function edit($id)

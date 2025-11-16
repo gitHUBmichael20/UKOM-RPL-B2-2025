@@ -1,7 +1,7 @@
-<?php
+@extends('admin.layouts.app')
 @section('title', 'Manajemen Sutradara')
-?>
 
+@section('content')
 <div class="max-w-7xl mx-auto py-8">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-800">Manajemen Sutradara</h1>
@@ -41,7 +41,7 @@
                             <td class="px-6 py-4 font-medium">{{ $s->nama_sutradara }}</td>
 
                             <td class="px-6 py-4">
-                                <img src="{{ $s->foto_profil ? asset('storage/' . $s->foto_profil) : asset('default_profile.png') }}"
+                                <img src="{{ $s->foto_profil ? asset('storage/' . $s->foto_profil) : asset('storage/default_profile.jpg') }}"
                                     class="h-12 w-12 rounded-full object-cover" alt="foto {{ $s->nama_sutradara }}">
                             </td>
 
@@ -80,3 +80,4 @@
         @endif
     </div>
 </div>
+@endsection
