@@ -25,7 +25,7 @@ class FilmCreate extends Component
     protected $rules = [
         'sutradara_id' => 'required|exists:sutradara,id',
         'judul' => 'required|string|max:200',
-        'durasi' => 'required|string|max:255',
+        'durasi' => 'required|integer',
         'sinopsis' => 'required|string',
         'poster' => 'required|image|mimes:jpeg,jpg,png|max:2048',
         'rating' => 'required|string|in:SU,R13+,R17+,D21+',
@@ -89,7 +89,7 @@ class FilmCreate extends Component
 
             session()->flash('success', 'Film berhasil ditambahkan!');
             
-            return redirect()->route('admin.film.management');
+            return redirect()->route('admin.film.index');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -97,6 +97,6 @@ class FilmCreate extends Component
 
     public function cancel()
     {
-        return redirect()->route('admin.film.management');
+        return redirect()->route('admin.film.index');
     }
 }

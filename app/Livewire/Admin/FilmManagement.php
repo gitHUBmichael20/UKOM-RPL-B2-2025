@@ -13,10 +13,6 @@ class FilmManagement extends Component
 
     public $search = '';
     public $filterStatus = '';
-    public $showDeleteModal = false;
-    
-    // Delete
-    public $deleteId;
 
     protected $paginationTheme = 'tailwind';
 
@@ -35,10 +31,10 @@ class FilmManagement extends Component
         $films = Film::with(['sutradara', 'genres'])
             ->when($this->search, function ($query) {
                 $query->where('judul', 'like', '%' . $this->search . '%')
-                      ->orWhere('sinopsis', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('sutradara', function($q) {
-                          $q->where('nama_sutradara', 'like', '%' . $this->search . '%');
-                      });
+                    ->orWhere('sinopsis', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('sutradara', function ($q) {
+                        $q->where('nama_sutradara', 'like', '%' . $this->search . '%');
+                    });
             })
             ->when($this->filterStatus, function ($query) {
                 $query->where('status', $this->filterStatus);
@@ -51,21 +47,16 @@ class FilmManagement extends Component
         ])->layout('admin.layouts.app');
     }
 
-    public function openDeleteModal($id)
-    {
-        $this->deleteId = $id;
-        $this->showDeleteModal = true;
-    }
-
-    public function delete()
+    public function delete($id)
     {
         try {
-            $film = Film::findOrFail($this->deleteId);
-            
+            $film = Film::findOrFail($id);
+
             // Cek apakah film sedang digunakan di jadwal tayang
-            if ($film->jadwalTayangs()->count() > 0) {
-                session()->flash('error', 'Film tidak dapat dihapus karena sedang digunakan pada jadwal tayang!');
-                $this->closeDeleteModal();
+            $jadwalCount = $film->jadwalTayangs()->count();
+
+            if ($jadwalCount > 0) {
+                $this->dispatch('error', 'Film tidak dapat dihapus karena sedang digunakan pada jadwal tayang!');
                 return;
             }
 
@@ -74,23 +65,17 @@ class FilmManagement extends Component
                 Storage::disk('public')->delete($film->poster);
             }
 
-            // Hapus relasi genre
-            $film->genres()->detach();
-            
-            // Hapus film
+            // HAPUS baris ini karena cascade sudah menangani
+            // $film->genres()->detach();
+
+            // Hapus film (cascade akan otomatis hapus film_genre)
             $film->delete();
-            
-            session()->flash('success', 'Film berhasil dihapus!');
+
+            $this->dispatch('success', 'Film berhasil dihapus!');
         } catch (\Exception $e) {
-            session()->flash('error', 'Terjadi kesalahan saat menghapus film!');
+            // Tambahkan log untuk debugging
+            \Log::error('Error deleting film: ' . $e->getMessage());
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus film: ' . $e->getMessage());
         }
-
-        $this->closeDeleteModal();
-    }
-
-    public function closeDeleteModal()
-    {
-        $this->showDeleteModal = false;
-        $this->deleteId = null;
     }
 }

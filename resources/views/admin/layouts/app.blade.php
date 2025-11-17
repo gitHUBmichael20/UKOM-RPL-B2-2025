@@ -17,18 +17,18 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body class="bg-gray-100">
-    <div class="min-h-screen">
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <div class="flex flex-1">
         <!-- Sidebar -->
         @include('admin.partials.sidebar')
 
         <!-- Main Content Wrapper -->
-        <div class="lg:ml-64 transition-all duration-300">
+        <div class="flex-1 lg:ml-64 transition-all duration-300 flex flex-col">
             <!-- Topbar -->
             @include('admin.partials.topbar')
 
             <!-- Page Content -->
-            <main class="p-4 md:p-6 lg:p-8">
+            <main class="p-4 md:p-6 lg:p-8 flex-1">
                 @hasSection('content')
                     @yield('content')
                 @else
