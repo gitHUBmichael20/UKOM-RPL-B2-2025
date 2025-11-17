@@ -22,7 +22,8 @@
 
             <!-- Films -->
             <li>
-                <a href="#" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+                <a href="{{ route('admin.film.management') }}"
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.film.*') ? 'bg-gray-700' : '' }}">
                     <i class="fa-solid fa-film w-5 text-gray-300"></i>
                     <span class="ml-3">Film</span>
                 </a>
@@ -61,18 +62,17 @@
 
                 <!-- Genre -->
                 <li>
-                    <a href="#" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
-                        <i class="fa-solid fa-tags w-5 text-gray-300"></i>
-                        <span class="ml-3">Genre</span>
-                    </a>
+                    <a href="{{ route('admin.genre.management') }}" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+    <i class="fa-solid fa-tags w-5 text-gray-300"></i>
+    <span class="ml-3">Genre</span>
+</a>
                 </li>
 
                 <!-- Sutradara -->
                 <li>
-                    <a href="{{ route('admin.sutradara.index') }}"
-                        class="flex items-center p-3 rounded-lg text-white 
-            hover:bg-gray-700
-            {{ request()->routeIs('admin.sutradara.*') ? 'bg-gray-700' : '' }}">
+                    <a href="{{ route('admin.sutradara.index') }}" class="flex items-center p-3 rounded-lg text-white 
+                    hover:bg-gray-700
+                    {{ request()->routeIs('admin.sutradara.*') ? 'bg-gray-700' : '' }}">
                         <i class="fa-solid fa-user-tie w-5 text-gray-300"></i>
                         <span class="ml-3">Sutradara</span>
                     </a>

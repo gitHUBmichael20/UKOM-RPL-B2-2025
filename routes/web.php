@@ -10,6 +10,9 @@ use App\Livewire\Admin\StudioCreate;
 use App\Livewire\Admin\StudioEdit;
 // use App\Livewire\Admin\SutradaraManagement;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FilmController;
+use App\Livewire\Admin\FilmManagement;
+use App\Livewire\Admin\GenreManagement;
 
 Route::get('/', function () {
     $user = auth()->user();
@@ -74,4 +77,14 @@ Route::middleware(['auth', 'role:admin'])
     });
 
 
+
+// Film Routes
+Route::get('/film-management', \App\Livewire\Admin\FilmManagement::class)->name('admin.film.management');
+Route::get('/film-create', \App\Livewire\Admin\FilmCreate::class)->name('admin.film.create');
+Route::get('/film-edit/{id}', \App\Livewire\Admin\FilmEdit::class)->name('admin.film.edit');
+
+// Genre Routes
+Route::get('/genre-management', \App\Livewire\Admin\GenreManagement::class)->name('admin.genre.management');
+Route::get('/genre-create', \App\Livewire\Admin\GenreCreate::class)->name('admin.genre.create');
+Route::get('/genre-edit/{id}', \App\Livewire\Admin\GenreEdit::class)->name('admin.genre.edit');
 require __DIR__ . '/auth.php';

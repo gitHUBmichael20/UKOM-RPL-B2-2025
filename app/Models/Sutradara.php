@@ -9,6 +9,7 @@ class Sutradara extends Model
     protected $table = 'sutradara'; // use your actual table name
 
     protected $fillable = ['nama_sutradara', 'foto_profil', 'biografi'];
+    protected $guarded = ['id'];
 
     public function films()
     {
