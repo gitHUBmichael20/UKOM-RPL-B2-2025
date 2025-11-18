@@ -46,6 +46,15 @@
                 </a>
             </li>
 
+             <!-- Harga Tiket -->
+            <li>
+                <a href="{{ route('admin.harga-tiket.management') }}"
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.harga-tiket.*') ? 'bg-gray-700' : '' }}">
+                    <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
+                    <span class="ml-3">Harga Tiket</span>
+                </a>
+            </li>
+
             <!-- Pemesanan -->
             <li>
                 <a href="#" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">

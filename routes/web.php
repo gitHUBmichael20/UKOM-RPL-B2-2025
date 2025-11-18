@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FilmController;
 use App\Livewire\Admin\FilmManagement;
 use App\Livewire\Admin\GenreManagement;
+use App\Livewire\Admin\HargaTiketManagemen;
 
 Route::get('/', function () {
     $user = auth()->user();
@@ -87,4 +88,22 @@ Route::get('/film-edit/{id}', \App\Livewire\Admin\FilmEdit::class)->name('admin.
 Route::get('/genre-management', \App\Livewire\Admin\GenreManagement::class)->name('admin.genre.management');
 Route::get('/genre-create', \App\Livewire\Admin\GenreCreate::class)->name('admin.genre.create');
 Route::get('/genre-edit/{id}', \App\Livewire\Admin\GenreEdit::class)->name('admin.genre.edit');
+
+// Harga tiket
+Route::prefix('admin/harga-tiket')->name('admin.harga-tiket.')->group(function () {
+    // Management - Bisa diakses semua user yang login
+    Route::get('/management', \App\Livewire\Admin\HargaTiketManagement::class)
+        ->name('management');
+    
+    // Tiket (create, edit, hapus)
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/create', \App\Livewire\Admin\HargaTiketCreate::class)
+            ->name('create');
+        Route::get('/edit/{id}', \App\Livewire\Admin\HargaTiketEdit::class)
+            ->name('edit');
+    });
+});
+
 require __DIR__ . '/auth.php';
+
+
