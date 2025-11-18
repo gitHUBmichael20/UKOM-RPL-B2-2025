@@ -1,4 +1,4 @@
-<div class="p-6">
+<div>
     <!-- Header -->
     <div class="mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Kelola Film</h2>
@@ -86,7 +86,7 @@
                             </td>
 
                             <!-- Genre -->
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 max-w-[300px]">
                                 <div class="flex flex-wrap gap-1">
                                     @foreach ($film->genres as $genre)
                                         <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-700">
@@ -107,7 +107,7 @@
                             <td class="px-6 py-4 text-gray-700">{{ $film->tahun_rilis }}</td>
 
                             <!-- Status -->
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 @if ($film->status == 'tayang')
                                     <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">
                                         <i class="fa-solid fa-circle-dot mr-1"></i>Tayang

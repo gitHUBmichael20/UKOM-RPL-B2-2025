@@ -1,4 +1,4 @@
-<div class="p-6">
+<div class="p-3">
     <!-- Header -->
     <div class="mb-6">
         <div class="flex items-center text-sm text-gray-600 mb-4">
@@ -60,24 +60,26 @@
                         @enderror
                     </div>
 
-                    <!-- Sutradara -->
-                    <div>
+                    <!-- Sutradara dengan Tom Select -->
+                    <div wire:ignore>
                         <label for="sutradara_id"
                                class="block text-sm font-medium text-gray-700 mb-2">
                             Sutradara <span class="text-red-500">*</span>
                         </label>
-                        <select wire:model="sutradara_id"
-                                id="sutradara_id"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('sutradara_id') border-red-500 @enderror">
+                        <select id="sutradara_id"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg @error('sutradara_id') border-red-500 @enderror">
                             <option value="">Pilih Sutradara</option>
                             @foreach ($sutradaras as $sutradara)
-                                <option value="{{ $sutradara->id }}">{{ $sutradara->nama_sutradara }}</option>
+                                <option value="{{ $sutradara->id }}"
+                                        {{ $sutradara_id == $sutradara->id ? 'selected' : '' }}>
+                                    {{ $sutradara->nama_sutradara }}
+                                </option>
                             @endforeach
                         </select>
-                        @error('sutradara_id')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
                     </div>
+                    @error('sutradara_id')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
 
                     <!-- Durasi -->
                     <div>
@@ -260,3 +262,30 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inisialisasi Tom Select untuk Sutradara
+    const sutradaraSelect = new TomSelect('#sutradara_id', {
+        placeholder: 'Pilih atau cari sutradara...',
+        allowEmptyOption: true,
+        create: false,
+        maxOptions: null,
+        onChange: function(value) {
+            // Sinkronisasi dengan Livewire
+            @this.set('sutradara_id', value);
+        }
+    });
+
+    // Update Tom Select saat Livewire data berubah
+    window.addEventListener('livewire:load', function() {
+        Livewire.hook('message.processed', (message, component) => {
+            if (sutradaraSelect) {
+                sutradaraSelect.setValue(@this.sutradara_id);
+            }
+        });
+    });
+});
+</script>
+@endpush

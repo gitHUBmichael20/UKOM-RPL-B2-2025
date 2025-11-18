@@ -15,6 +15,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css"
+          rel="stylesheet">
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -45,8 +48,8 @@
     <div id="sidebar-overlay"
          class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
 
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 
     @livewireScripts
     @stack('scripts')

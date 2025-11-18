@@ -9,10 +9,14 @@ use App\Livewire\Admin\StudioManagement;
 use App\Livewire\Admin\StudioCreate;
 use App\Livewire\Admin\StudioEdit;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FilmController;
 use App\Livewire\Admin\FilmManagement;
 use App\Livewire\Admin\GenreManagement;
 use App\Http\Controllers\SutradaraManagement;
+use App\Livewire\Admin\FilmCreate;
+use App\Livewire\Admin\FilmEdit;
+use App\Livewire\Admin\HargaTiketCreate;
+use App\Livewire\Admin\HargaTiketEdit;
+use App\Livewire\Admin\HargaTiketManagement;
 
 Route::get('/', function () {
     $user = auth()->user();
@@ -40,6 +44,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
+
+    Route::get('/admin/harga-tiket', HargaTiketManagement::class)
+        ->name('admin.harga-tiket.index');  
 });
 
 // Admin & Kasir Routes
@@ -53,8 +60,8 @@ Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')
 
     // Film Routes
     Route::get('/film', FilmManagement::class)->name('film.index');
-    Route::get('/film/create', \App\Livewire\Admin\FilmCreate::class)->name('film.create');
-    Route::get('/film/{id}/edit', \App\Livewire\Admin\FilmEdit::class)->name('film.edit');
+    Route::get('/film/create', FilmCreate::class)->name('film.create');
+    Route::get('/film/{id}/edit', FilmEdit::class)->name('film.edit');
 
     // Genre Routes
     Route::get('/genre', GenreManagement::class)->name('genre.index');
@@ -74,6 +81,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/sutradara/{id}/edit', [SutradaraManagement::class, 'edit'])->name('sutradara.edit');
     Route::put('/sutradara/{id}', [SutradaraManagement::class, 'update'])->name('sutradara.update');
     Route::delete('/sutradara/{id}', [SutradaraManagement::class, 'destroy'])->name('sutradara.destroy');
+
+    // Harga Tiket Routes
+    Route::get('/create', HargaTiketCreate::class)->name('harga-tiket.create');
+    Route::get('/edit/{id}', HargaTiketEdit::class)->name('harga-tiket.edit');
 });
 
 Route::get('/pemesanan', function () {

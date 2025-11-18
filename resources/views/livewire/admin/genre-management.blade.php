@@ -1,4 +1,4 @@
-<div class="p-6">
+<div class="p-3">
     <!-- Header -->
     <div class="mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Kelola Genre</h2>
@@ -92,7 +92,7 @@
         @endif
     </div>
 
-    <!-- Create/Edit Modal -->
+    <!-- Create/Edit Modal (dipercantik & konsisten) -->
     @if ($showModal)
         <div class="fixed inset-0 z-50 overflow-y-auto"
              x-data
