@@ -12,25 +12,25 @@ class GenreManagement extends Component
 
     public $search = '';
     public $showModal = false;
-    public $showDeleteModal = false;
-    public $modalMode = 'create'; // 'create' atau 'edit'
-    
+    public $modalMode = 'create';
+
     // Form fields
     public $genreId;
     public $nama_genre = '';
-    
-    // Delete
-    public $deleteId;
 
     protected $paginationTheme = 'tailwind';
 
-    protected $rules = [
-        'nama_genre' => 'required|string|max:50',
-    ];
+    protected function rules()
+    {
+        return [
+            'nama_genre' => 'required|string|max:50|unique:genre,nama_genre,' . $this->genreId,
+        ];
+    }
 
     protected $messages = [
         'nama_genre.required' => 'Nama genre wajib diisi',
         'nama_genre.max' => 'Nama genre maksimal 50 karakter',
+        'nama_genre.unique' => 'Genre ini sudah ada, silakan gunakan nama lain',
     ];
 
     public function updatingSearch()
@@ -64,7 +64,7 @@ class GenreManagement extends Component
         $genre = Genre::findOrFail($id);
         $this->genreId = $genre->id;
         $this->nama_genre = $genre->nama_genre;
-        
+
         $this->modalMode = 'edit';
         $this->showModal = true;
     }
@@ -78,56 +78,41 @@ class GenreManagement extends Component
                 'nama_genre' => $this->nama_genre,
             ]);
 
-            session()->flash('success', 'Genre berhasil ditambahkan!');
+            $this->dispatch('success', 'Genre berhasil ditambahkan!');
         } else {
             $genre = Genre::findOrFail($this->genreId);
             $genre->update([
                 'nama_genre' => $this->nama_genre,
             ]);
 
-            session()->flash('success', 'Genre berhasil diperbarui!');
+            $this->dispatch('success', 'Genre berhasil diperbarui!');
         }
 
         $this->closeModal();
     }
 
-    public function openDeleteModal($id)
-    {
-        $this->deleteId = $id;
-        $this->showDeleteModal = true;
-    }
-
-    public function delete()
+    public function delete($id)
     {
         try {
-            $genre = Genre::findOrFail($this->deleteId);
-            
+            $genre = Genre::findOrFail($id);
+
             // Cek apakah genre sedang digunakan di film
             if ($genre->filmGenres()->count() > 0) {
-                session()->flash('error', 'Genre tidak dapat dihapus karena sedang digunakan pada film!');
-                $this->closeDeleteModal();
+                $this->dispatch('error', 'Genre tidak dapat dihapus karena sedang digunakan pada film!');
                 return;
             }
 
             $genre->delete();
-            session()->flash('success', 'Genre berhasil dihapus!');
+            $this->dispatch('success', 'Genre berhasil dihapus!');
         } catch (\Exception $e) {
-            session()->flash('error', 'Terjadi kesalahan saat menghapus genre!');
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus genre!');
         }
-
-        $this->closeDeleteModal();
     }
 
     public function closeModal()
     {
         $this->showModal = false;
         $this->resetForm();
-    }
-
-    public function closeDeleteModal()
-    {
-        $this->showDeleteModal = false;
-        $this->deleteId = null;
     }
 
     private function resetForm()

@@ -8,12 +8,6 @@
         <p class="text-gray-600 mt-1">Kelola data sutradara dengan mudah dan cepat.</p>
     </div>
 
-    @if (session('message'))
-        <div class="mb-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded-lg">
-            {{ session('message') }}
-        </div>
-    @endif
-
     <!-- Header Actions -->
     <div class="flex justify-end mb-4">
         <a href="{{ route('admin.sutradara.create') }}"

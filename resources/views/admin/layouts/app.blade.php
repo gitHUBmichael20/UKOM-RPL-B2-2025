@@ -15,20 +15,23 @@
     <!-- Font Awesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css"
+          rel="stylesheet">
 </head>
 
-<body class="bg-gray-100">
-    <div class="min-h-screen">
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <div class="flex flex-1">
         <!-- Sidebar -->
         @include('admin.partials.sidebar')
 
         <!-- Main Content Wrapper -->
-        <div class="lg:ml-64 transition-all duration-300">
+        <div class="flex-1 lg:ml-64 transition-all duration-300 flex flex-col">
             <!-- Topbar -->
             @include('admin.partials.topbar')
 
             <!-- Page Content -->
-            <main class="p-4 md:p-6 lg:p-8">
+            <main class="p-4 md:p-6 lg:p-8 flex-1">
                 @hasSection('content')
                     @yield('content')
                 @else
@@ -45,8 +48,8 @@
     <div id="sidebar-overlay"
          class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
 
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 
     @livewireScripts
     @stack('scripts')

@@ -8,12 +8,16 @@ use App\Livewire\Admin\UserEdit;
 use App\Livewire\Admin\StudioManagement;
 use App\Livewire\Admin\StudioCreate;
 use App\Livewire\Admin\StudioEdit;
-// use App\Livewire\Admin\SutradaraManagement;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FilmController;
 use App\Livewire\Admin\FilmManagement;
 use App\Livewire\Admin\GenreManagement;
+use App\Http\Controllers\SutradaraManagement;
+use App\Livewire\Admin\FilmCreate;
+use App\Livewire\Admin\FilmEdit;
+use App\Livewire\Admin\HargaTiketCreate;
+use App\Livewire\Admin\HargaTiketEdit;
 use App\Livewire\Admin\HargaTiketManagemen;
+use App\Livewire\Admin\HargaTiketManagement;
 
 Route::get('/', function () {
     $user = auth()->user();
@@ -43,14 +47,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
 });
 
-// Admin & Kasir
+// Admin & Kasir Routes
 Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Studio Routes (accessible by both admin & kasir)
+    // Studio Routes
     Route::get('/studio', StudioManagement::class)->name('studio.index');
     Route::get('/studio/create', StudioCreate::class)->name('studio.create');
     Route::get('/studio/{id}/edit', StudioEdit::class)->name('studio.edit');
+
+    // Film Routes
+    Route::get('/film', FilmManagement::class)->name('film.index');
+    Route::get('/film/create', FilmCreate::class)->name('film.create');
+    Route::get('/film/{id}/edit', FilmEdit::class)->name('film.edit');
+
+    // Genre Routes
+    Route::get('/genre', GenreManagement::class)->name('genre.index');
 });
 
 // Admin Only Routes
@@ -59,51 +71,29 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/users', UserManagement::class)->name('users.index');
     Route::get('/users/create', UserCreate::class)->name('users.create');
     Route::get('/users/{id}/edit', UserEdit::class)->name('users.edit');
+
+    // Sutradara Routes
+    Route::get('/sutradara', [SutradaraManagement::class, 'index'])->name('sutradara.index');
+    Route::get('/sutradara/create', [SutradaraManagement::class, 'create'])->name('sutradara.create');
+    Route::post('/sutradara', [SutradaraManagement::class, 'store'])->name('sutradara.store');
+    Route::get('/sutradara/{id}/edit', [SutradaraManagement::class, 'edit'])->name('sutradara.edit');
+    Route::put('/sutradara/{id}', [SutradaraManagement::class, 'update'])->name('sutradara.update');
+    Route::delete('/sutradara/{id}', [SutradaraManagement::class, 'destroy'])->name('sutradara.destroy');
 });
-
-use App\Http\Controllers\SutradaraManagement;
-
-Route::middleware(['auth', 'role:admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
-
-        Route::get('/sutradara', [SutradaraManagement::class, 'index'])
-            ->name('sutradara.index');
-        Route::get('/sutradara/create', [SutradaraManagement::class, 'create'])->name('sutradara.create');
-        Route::post('/sutradara', [SutradaraManagement::class, 'store'])->name('sutradara.store');
-        Route::get('/sutradara/{id}/edit', [SutradaraManagement::class, 'edit'])->name('sutradara.edit');
-        Route::put('/sutradara/{id}', [SutradaraManagement::class, 'update'])->name('sutradara.update');
-        Route::delete('/sutradara/{id}', [SutradaraManagement::class, 'destroy'])->name('sutradara.destroy');
-    });
-
-
-
-// Film Routes
-Route::get('/film-management', \App\Livewire\Admin\FilmManagement::class)->name('admin.film.management');
-Route::get('/film-create', \App\Livewire\Admin\FilmCreate::class)->name('admin.film.create');
-Route::get('/film-edit/{id}', \App\Livewire\Admin\FilmEdit::class)->name('admin.film.edit');
-
-// Genre Routes
-Route::get('/genre-management', \App\Livewire\Admin\GenreManagement::class)->name('admin.genre.management');
-Route::get('/genre-create', \App\Livewire\Admin\GenreCreate::class)->name('admin.genre.create');
-Route::get('/genre-edit/{id}', \App\Livewire\Admin\GenreEdit::class)->name('admin.genre.edit');
 
 // Harga tiket
 Route::prefix('admin/harga-tiket')->name('admin.harga-tiket.')->group(function () {
     // Management - Bisa diakses semua user yang login
-    Route::get('/management', \App\Livewire\Admin\HargaTiketManagement::class)
-        ->name('management');
-    
+    Route::get('/', HargaTiketManagement::class)
+        ->name('hargatiket.index');
+
     // Tiket (create, edit, hapus)
     Route::middleware(['role:admin'])->group(function () {
-        Route::get('/create', \App\Livewire\Admin\HargaTiketCreate::class)
-            ->name('create');
-        Route::get('/edit/{id}', \App\Livewire\Admin\HargaTiketEdit::class)
-            ->name('edit');
+        Route::get('/create', HargaTiketCreate::class)
+            ->name('hargatiket.create');
+        Route::get('/edit/{id}', HargaTiketEdit::class)
+            ->name('hargatiket.edit');
     });
 });
 
 require __DIR__ . '/auth.php';
-
-

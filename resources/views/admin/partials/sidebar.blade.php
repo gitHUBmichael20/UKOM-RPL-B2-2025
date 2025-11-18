@@ -22,7 +22,7 @@
 
             <!-- Films -->
             <li>
-                <a href="{{ route('admin.film.management') }}"
+                <a href="{{ route('admin.film.index') }}"
                     class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.film.*') ? 'bg-gray-700' : '' }}">
                     <i class="fa-solid fa-film w-5 text-gray-300"></i>
                     <span class="ml-3">Film</span>
@@ -46,15 +46,6 @@
                 </a>
             </li>
 
-             <!-- Harga Tiket -->
-            <li>
-                <a href="{{ route('admin.harga-tiket.management') }}"
-                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.harga-tiket.*') ? 'bg-gray-700' : '' }}">
-                    <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
-                    <span class="ml-3">Harga Tiket</span>
-                </a>
-            </li>
-
             <!-- Pemesanan -->
             <li>
                 <a href="#" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
@@ -71,7 +62,7 @@
 
                 <!-- Genre -->
                 <li>
-                    <a href="{{ route('admin.genre.management') }}" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+                    <a href="{{ route('admin.genre.index') }}" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
     <i class="fa-solid fa-tags w-5 text-gray-300"></i>
     <span class="ml-3">Genre</span>
 </a>
