@@ -76,4 +76,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/sutradara/{id}', [SutradaraManagement::class, 'destroy'])->name('sutradara.destroy');
 });
 
+Route::get('/pemesanan', function () {
+    return view('pemesanan.check-out');
+})->name('pemesanan');
+
 require __DIR__ . '/auth.php';
