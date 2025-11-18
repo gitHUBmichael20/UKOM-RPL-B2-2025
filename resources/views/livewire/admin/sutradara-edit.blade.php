@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Header -->
-    <div class="p-6">
+    <div class="p-3">
         <div class="mb-6">
             <div class="flex items-center text-sm text-gray-600 mb-4">
                 <a href="{{ route('admin.sutradara.index') }}"

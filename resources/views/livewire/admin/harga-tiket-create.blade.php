@@ -1,6 +1,6 @@
 <div>
     <!-- Wrapper sederhana seperti halaman Studio -->
-    <div class="p-6">
+    <div class="p-3">
             {{-- Header --}}
             <div class="mb-6">
                 <div class="flex items-center text-sm text-gray-600 mb-4">

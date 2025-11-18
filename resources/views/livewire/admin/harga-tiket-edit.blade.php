@@ -1,6 +1,6 @@
 <div>
     <!-- Wrapper sederhana seperti halaman Studio & form Tambah sebelumnya -->
-    <div class="p-6">
+    <div class="p-3">
         <div class="mt-14">
             <!-- Header Konsisten -->
             <div class="mb-6">

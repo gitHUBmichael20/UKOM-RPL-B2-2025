@@ -1,4 +1,4 @@
-<div class="p-6">
+<div class="p-3">
     @section('title', 'Tambah User')
 
     <!-- Header -->

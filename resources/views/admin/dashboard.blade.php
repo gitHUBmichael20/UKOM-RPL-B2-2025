@@ -107,7 +107,7 @@
             <div class="p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-900">Pemesanan Terbaru</h3>
             </div>
-            <div class="p-6">
+            <div class="p-3">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead>

@@ -1,6 +1,6 @@
 <div>
     <!-- Wrapper konsisten dengan semua halaman admin -->
-    <div class="p-6">
+    <div class="p-3">
         <div class="mt-14">
 
             <!-- Header + Breadcrumb + Deskripsi -->
