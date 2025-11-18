@@ -1,22 +1,16 @@
 <div>
     <!-- Wrapper sederhana seperti halaman Studio -->
     <div class="p-6">
-        <div class="mt-14">
-            <!-- Header Konsisten dengan Button Tambah di kanan -->
+            {{-- Header --}}
             <div class="mb-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="flex items-center space-x-2 text-gray-600 mb-1">
-                            <a href="{{ route('admin.harga-tiket.management') }}" class="hover:text-blue-600">
-                                <i class="fa-solid fa-ticket"></i> Harga Tiket
-                            </a>
-                            <span>/</span>
-                            <span class="text-gray-900 font-medium">Tambah Harga Tiket</span>
-                        </div>
-                        <h1 class="text-3xl font-bold text-gray-900">Tambah Harga Tiket</h1>
-                        <p class="mt-1 text-gray-600">Tambah harga tiket bioskop berdasarkan tipe studio dan hari</p>
-                    </div>
+                <div class="flex items-center text-sm text-gray-600 mb-4">
+                    <a href="{{ route('admin.harga-tiket.index') }}"
+                       class="hover:text-blue-600">Harga Tiket</a>
+                    <i class="fa-solid fa-chevron-right mx-2 text-xs"></i>
+                    <span class="text-gray-900">Tambah Harga Tiket</span>
                 </div>
+                <h2 class="text-2xl font-bold text-gray-800">Tambah Harga Tiket</h2>
+                <p class="text-gray-600 mt-1">Tambah harga tiket bioskop berdasarkan tipe studio dan hari</p>
             </div>
 
             <!-- Alert Messages - lebih modern -->
@@ -39,7 +33,7 @@
                                 Tipe Studio <span class="text-red-500">*</span>
                             </label>
                             <select wire:model="tipe_studio"
-                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                 @error('tipe_studio') border-red-500 @enderror">
                                 <option value="">Pilih Tipe Studio</option>
                                 @foreach($tipeStudioOptions as $key => $label)
@@ -57,7 +51,7 @@
                                 Tipe Hari <span class="text-red-500">*</span>
                             </label>
                             <select wire:model="tipe_hari"
-                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                 @error('tipe_hari') border-red-500 @enderror">
                                 <option value="">Pilih Tipe Hari</option>
                                 @foreach($tipeHariOptions as $key => $label)
@@ -78,9 +72,12 @@
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
                                     Rp
                                 </span>
-                                <input type="number" wire:model="harga" step="0.01" min="0"
-                                    placeholder="Masukkan harga tiket"
-                                    class="w-full pl-12 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                <input type="number"
+                                       wire:model="harga"
+                                       step="0.01"
+                                       min="0"
+                                       placeholder="Masukkan harga tiket"
+                                       class="w-full pl-12 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                     @error('harga') border-red-500 @enderror">
                             </div>
                             @error('harga')
@@ -97,7 +94,7 @@
                                 </div>
                                 <div class="ml-3">
                                     <p class="text-sm text-blue-700">
-                                        <strong>Catatan:</strong> Kombinasi tipe studio dan tipe hari harus unik. 
+                                        <strong>Catatan:</strong> Kombinasi tipe studio dan tipe hari harus unik.
                                         Pastikan tidak ada duplikasi data.
                                     </p>
                                 </div>
@@ -107,17 +104,16 @@
 
                     <!-- Action Buttons - konsisten dengan Studio -->
                     <div class="mt-8 flex justify-end gap-3">
-                        <a href="{{ route('admin.harga-tiket.management') }}"
-                            class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition duration-200">
+                        <a href="{{ route('admin.harga-tiket.index') }}"
+                           class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition duration-200">
                             Batal
                         </a>
                         <button type="submit"
-                            class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition duration-200 flex items-center">
+                                class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition duration-200 flex items-center">
                             <i class="fa-solid fa-save mr-2"></i> Simpan
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
 </div>

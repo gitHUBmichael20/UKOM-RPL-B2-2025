@@ -14,6 +14,8 @@ class HargaTiketManagement extends Component
     public $filterTipeStudio = '';
     public $filterTipeHari = '';
 
+    protected $listeners = ['delete' => 'delete'];
+
     protected $queryString = [
         'search' => ['except' => ''],
         'filterTipeStudio' => ['except' => ''],
@@ -47,7 +49,7 @@ class HargaTiketManagement extends Component
             $hargaTiket = HargaTiket::findOrFail($id);
             $hargaTiket->delete();
 
-            session()->flash('success', 'Harga tiket berhasil dihapus!');
+            $this->dispatch('success', 'Harga tiket berhasil dihapus!');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menghapus harga tiket: ' . $e->getMessage());
         }

@@ -7,7 +7,7 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <div class="flex items-center space-x-2 text-gray-600 mb-1">
-                            <a href="{{ route('admin.harga-tiket.management') }}" class="hover:text-blue-600">
+                            <a href="{{ route('admin.harga-tiket.index') }}" class="hover:text-blue-600">
                                 <i class="fa-solid fa-ticket"></i> Harga Tiket
                             </a>
                             <span>/</span>
@@ -107,7 +107,7 @@
 
                     <!-- Action Buttons -->
                     <div class="mt-8 flex justify-end gap-3">
-                        <a href="{{ route('admin.harga-tiket.management') }}"
+                        <a href="{{ route('admin.harga-tiket.index') }}"
                             class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition duration-200">
                             Batal
                         </a>

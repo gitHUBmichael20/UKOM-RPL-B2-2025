@@ -14,16 +14,6 @@
         @endif
     </div>
 
-    <!-- Alert Messages -->
-    @if (session()->has('success'))
-        <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-lg">
-            <div class="flex items-center">
-                <i class="fa-solid fa-circle-check mr-2"></i>
-                <p>{{ session('success') }}</p>
-            </div>
-        </div>
-    @endif
-
     @if (session()->has('error'))
         <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg">
             <div class="flex items-center">
@@ -41,8 +31,8 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Cari</label>
                 <div class="relative">
                     <i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i>
-                    <input type="text" 
-                           wire:model.live="search" 
+                    <input type="text"
+                           wire:model.live="search"
                            placeholder="Cari harga tiket..."
                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
@@ -75,7 +65,7 @@
 
         <!-- Reset Filter -->
         <div class="flex justify-end">
-            <button wire:click="resetFilters" 
+            <button wire:click="resetFilters"
                     class="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 transition-colors">
                 <i class="fa-solid fa-rotate-right"></i>
                 Reset Filter
@@ -122,17 +112,19 @@
                                         'imax' => 'bg-yellow-100 text-yellow-800'
                                     ][$hargaTiket->tipe_studio] ?? 'bg-gray-100 text-gray-800';
                                 @endphp
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $badgeColor }}">
+                                <span
+                                      class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $badgeColor }}">
                                     {{ strtoupper($hargaTiket->tipe_studio) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
-                                    $dayBadgeColor = $hargaTiket->tipe_hari == 'weekday' 
-                                        ? 'bg-green-100 text-green-800' 
+                                    $dayBadgeColor = $hargaTiket->tipe_hari == 'weekday'
+                                        ? 'bg-green-100 text-green-800'
                                         : 'bg-orange-100 text-orange-800';
                                 @endphp
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $dayBadgeColor }}">
+                                <span
+                                      class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $dayBadgeColor }}">
                                     {{ ucfirst($hargaTiket->tipe_hari) }}
                                 </span>
                             </td>
@@ -147,7 +139,7 @@
                                             <i class="fa-solid fa-edit mr-1"></i>
                                             Edit
                                         </a>
-                                        <button wire:click="delete({{ $hargaTiket->id }})"
+                                        <button onclick="confirmDelete({{ $hargaTiket->id }})"
                                                 wire:confirm="Apakah Anda yakin ingin menghapus harga tiket ini?"
                                                 class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">
                                             <i class="fa-solid fa-trash mr-1"></i>
@@ -159,11 +151,12 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ isRole('admin') ? '5' : '4' }}" 
+                            <td colspan="{{ isRole('admin') ? '5' : '4' }}"
                                 class="px-6 py-12 text-center text-gray-500">
                                 <i class="fa-solid fa-ticket text-6xl text-gray-300 mb-4"></i>
                                 <p class="text-lg font-medium">Belum ada data harga tiket</p>
-                                <p class="text-sm mt-1">Klik tombol "Tambah Harga Tiket" untuk menambahkan harga tiket baru</p>
+                                <p class="text-sm mt-1">Klik tombol "Tambah Harga Tiket" untuk menambahkan harga tiket baru
+                                </p>
                             </td>
                         </tr>
                     @endforelse
@@ -178,3 +171,32 @@
         @endif
     </div>
 </div>
+<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: "Yakin ingin menghapus?",
+            text: "Data tidak dapat dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Ya, hapus!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Livewire.dispatch('delete', { id: id });
+            }
+        });
+    }
+
+    window.addEventListener('success', event => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: event.detail[0],
+            timer: 3000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    });
+</script>

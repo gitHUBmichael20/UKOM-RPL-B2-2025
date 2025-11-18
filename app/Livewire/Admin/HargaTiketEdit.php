@@ -67,7 +67,7 @@ class HargaTiketEdit extends Component
             ]);
 
             session()->flash('success', 'Harga tiket berhasil diupdate!');
-            return redirect()->route('admin.harga-tiket.management');
+            return redirect()->route('admin.harga-tiket.index');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengupdate harga tiket: ' . $e->getMessage());
         }

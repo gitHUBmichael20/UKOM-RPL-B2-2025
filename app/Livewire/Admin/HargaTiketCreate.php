@@ -57,7 +57,7 @@ class HargaTiketCreate extends Component
             ]);
 
             session()->flash('success', 'Harga tiket berhasil ditambahkan!');
-            return redirect()->route('admin.harga-tiket.management');
+            return redirect()->route('admin.harga-tiket.index');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menambahkan harga tiket: ' . $e->getMessage());
         }
