@@ -52,4 +52,8 @@
             </div>
         </form>
     </x-modal>
+<<<<<<< HEAD
 </section>
+=======
+</section>
+>>>>>>> 0443b174252208410a9f0f111489ede25b51f90c
