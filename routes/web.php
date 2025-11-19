@@ -25,7 +25,9 @@ Route::get('/', function () {
         return redirect()->route('admin.dashboard');
     }
 
-    return view('dashboard');
+    // This will use your existing dashboard.blade.php
+    $films = []; // You'll need to add the film data logic here
+    return view('dashboard', compact('films'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
@@ -46,7 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
 
     Route::get('/admin/harga-tiket', HargaTiketManagement::class)
-        ->name('admin.harga-tiket.index');  
+        ->name('admin.harga-tiket.index');
 });
 
 // Admin & Kasir Routes

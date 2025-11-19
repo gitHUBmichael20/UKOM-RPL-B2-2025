@@ -16,7 +16,7 @@
                     </div>
                     <div class="flex space-x-2">
                         <button
-                            class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center">
+                            class="filter-btn px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
@@ -25,7 +25,7 @@
                             Filter
                         </button>
                         <button
-                            class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center">
+                            class="sort-btn px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
@@ -39,51 +39,12 @@
             <!-- Movies Grid -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    @php
-                        // Generate detailed dummy movies
-                        $movies = [];
-                        $genres = ['Action', 'Drama', 'Comedy', 'Sci-Fi', 'Thriller', 'Horror', 'Romance', 'Adventure'];
-                        $directors = [
-                            'Christopher Nolan',
-                            'Steven Spielberg',
-                            'Quentin Tarantino',
-                            'Martin Scorsese',
-                            'James Cameron',
-                            'David Fincher',
-                            'Tim Burton',
-                            'Wes Anderson',
-                        ];
-                        $statuses = ['Available', 'Not Available'];
-
-                        $loremIpsum =
-                            'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat';
-                        $loremWords = explode(' ', $loremIpsum);
-
-                        for ($i = 1; $i <= 12; $i++) {
-                            // Generate random synopsis (around 30 words)
-                            $synopsis = implode(' ', array_slice($loremWords, 0, 30));
-
-                            $movies[] = [
-                                'id' => $i,
-                                'title' => 'Movie ' . $i,
-                                'director' => $directors[array_rand($directors)],
-                                'duration' => rand(90, 180) . ' min',
-                                'synopsis' => $synopsis,
-                                'poster' => 'https://picsum.photos/400/600?random=' . $i,
-                                'rating' => round(rand(30, 95) / 10, 1),
-                                'release_date' => date('Y-m-d', strtotime('-' . rand(0, 365) . ' days')),
-                                'status' => $statuses[array_rand($statuses)],
-                                'genre' => $genres[array_rand($genres)],
-                                'year' => rand(2010, 2023),
-                            ];
-                        }
-                    @endphp
-
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                        @foreach ($movies as $movie)
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
+                        id="movies-grid">
+                        @foreach ($films as $movie)
                             <div
-                                class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group border border-gray-100">
-                                {{-- Poster --}}
+                                class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group border border-gray-100 movie-card">
+                                <!-- Poster -->
                                 <div class="relative overflow-hidden">
                                     <img src="{{ $movie['poster'] }}"
                                         class="w-full aspect-[2/3] object-cover group-hover:scale-105 transition duration-500"
@@ -100,11 +61,9 @@
                                     </div>
                                 </div>
 
-                                {{-- Info --}}
+                                <!-- Info -->
                                 <div class="p-4">
-                                    <h3 class="font-semibold text-gray-800 line-clamp-1 mb-1">
-                                        {{ $movie['title'] }}
-                                    </h3>
+                                    <h3 class="font-semibold text-gray-800 line-clamp-1 mb-1">{{ $movie['title'] }}</h3>
 
                                     <div class="flex justify-between text-xs text-gray-500 mb-2">
                                         <span>{{ $movie['year'] }}</span>
@@ -113,12 +72,10 @@
                                     </div>
 
                                     <p class="text-xs text-gray-600 line-clamp-2 mb-3">
-                                        {{ $movie['synopsis'] }}
-                                    </p>
+                                        {{ Str::limit($movie['synopsis'], 80) }}</p>
 
                                     <button onclick="openModal({{ $movie['id'] }})"
-                                        class="w-full bg-gray-800 text-white text-xs font-medium py-2 rounded-lg hover:bg-gray-700 transition flex items-center justify-center view-details-btn"
-                                        data-movie-id="{{ $movie['id'] }}">
+                                        class="w-full bg-gray-800 text-white text-xs font-medium py-2 rounded-lg hover:bg-gray-700 transition flex items-center justify-center view-details-btn">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -134,17 +91,9 @@
                         @endforeach
                     </div>
 
-                    {{-- Load More Button --}}
-                    <div class="flex justify-center mt-12">
-                        <button
-                            class="px-6 py-3 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 transition flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                </path>
-                            </svg>
-                            Load More Movies
-                        </button>
+                    <!-- Loading State -->
+                    <div id="loading" class="hidden flex justify-center mt-12">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800"></div>
                     </div>
                 </div>
             </div>
@@ -204,17 +153,21 @@
                                 <p id="modalDuration" class="text-gray-900">-</p>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-500">Release Date</label>
-                                <p id="modalReleaseDate" class="text-gray-900">-</p>
+                                <label class="text-sm font-medium text-gray-500">Release Year</label>
+                                <p id="modalReleaseYear" class="text-gray-900">-</p>
                             </div>
                         </div>
 
                         <div>
                             <label class="text-sm font-medium text-gray-500">Status</label>
                             <span id="modalStatus"
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                -
-                            </span>
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">-</span>
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Age Rating</label>
+                            <span id="modalAgeRating"
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">-</span>
                         </div>
 
                         <div>
@@ -227,9 +180,7 @@
                 <!-- Modal Footer -->
                 <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
                     <button onclick="closeModal()"
-                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                        Close
-                    </button>
+                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Close</button>
                     <button
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,37 +196,46 @@
     </div>
 
     <script>
-        // Movie data for modal
-        const moviesData = @json($movies);
+        // Movie data from server
+        const moviesData = @json($films);
 
-        function openModal(movieId) {
-            const movie = moviesData.find(m => m.id === movieId);
-            if (!movie) return;
+        async function openModal(movieId) {
+            try {
+                // Show loading state
+                document.getElementById('movieModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
 
-            // Populate modal with movie data
-            document.getElementById('modalTitle').textContent = movie.title;
-            document.getElementById('modalId').textContent = movie.id;
-            document.getElementById('modalDirector').textContent = movie.director;
-            document.getElementById('modalDuration').textContent = movie.duration;
-            document.getElementById('modalSynopsis').textContent = movie.synopsis;
-            document.getElementById('modalPoster').src = movie.poster;
-            document.getElementById('modalRatingValue').textContent = movie.rating;
-            document.getElementById('modalReleaseDate').textContent = new Date(movie.release_date).toLocaleDateString();
+                // Try to get from preloaded data first
+                let movie = moviesData.find(m => m.id === movieId);
 
-            // Set status with appropriate color
-            const statusElement = document.getElementById('modalStatus');
-            statusElement.textContent = movie.status;
-            if (movie.status === 'Available') {
-                statusElement.className =
-                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800';
-            } else {
-                statusElement.className =
+                if (!movie) {
+                    // Fetch fresh data if not found
+                    const response = await fetch(`/movies/${movieId}`);
+                    movie = await response.json();
+                }
+
+                // Populate modal with movie data
+                document.getElementById('modalTitle').textContent = movie.title;
+                document.getElementById('modalId').textContent = movie.id;
+                document.getElementById('modalDirector').textContent = movie.director;
+                document.getElementById('modalDuration').textContent = movie.duration;
+                document.getElementById('modalSynopsis').textContent = movie.synopsis;
+                document.getElementById('modalPoster').src = movie.poster;
+                document.getElementById('modalRatingValue').textContent = movie.rating;
+                document.getElementById('modalReleaseYear').textContent = movie.year;
+                document.getElementById('modalAgeRating').textContent = movie.rating_original;
+
+                // Set status with appropriate color
+                const statusElement = document.getElementById('modalStatus');
+                statusElement.textContent = movie.status;
+                statusElement.className = movie.status === 'Available' ?
+                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800' :
                     'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800';
-            }
 
-            // Show modal
-            document.getElementById('movieModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+            } catch (error) {
+                console.error('Error loading movie details:', error);
+                closeModal();
+            }
         }
 
         function closeModal() {
@@ -285,21 +245,39 @@
 
         // Close modal when clicking outside
         document.getElementById('movieModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
+            if (e.target === this) closeModal();
         });
 
         // Close modal with Escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Simple filter and sort functionality
+        document.querySelector('.filter-btn')?.addEventListener('click', function() {
+            alert('Filter functionality to be implemented');
+        });
+
+        document.querySelector('.sort-btn')?.addEventListener('click', function() {
+            alert('Sort functionality to be implemented');
         });
     </script>
 
     <style>
-        /* Smooth transitions for modal */
+        .line-clamp-1 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+        }
+
+        .line-clamp-2 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
         #movieModal {
             transition: opacity 0.3s ease;
         }
@@ -311,6 +289,10 @@
 
         #movieModal:not(.hidden)>div {
             transform: scale(1);
+        }
+
+        .movie-card {
+            transition: all 0.3s ease;
         }
     </style>
 </x-app-layout>
