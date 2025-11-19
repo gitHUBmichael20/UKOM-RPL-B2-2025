@@ -4,7 +4,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto py-8">
     <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Manajemen Sutradara</h1>
+        <h2 class="text-2xl font-bold text-gray-800">Manajemen Sutradara</h2>
         <p class="text-gray-600 mt-1">Kelola data sutradara dengan mudah dan cepat.</p>
     </div>
 
