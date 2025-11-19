@@ -87,4 +87,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/edit/{id}', HargaTiketEdit::class)->name('harga-tiket.edit');
 });
 
+Route::get('/pemesanan', function () {
+    return view('pemesanan.check-out');
+})->name('pemesanan');
+
 require __DIR__ . '/auth.php';
