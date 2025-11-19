@@ -22,4 +22,10 @@ class Studio extends Model
     {
         return $this->hasMany(JadwalTayang::class);
     }
+
+    // Add this missing relationship
+    public function hargaTiket()
+    {
+        return $this->hasMany(HargaTiket::class, 'tipe_studio', 'tipe_studio');
+    }
 }

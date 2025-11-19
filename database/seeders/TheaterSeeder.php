@@ -14,7 +14,7 @@ class TheaterSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing data (kecuali users)
+        // Clear existing data (except users)
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::table('detail_pemesanan')->truncate();
         DB::table('pemesanan')->truncate();
@@ -28,7 +28,7 @@ class TheaterSeeder extends Seeder
         DB::table('genre')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
-        // Seed data
+        // Seed data in correct order
         $this->seedHargaTiket();
         $genreIds = $this->seedGenres();
         $sutradaraIds = $this->seedSutradara();
@@ -398,13 +398,11 @@ class TheaterSeeder extends Seeder
 
     private function seedJadwalTayang(array $filmIds, array $studioIds): array
     {
-        $jadwalTayang = [];
         $jadwalIds = [];
 
         // Create schedules for the next 14 days
         for ($day = 0; $day < 14; $day++) {
             $date = Carbon::now()->addDays($day);
-            $isWeekend = in_array($date->dayOfWeek, [0, 6]); // 0 = Sunday, 6 = Saturday
 
             foreach ($filmIds as $filmId) {
                 // Each film gets 2-4 screenings per day
@@ -444,17 +442,22 @@ class TheaterSeeder extends Seeder
         $kasirIds = DB::table('users')->where('role', 'kasir')->pluck('id')->toArray();
 
         if (empty($pelangganIds) || empty($kasirIds)) {
-            return; // Skip if no users found
+            echo "No users found for seeding bookings. Please run UserSeeder first.\n";
+            return;
         }
 
-        $pemesananData = [];
         $detailPemesananData = [];
 
-        // Create 50 random bookings
-        for ($i = 0; $i < 50; $i++) {
+        // Create 20 random bookings (reduced for performance)
+        for ($i = 0; $i < 20; $i++) {
             $jadwalTayangId = $jadwalTayangIds[array_rand($jadwalTayangIds)];
             $jadwal = DB::table('jadwal_tayang')->where('id', $jadwalTayangId)->first();
+
+            if (!$jadwal) continue;
+
             $studio = DB::table('studio')->where('id', $jadwal->studio_id)->first();
+
+            if (!$studio) continue;
 
             // Get available seats for this schedule
             $availableKursi = DB::table('kursi')
@@ -471,8 +474,8 @@ class TheaterSeeder extends Seeder
 
             if (empty($availableKursi)) continue;
 
-            $jumlahTiket = rand(1, 4);
-            $selectedKursi = array_slice($availableKursi, 0, min($jumlahTiket, count($availableKursi)));
+            $jumlahTiket = rand(1, min(4, count($availableKursi)));
+            $selectedKursi = array_slice($availableKursi, 0, $jumlahTiket);
 
             // Calculate price based on studio type and day type
             $tanggalTayang = Carbon::parse($jadwal->tanggal_tayang);
@@ -486,13 +489,13 @@ class TheaterSeeder extends Seeder
 
             $totalHarga = $hargaTiket ? $hargaTiket->harga * $jumlahTiket : 35000 * $jumlahTiket;
 
-            $statusPembayaran = ['pending', 'lunas', 'batal', 'redeemed'][rand(0, 3)];
+            $statusPembayaran = ['pending', 'lunas'][rand(0, 1)]; // Only active bookings
             $jenisPemesanan = ['online', 'offline'][rand(0, 1)];
             $metodePembayaran = ['cash', 'transfer', 'qris', 'debit'][rand(0, 3)];
 
-            // FIX: Generate shorter kode_booking (max 14 chars)
-            $kodeBooking = 'BK' . date('md') . str_pad($i, 8, '0', STR_PAD_LEFT);
-            $kodeBooking = substr($kodeBooking, 0, 14); // Ensure max 14 characters
+            // Generate kode_booking
+            $kodeBooking = 'BK' . date('md') . str_pad($i, 6, '0', STR_PAD_LEFT);
+            $kodeBooking = substr($kodeBooking, 0, 14);
 
             $pemesananId = DB::table('pemesanan')->insertGetId([
                 'kode_booking' => $kodeBooking,
@@ -503,7 +506,7 @@ class TheaterSeeder extends Seeder
                 'metode_pembayaran' => $metodePembayaran,
                 'jenis_pemesanan' => $jenisPemesanan,
                 'status_pembayaran' => $statusPembayaran,
-                'tanggal_pemesanan' => Carbon::now()->subDays(rand(0, 30)),
+                'tanggal_pemesanan' => Carbon::now()->subDays(rand(0, 7)),
                 'kasir_id' => $jenisPemesanan === 'offline' ? $kasirIds[array_rand($kasirIds)] : null,
                 'created_at' => now(),
                 'updated_at' => now(),

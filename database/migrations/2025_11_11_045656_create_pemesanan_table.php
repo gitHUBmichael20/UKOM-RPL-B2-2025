@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pemesanan', function (Blueprint $table) {
             $table->id();
-            $table->char('kode_booking', 14)->unique();
+            $table->char('kode_booking', 20)->unique();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('jadwal_tayang_id')->constrained('jadwal_tayang')->onDelete('cascade');
             $table->integer('jumlah_tiket');

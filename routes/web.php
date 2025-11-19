@@ -2,22 +2,27 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\FilmController;
+use App\Http\Controllers\SutradaraManagement;
+use App\Http\Controllers\PaymentController;
 use App\Livewire\Admin\UserManagement;
 use App\Livewire\Admin\UserCreate;
 use App\Livewire\Admin\UserEdit;
 use App\Livewire\Admin\StudioManagement;
 use App\Livewire\Admin\StudioCreate;
 use App\Livewire\Admin\StudioEdit;
-use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\FilmManagement;
 use App\Livewire\Admin\GenreManagement;
-use App\Http\Controllers\SutradaraManagement;
 use App\Livewire\Admin\FilmCreate;
 use App\Livewire\Admin\FilmEdit;
 use App\Livewire\Admin\HargaTiketCreate;
 use App\Livewire\Admin\HargaTiketEdit;
 use App\Livewire\Admin\HargaTiketManagement;
+use Illuminate\Support\Facades\Route;
 
+
+// Dashboard Routes
 Route::get('/', function () {
     $user = auth()->user();
 
@@ -25,11 +30,8 @@ Route::get('/', function () {
         return redirect()->route('admin.dashboard');
     }
 
-    // This will use your existing dashboard.blade.php
-    $films = []; // You'll need to add the film data logic here
-    return view('dashboard', compact('films'));
+    return app(FilmController::class)->index();
 })->middleware(['auth', 'verified'])->name('dashboard');
-
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
@@ -41,56 +43,108 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Profile Routes
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
-
-    Route::get('/admin/harga-tiket', HargaTiketManagement::class)
-        ->name('admin.harga-tiket.index');
 });
+
+Route::middleware(['auth'])->prefix('pemesanan')->name('pemesanan.')->group(function () {
+    // Show film details and schedules
+    Route::get('/{film}', [BookingController::class, 'show'])->name('show');
+
+    // Seat selection page
+    Route::get('/{film}/schedule/{jadwalTayang}/seat', [BookingController::class, 'seatSelection'])->name('seats');
+
+    // Payment page
+    Route::get('/{film}/schedule/{jadwalTayang}/payment', [BookingController::class, 'payment'])->name('payment');
+
+    // Store booking - UPDATE INI
+    Route::post('/{film}/schedule/{jadwalTayang}/store', [BookingController::class, 'store'])->name('store');
+
+    // Success page
+    Route::get('/success/{pemesanan}', [BookingController::class, 'success'])->name('success');
+
+    // Ticket page
+    Route::get('/ticket/{pemesanan}', [BookingController::class, 'ticket'])->name('ticket');
+});
+
 
 // Admin & Kasir Routes
 Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Studio Routes
-    Route::get('/studio', StudioManagement::class)->name('studio.index');
-    Route::get('/studio/create', StudioCreate::class)->name('studio.create');
-    Route::get('/studio/{id}/edit', StudioEdit::class)->name('studio.edit');
+    Route::prefix('studio')->name('studio.')->group(function () {
+        Route::get('/', StudioManagement::class)->name('index');
+        Route::get('/create', StudioCreate::class)->name('create');
+        Route::get('/{id}/edit', StudioEdit::class)->name('edit');
+    });
 
     // Film Routes
-    Route::get('/film', FilmManagement::class)->name('film.index');
-    Route::get('/film/create', FilmCreate::class)->name('film.create');
-    Route::get('/film/{id}/edit', FilmEdit::class)->name('film.edit');
+    Route::prefix('film')->name('film.')->group(function () {
+        Route::get('/', FilmManagement::class)->name('index');
+        Route::get('/create', FilmCreate::class)->name('create');
+        Route::get('/{id}/edit', FilmEdit::class)->name('edit');
+    });
 
     // Genre Routes
     Route::get('/genre', GenreManagement::class)->name('genre.index');
+
+    // Harga Tiket Routes (accessible to both admin & kasir)
+    Route::prefix('harga-tiket')->name('harga-tiket.')->group(function () {
+        Route::get('/', HargaTiketManagement::class)->name('index');
+        Route::get('/create', HargaTiketCreate::class)->name('create');
+        Route::get('/edit/{id}', HargaTiketEdit::class)->name('edit');
+    });
+});
+
+// Payment Routes
+Route::middleware(['auth'])->prefix('payment')->name('payment.')->group(function () {
+    Route::get('/payment/{pemesanan}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/{pemesanan}/process', [PaymentController::class, 'process'])->name('process');
+    Route::get('/{pemesanan}/success', [PaymentController::class, 'success'])->name('success');
+    Route::post('/{pemesanan}/cancel', [PaymentController::class, 'cancel'])->name('cancel');
 });
 
 // Admin Only Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Users Routes
-    Route::get('/users', UserManagement::class)->name('users.index');
-    Route::get('/users/create', UserCreate::class)->name('users.create');
-    Route::get('/users/{id}/edit', UserEdit::class)->name('users.edit');
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', UserManagement::class)->name('index');
+        Route::get('/create', UserCreate::class)->name('create');
+        Route::get('/{id}/edit', UserEdit::class)->name('edit');
+    });
 
     // Sutradara Routes
-    Route::get('/sutradara', [SutradaraManagement::class, 'index'])->name('sutradara.index');
-    Route::get('/sutradara/create', [SutradaraManagement::class, 'create'])->name('sutradara.create');
-    Route::post('/sutradara', [SutradaraManagement::class, 'store'])->name('sutradara.store');
-    Route::get('/sutradara/{id}/edit', [SutradaraManagement::class, 'edit'])->name('sutradara.edit');
-    Route::put('/sutradara/{id}', [SutradaraManagement::class, 'update'])->name('sutradara.update');
-    Route::delete('/sutradara/{id}', [SutradaraManagement::class, 'destroy'])->name('sutradara.destroy');
-
-    // Harga Tiket Routes
-    Route::get('/create', HargaTiketCreate::class)->name('harga-tiket.create');
-    Route::get('/edit/{id}', HargaTiketEdit::class)->name('harga-tiket.edit');
+    Route::prefix('sutradara')->name('sutradara.')->group(function () {
+        Route::get('/', [SutradaraManagement::class, 'index'])->name('index');
+        Route::get('/create', [SutradaraManagement::class, 'create'])->name('create');
+        Route::post('/', [SutradaraManagement::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [SutradaraManagement::class, 'edit'])->name('edit');
+        Route::put('/{id}', [SutradaraManagement::class, 'update'])->name('update');
+        Route::delete('/{id}', [SutradaraManagement::class, 'destroy'])->name('destroy');
+    });
 });
 
-Route::get('/pemesanan', function () {
-    return view('pemesanan.check-out');
-})->name('pemesanan');
+// Route::get('/your-order', function () {
+//     if (!Auth::check()) {
+//         return redirect()->route('login');
+//     }
+
+//     $orders = Pemesanan::with([
+//         'jadwalTayang.film.sutradara',
+//         'jadwalTayang.film.genres', 
+//         'detailPemesanan.kursi'
+//     ])
+//     ->where('user_id', Auth::id())
+//     ->orderBy('created_at', 'desc')
+//     ->get();
+
+//     return view('pemesanan.orders', compact('orders'));
+// })->name('your-order')->middleware(['auth', 'verified']);
 
 require __DIR__ . '/auth.php';
