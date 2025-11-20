@@ -39,7 +39,6 @@ class HargaTiketManagement extends Component
 
     public function delete($id)
     {
-        // Cek apakah user adalah admin
         if (!isRole('admin')) {
             session()->flash('error', 'Anda tidak memiliki akses untuk menghapus harga tiket.');
             return;

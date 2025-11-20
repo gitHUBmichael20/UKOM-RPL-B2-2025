@@ -33,7 +33,7 @@
 
             <!-- Jadwal Tayang -->
             <li>
-                <a href="#"
+                <a href="{{ route('admin.jadwal-tayang.index') }}"
                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
                     <i class="fa-solid fa-calendar-days w-5 text-gray-300"></i>
                     <span class="ml-3">Jadwal Tayang</span>
