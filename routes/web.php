@@ -19,6 +19,9 @@ use App\Livewire\Admin\FilmEdit;
 use App\Livewire\Admin\HargaTiketCreate;
 use App\Livewire\Admin\HargaTiketEdit;
 use App\Livewire\Admin\HargaTiketManagement;
+use App\Livewire\Admin\JadwalTayangManagement;
+use App\Livewire\Admin\JadwalTayangCreate;
+use App\Livewire\Admin\JadwalTayangEdit;
 use Illuminate\Support\Facades\Route;
 
 
@@ -100,6 +103,12 @@ Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')
         Route::get('/create', HargaTiketCreate::class)->name('create');
         Route::get('/edit/{id}', HargaTiketEdit::class)->name('edit');
     });
+
+    Route::prefix('jadwal-tayang')->name('jadwal-tayang.')->group(function () {
+        Route::get('/', JadwalTayangManagement::class)->name('index');
+        Route::get('/create', JadwalTayangCreate::class)->name('create');
+        Route::get('/edit/{id}', JadwalTayangEdit::class)->name('edit');
+    });
 });
 
 // Payment Routes
@@ -129,22 +138,5 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::delete('/{id}', [SutradaraManagement::class, 'destroy'])->name('destroy');
     });
 });
-
-// Route::get('/your-order', function () {
-//     if (!Auth::check()) {
-//         return redirect()->route('login');
-//     }
-
-//     $orders = Pemesanan::with([
-//         'jadwalTayang.film.sutradara',
-//         'jadwalTayang.film.genres', 
-//         'detailPemesanan.kursi'
-//     ])
-//     ->where('user_id', Auth::id())
-//     ->orderBy('created_at', 'desc')
-//     ->get();
-
-//     return view('pemesanan.orders', compact('orders'));
-// })->name('your-order')->middleware(['auth', 'verified']);
 
 require __DIR__ . '/auth.php';
