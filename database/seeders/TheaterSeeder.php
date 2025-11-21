@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class TheaterSeeder extends Seeder
@@ -28,6 +29,9 @@ class TheaterSeeder extends Seeder
         DB::table('genre')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
+        // Create storage directories
+        $this->createDirectories();
+
         // Seed data in correct order
         $this->seedHargaTiket();
         $genreIds = $this->seedGenres();
@@ -38,6 +42,45 @@ class TheaterSeeder extends Seeder
         $this->seedKursi($studioIds);
         $jadwalTayangIds = $this->seedJadwalTayang($filmIds, $studioIds);
         $this->seedPemesanan($jadwalTayangIds);
+    }
+
+    private function createDirectories(): void
+    {
+        $directories = [
+            'public/images/sutradara',
+            'public/images/posters',
+        ];
+
+        foreach ($directories as $directory) {
+            if (!Storage::exists($directory)) {
+                Storage::makeDirectory($directory);
+            }
+        }
+    }
+
+    private function downloadImage($url, $filename, $folder): ?string
+    {
+        try {
+            $imageContent = file_get_contents($url);
+            if ($imageContent === false) {
+                return null;
+            }
+
+            $publicPath = "images/{$folder}/{$filename}";
+            $fullPath = public_path($publicPath);
+
+            // Ensure directory exists
+            $directory = dirname($fullPath);
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            file_put_contents($fullPath, $imageContent);
+
+            return "/{$publicPath}";
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     private function seedHargaTiket(): void
@@ -159,7 +202,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Inception',
                 'durasi' => 148,
                 'sinopsis' => 'A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.',
-                'poster' => 'https://picsum.photos/400/600?random=201',
                 'rating' => 'R13+',
                 'tahun_rilis' => 2010,
                 'status' => 'tayang'
@@ -168,7 +210,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'The Dark Knight',
                 'durasi' => 152,
                 'sinopsis' => 'Batman must accept one of the greatest psychological tests when the Joker wreaks havoc on Gotham.',
-                'poster' => 'https://picsum.photos/400/600?random=202',
                 'rating' => 'R13+',
                 'tahun_rilis' => 2008,
                 'status' => 'tayang'
@@ -177,7 +218,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Parasite',
                 'durasi' => 132,
                 'sinopsis' => 'Greed and class discrimination threaten the relationship between the wealthy Park family and the destitute Kim clan.',
-                'poster' => 'https://picsum.photos/400/600?random=203',
                 'rating' => 'R17+',
                 'tahun_rilis' => 2019,
                 'status' => 'tayang'
@@ -186,7 +226,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Spirited Away',
                 'durasi' => 125,
                 'sinopsis' => 'A young girl wanders into a world of gods, witches, and spirits where humans are changed into beasts.',
-                'poster' => 'https://picsum.photos/400/600?random=204',
                 'rating' => 'SU',
                 'tahun_rilis' => 2001,
                 'status' => 'tayang'
@@ -195,7 +234,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Dune: Part Two',
                 'durasi' => 166,
                 'sinopsis' => 'Paul Atreides continues his journey on Arrakis, uniting with the Fremen to fight against the Harkonnens.',
-                'poster' => 'https://picsum.photos/400/600?random=205',
                 'rating' => 'R13+',
                 'tahun_rilis' => 2024,
                 'status' => 'tayang'
@@ -204,7 +242,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Oppenheimer',
                 'durasi' => 180,
                 'sinopsis' => 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.',
-                'poster' => 'https://picsum.photos/400/600?random=206',
                 'rating' => 'R17+',
                 'tahun_rilis' => 2023,
                 'status' => 'tayang'
@@ -213,7 +250,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'The Marvels',
                 'durasi' => 105,
                 'sinopsis' => 'Carol Danvers teams up with two other superheroes to save the universe.',
-                'poster' => 'https://picsum.photos/400/600?random=207',
                 'rating' => 'R13+',
                 'tahun_rilis' => 2023,
                 'status' => 'tayang'
@@ -222,7 +258,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Wonka',
                 'durasi' => 116,
                 'sinopsis' => 'The story of how Willy Wonka became the world\'s greatest inventor and chocolatier.',
-                'poster' => 'https://picsum.photos/400/600?random=208',
                 'rating' => 'SU',
                 'tahun_rilis' => 2023,
                 'status' => 'tayang'
@@ -231,7 +266,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Mission: Impossible 7',
                 'durasi' => 163,
                 'sinopsis' => 'Ethan Hunt and his IMF team must track down a terrifying new weapon that threatens humanity.',
-                'poster' => 'https://picsum.photos/400/600?random=209',
                 'rating' => 'R13+',
                 'tahun_rilis' => 2023,
                 'status' => 'tayang'
@@ -240,7 +274,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Avatar: The Way of Water',
                 'durasi' => 192,
                 'sinopsis' => 'Jake Sully lives with his newfound family on Pandora, but a new threat forces him to protect his home.',
-                'poster' => 'https://picsum.photos/400/600?random=210',
                 'rating' => 'R13+',
                 'tahun_rilis' => 2022,
                 'status' => 'tayang'
@@ -249,7 +282,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'John Wick: Chapter 4',
                 'durasi' => 169,
                 'sinopsis' => 'John Wick uncovers a path to defeating The High Table, but must face new enemies with powerful alliances.',
-                'poster' => 'https://picsum.photos/400/600?random=211',
                 'rating' => 'R17+',
                 'tahun_rilis' => 2023,
                 'status' => 'tayang'
@@ -258,7 +290,6 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Spider-Man: Across the Spider-Verse',
                 'durasi' => 140,
                 'sinopsis' => 'Miles Morales catapults across the Multiverse, where he encounters a team of Spider-People.',
-                'poster' => 'https://picsum.photos/400/600?random=212',
                 'rating' => 'SU',
                 'tahun_rilis' => 2023,
                 'status' => 'tayang'
@@ -267,12 +298,19 @@ class TheaterSeeder extends Seeder
 
         $filmIds = [];
         foreach ($films as $index => $film) {
+            // Download and store movie poster
+            $posterPath = $this->downloadImage(
+                "https://picsum.photos/400/600?random=20" . ($index + 1),
+                "poster_" . ($index + 1) . ".jpg",
+                "posters"
+            );
+
             $id = DB::table('film')->insertGetId([
                 'sutradara_id' => $sutradaraIds[array_rand($sutradaraIds)],
                 'judul' => $film['judul'],
                 'durasi' => $film['durasi'],
                 'sinopsis' => $film['sinopsis'],
-                'poster' => $film['poster'],
+                'poster' => $posterPath,
                 'rating' => $film['rating'],
                 'tahun_rilis' => $film['tahun_rilis'],
                 'status' => $film['status'],
@@ -448,8 +486,95 @@ class TheaterSeeder extends Seeder
 
         $detailPemesananData = [];
 
-        // Create 20 random bookings (reduced for performance)
-        for ($i = 0; $i < 20; $i++) {
+        // Phase 1: Ensure each schedule has at least 25 booked seats
+        foreach ($jadwalTayangIds as $jadwalTayangId) {
+            $jadwal = DB::table('jadwal_tayang')->where('id', $jadwalTayangId)->first();
+
+            if (!$jadwal) continue;
+
+            $studio = DB::table('studio')->where('id', $jadwal->studio_id)->first();
+
+            if (!$studio) continue;
+
+            // Count currently booked seats for this schedule
+            $currentBookedCount = DB::table('detail_pemesanan')
+                ->join('pemesanan', 'detail_pemesanan.pemesanan_id', '=', 'pemesanan.id')
+                ->where('pemesanan.jadwal_tayang_id', $jadwalTayangId)
+                ->whereIn('pemesanan.status_pembayaran', ['lunas', 'pending'])
+                ->count();
+
+            $seatsNeeded = max(0, 25 - $currentBookedCount);
+
+            if ($seatsNeeded > 0) {
+                // Get available seats for this schedule
+                $availableKursi = DB::table('kursi')
+                    ->where('studio_id', $jadwal->studio_id)
+                    ->whereNotIn('id', function ($query) use ($jadwalTayangId) {
+                        $query->select('kursi_id')
+                            ->from('detail_pemesanan')
+                            ->join('pemesanan', 'detail_pemesanan.pemesanan_id', '=', 'pemesanan.id')
+                            ->where('pemesanan.jadwal_tayang_id', $jadwalTayangId)
+                            ->whereIn('pemesanan.status_pembayaran', ['lunas', 'pending']);
+                    })
+                    ->pluck('id')
+                    ->toArray();
+
+                if (count($availableKursi) > 0) {
+                    // Take only the needed number of seats (max available)
+                    $seatsToBook = min($seatsNeeded, count($availableKursi));
+                    $selectedKursi = array_slice($availableKursi, 0, $seatsToBook);
+
+                    // Calculate price based on studio type and day type
+                    $tanggalTayang = Carbon::parse($jadwal->tanggal_tayang);
+                    $isWeekend = in_array($tanggalTayang->dayOfWeek, [0, 6]);
+                    $tipeHari = $isWeekend ? 'weekend' : 'weekday';
+
+                    $hargaTiket = DB::table('harga_tiket')
+                        ->where('tipe_studio', $studio->tipe_studio)
+                        ->where('tipe_hari', $tipeHari)
+                        ->first();
+
+                    $totalHarga = $hargaTiket ? $hargaTiket->harga * $seatsToBook : 35000 * $seatsToBook;
+
+                    // Generate kode_booking
+                    $bookingNumber = count($detailPemesananData) + 1;
+                    $kodeBooking = 'BK' . date('md') . str_pad($bookingNumber, 6, '0', STR_PAD_LEFT);
+                    $kodeBooking = substr($kodeBooking, 0, 14);
+
+                    $pemesananId = DB::table('pemesanan')->insertGetId([
+                        'kode_booking' => $kodeBooking,
+                        'user_id' => $pelangganIds[array_rand($pelangganIds)],
+                        'jadwal_tayang_id' => $jadwalTayangId,
+                        'jumlah_tiket' => $seatsToBook,
+                        'total_harga' => $totalHarga,
+                        'metode_pembayaran' => 'transfer',
+                        'jenis_pemesanan' => 'online',
+                        'status_pembayaran' => 'lunas', // Mark as paid for guaranteed seats
+                        'tanggal_pemesanan' => Carbon::now()->subDays(rand(1, 3)),
+                        'kasir_id' => null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    // Create detail pemesanan for each seat
+                    foreach ($selectedKursi as $kursiId) {
+                        $detailPemesananData[] = [
+                            'pemesanan_id' => $pemesananId,
+                            'kursi_id' => $kursiId,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    }
+
+                    echo "Added {$seatsToBook} seats for schedule {$jadwalTayangId} (Studio: {$studio->nama_studio})\n";
+                }
+            }
+        }
+
+        // Phase 2: Add additional random bookings (existing logic)
+        $additionalBookings = 30; // Additional random bookings
+
+        for ($i = 0; $i < $additionalBookings; $i++) {
             $jadwalTayangId = $jadwalTayangIds[array_rand($jadwalTayangIds)];
             $jadwal = DB::table('jadwal_tayang')->where('id', $jadwalTayangId)->first();
 
@@ -489,12 +614,13 @@ class TheaterSeeder extends Seeder
 
             $totalHarga = $hargaTiket ? $hargaTiket->harga * $jumlahTiket : 35000 * $jumlahTiket;
 
-            $statusPembayaran = ['pending', 'lunas'][rand(0, 1)]; // Only active bookings
+            $statusPembayaran = ['pending', 'lunas'][rand(0, 1)];
             $jenisPemesanan = ['online', 'offline'][rand(0, 1)];
             $metodePembayaran = ['cash', 'transfer', 'qris', 'debit'][rand(0, 3)];
 
             // Generate kode_booking
-            $kodeBooking = 'BK' . date('md') . str_pad($i, 6, '0', STR_PAD_LEFT);
+            $bookingNumber = count($detailPemesananData) + $i + 1;
+            $kodeBooking = 'BK' . date('md') . str_pad($bookingNumber, 6, '0', STR_PAD_LEFT);
             $kodeBooking = substr($kodeBooking, 0, 14);
 
             $pemesananId = DB::table('pemesanan')->insertGetId([
@@ -523,9 +649,35 @@ class TheaterSeeder extends Seeder
             }
         }
 
-        // Insert detail pemesanan in chunks
+        // Insert all detail pemesanan in chunks
         foreach (array_chunk($detailPemesananData, 100) as $chunk) {
             DB::table('detail_pemesanan')->insert($chunk);
+        }
+
+        echo "Seeding completed. Total bookings created: " . count($detailPemesananData) . " seat reservations\n";
+
+        // Verify each schedule has at least 25 booked seats
+        $this->verifyMinimumSeats($jadwalTayangIds);
+    }
+
+    private function verifyMinimumSeats(array $jadwalTayangIds): void
+    {
+        echo "\nVerifying minimum 25 seats per schedule:\n";
+
+        foreach ($jadwalTayangIds as $jadwalTayangId) {
+            $bookedCount = DB::table('detail_pemesanan')
+                ->join('pemesanan', 'detail_pemesanan.pemesanan_id', '=', 'pemesanan.id')
+                ->where('pemesanan.jadwal_tayang_id', $jadwalTayangId)
+                ->whereIn('pemesanan.status_pembayaran', ['lunas', 'pending'])
+                ->count();
+
+            $jadwal = DB::table('jadwal_tayang')->where('id', $jadwalTayangId)->first();
+            $studio = $jadwal ? DB::table('studio')->where('id', $jadwal->studio_id)->first() : null;
+
+            $studioName = $studio ? $studio->nama_studio : 'Unknown';
+            $status = $bookedCount >= 25 ? '✓' : '✗';
+
+            echo "Schedule {$jadwalTayangId} ({$studioName}): {$bookedCount} seats {$status}\n";
         }
     }
 }

@@ -15,11 +15,8 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Home Page') }}
                     </x-nav-link>
-                    {{-- <x-nav-link :href="route('your-order')" :active="request()->routeIs('your-order')">
-                        {{ __('Check Your Order Here !!') }}
-                    </x-nav-link> --}}
-                    <x-nav-link >
-                        {{ __('Check Your Order Here !!') }}
+                    <x-nav-link :href="route('pemesanan.my-bookings')" :active="request()->routeIs('pemesanan.my-bookings')">
+                        {{ __('My Bookings') }}
                     </x-nav-link>
                 </div>
             </div>
