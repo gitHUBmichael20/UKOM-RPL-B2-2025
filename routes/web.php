@@ -14,6 +14,7 @@ use App\Livewire\Admin\StudioCreate;
 use App\Livewire\Admin\StudioEdit;
 use App\Livewire\Admin\FilmManagement;
 use App\Livewire\Admin\GenreManagement;
+use App\Livewire\Admin\PemesananManagement;
 use App\Livewire\Admin\FilmCreate;
 use App\Livewire\Admin\FilmEdit;
 use App\Livewire\Admin\HargaTiketCreate;
@@ -124,7 +125,7 @@ Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')
 
     // Pemesanan Management (Admin & Kasir)
     Route::prefix('pemesanan')->name('pemesanan.')->group(function () {
-        Route::get('/', [PaymentController::class, 'index'])->name('index');
+        Route::get('/', PemesananManagement::class)->name('index');
         Route::get('/{id}/edit', [PaymentController::class, 'edit'])->name('edit');
         Route::put('/{id}', [PaymentController::class, 'update'])->name('update');
         Route::delete('/{id}', [PaymentController::class, 'destroy'])->name('destroy');
