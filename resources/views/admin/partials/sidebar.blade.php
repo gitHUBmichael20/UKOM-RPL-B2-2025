@@ -31,7 +31,8 @@
 
             <!-- Jadwal Tayang -->
             <li>
-                <a href="#" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+                <a href="{{ route('admin.jadwal-tayang.index') }}"
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
                     <i class="fa-solid fa-calendar-days w-5 text-gray-300"></i>
                     <span class="ml-3">Jadwal Tayang</span>
                 </a>
@@ -55,14 +56,24 @@
                 </a>
             </li>
 
-            <!-- Pemesanan -->
-            <li>
-                <a href="{{ route('admin.pemesanan.index') }}"
-                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.pemesanan.*') ? 'bg-gray-700' : '' }}">
-                    <i class="fa-solid fa-receipt w-5 text-gray-300"></i>
-                    <span class="ml-3">Pemesanan</span>
-                </a>
-            </li>
+<!-- Pemesanan -->
+@if (isRole('admin'))
+    <li>
+        <a href="{{ route('admin.pemesanan.index') }}"
+            class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.pemesanan.index') ? 'bg-gray-700' : '' }}">
+            <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
+            <span class="ml-3">Pemesanan</span>
+        </a>
+    </li>
+@elseif (isRole('kasir'))
+    <li>
+        <a href="{{ route('admin.kasir.pemesanan.index') }}"
+            class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.kasir.pemesanan.index') ? 'bg-gray-700' : '' }}">
+            <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
+            <span class="ml-3">Pemesanan</span>
+        </a>
+    </li>
+@endif
 
             @if (isRole('admin'))
                 <!-- Divider -->
@@ -81,10 +92,9 @@
 
                 <!-- Sutradara -->
                 <li>
-                    <a href="{{ route('admin.sutradara.index') }}"
-                        class="flex items-center p-3 rounded-lg text-white 
-                        hover:bg-gray-700
-                        {{ request()->routeIs('admin.sutradara.*') ? 'bg-gray-700' : '' }}">
+                    <a href="{{ route('admin.sutradara.index') }}" class="flex items-center p-3 rounded-lg text-white 
+                            hover:bg-gray-700
+                            {{ request()->routeIs('admin.sutradara.*') ? 'bg-gray-700' : '' }}">
                         <i class="fa-solid fa-user-tie w-5 text-gray-300"></i>
                         <span class="ml-3">Sutradara</span>
                     </a>

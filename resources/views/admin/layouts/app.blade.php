@@ -23,12 +23,16 @@
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <div class="flex flex-1">
         <!-- Sidebar -->
+        @if (isRole('admin', 'kasir'))
         @include('admin.partials.sidebar')
+        @endif
 
         <!-- Main Content Wrapper -->
         <div class="flex-1 lg:ml-64 transition-all duration-300 flex flex-col">
             <!-- Topbar -->
+            @if (isRole('admin', 'kasir'))
             @include('admin.partials.topbar')
+            @endif
 
             <!-- Page Content -->
             <main class="p-4 md:p-6 lg:p-8 flex-1">
@@ -40,7 +44,9 @@
             </main>
 
             <!-- Footer -->
+            @if (isRole('admin', 'kasir'))
             @include('admin.partials.footer')
+            @endif
         </div>
     </div>
 

@@ -67,7 +67,7 @@
                             Sutradara <span class="text-red-500">*</span>
                         </label>
                         <select id="sutradara_id"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg @error('sutradara_id') border-red-500 @enderror">
+                                class="w-full px-2 py-2 border border-gray-300 rounded-lg @error('sutradara_id') border-red-500 @enderror">
                             <option value="">Pilih Sutradara</option>
                             @foreach ($sutradaras as $sutradara)
                                 <option value="{{ $sutradara->id }}"
