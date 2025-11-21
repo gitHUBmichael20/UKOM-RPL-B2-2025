@@ -36,6 +36,7 @@ class DashboardFilm extends Component
     public function closeModal()
     {
         $this->selectedFilm = null;
+        $this->dispatch('close-modal');
     }
 
     public function render()

@@ -218,7 +218,7 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Parasite',
                 'durasi' => 132,
                 'sinopsis' => 'Greed and class discrimination threaten the relationship between the wealthy Park family and the destitute Kim clan.',
-                'rating' => 'R17+',
+                'rating' => 'D17+',
                 'tahun_rilis' => 2019,
                 'status' => 'tayang'
             ],
@@ -242,7 +242,7 @@ class TheaterSeeder extends Seeder
                 'judul' => 'Oppenheimer',
                 'durasi' => 180,
                 'sinopsis' => 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.',
-                'rating' => 'R17+',
+                'rating' => 'D17+',
                 'tahun_rilis' => 2023,
                 'status' => 'tayang'
             ],
@@ -282,7 +282,7 @@ class TheaterSeeder extends Seeder
                 'judul' => 'John Wick: Chapter 4',
                 'durasi' => 169,
                 'sinopsis' => 'John Wick uncovers a path to defeating The High Table, but must face new enemies with powerful alliances.',
-                'rating' => 'R17+',
+                'rating' => 'D17+',
                 'tahun_rilis' => 2023,
                 'status' => 'tayang'
             ],

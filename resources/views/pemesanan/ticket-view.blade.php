@@ -25,7 +25,7 @@
                 <!-- Movie Info -->
                 <div class="p-6 border-b border-gray-200">
                     <div class="flex items-center space-x-4">
-                        <img src="{{ $pemesanan->jadwalTayang->film->poster ?? '/placeholder-poster.jpg' }}"
+                        <img src="{{ $pemesanan->jadwalTayang->film->poster ?? 'storage/default_poster.png' }}"
                             alt="{{ $pemesanan->jadwalTayang->film->judul }}" class="w-20 h-28 object-cover rounded-lg">
                         <div class="flex-1">
                             <h2 class="text-xl font-bold text-gray-900">{{ $pemesanan->jadwalTayang->film->judul }}</h2>

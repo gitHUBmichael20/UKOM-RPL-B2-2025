@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('durasi');
             $table->text('sinopsis')->nullable();
             $table->string('poster', 255)->nullable();
-            $table->enum('rating', ['SU', 'R13+', 'R17+', 'D21+']);
+            $table->enum('rating', ['SU', 'R13+', 'D17+', 'D21+']);
             $table->year('tahun_rilis');
             $table->enum('status', ['tayang', 'segera', 'selesai'])->default('segera');
             $table->timestamps();

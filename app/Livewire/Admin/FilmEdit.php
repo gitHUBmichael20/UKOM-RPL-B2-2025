@@ -31,7 +31,7 @@ class FilmEdit extends Component
         'durasi' => 'required|integer',
         'sinopsis' => 'required|string',
         'poster' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-        'rating' => 'required|string|in:SU,R13+,R17+,D21+',
+        'rating' => 'required|string|in:SU,R13+,D17+,D21+',
         'tahun_rilis' => 'required|integer|min:1900|max:2100',
         'status' => 'required|string|in:tayang,segera,selesai',
         'selectedGenres' => 'required|array|min:1',

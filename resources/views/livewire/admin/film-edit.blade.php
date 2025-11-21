@@ -109,7 +109,7 @@
                             <option value="">Pilih Rating</option>
                             <option value="SU">SU - Semua Umur</option>
                             <option value="R13+">R13+ - 13 Tahun ke atas</option>
-                            <option value="R17+">R17+ - 17 Tahun ke atas</option>
+                            <option value="D17+">D17+ - 17 Tahun ke atas</option>
                             <option value="D21+">D21+ - Dewasa 21 Tahun ke atas</option>
                         </select>
                         @error('rating')
@@ -150,19 +150,14 @@
                             <p class="text-xs text-gray-600 mb-2 font-medium">Preview Poster:</p>
                             @if ($poster)
                                 <!-- Show NEW poster if uploaded -->
-                                <img src="{{ $poster->temporaryUrl() }}"
+                                <img src="{{ $poster ? $poster->temporaryUrl() : asset('storage/default_poster.png') }}"
                                      alt="Preview Poster Baru"
                                      class="w-48 h-64 object-cover rounded-lg shadow-md">
-                            @elseif ($oldPoster)
+                            @else ($oldPoster)
                                 <!-- Show OLD poster if no new upload -->
-                                <img src="{{ asset('storage/' . $oldPoster) }}"
+                                <img src="{{ $oldPoster ? asset('storage/' . $oldPoster) : asset('storage/default_poster.png') }}"
                                      alt="Preview Poster"
                                      class="w-48 h-64 object-cover rounded-lg shadow-md">
-                            @else
-                                <!-- No poster at all -->
-                                <div class="w-48 h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-                                    <i class="fa-solid fa-image text-gray-400 text-4xl"></i>
-                                </div>
                             @endif
                         </div>
 

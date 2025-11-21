@@ -59,7 +59,7 @@
                             @foreach ($sutradaras as $sutradara)
                                 <option value="{{ $sutradara->id }}"
                                         {{ $sutradara_id == $sutradara->id ? 'selected' : '' }}>
-                                    {{ $skutradara->nama_sutradara }}
+                                    {{ $sutradara->nama_sutradara }}
                                 </option>
                             @endforeach
                         </select>
@@ -96,7 +96,7 @@
                             <option value="">Pilih Rating</option>
                             <option value="SU">SU - Semua Umur</option>
                             <option value="R13+">R13+ - 13 Tahun ke atas</option>
-                            <option value="R17+">R17+ - 17 Tahun ke atas</option>
+                            <option value="D17+">D17+ - 17 Tahun ke atas</option>
                             <option value="D21+">D21+ - Dewasa 21 Tahun ke atas</option>
                         </select>
                         @error('rating')
