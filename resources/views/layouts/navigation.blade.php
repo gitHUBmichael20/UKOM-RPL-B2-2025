@@ -10,7 +10,8 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Navigation Links - HANYA untuk user login -->
+                @auth
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Home Page') }}
@@ -19,9 +20,11 @@
                         {{ __('My Bookings') }}
                     </x-nav-link>
                 </div>
+                @endauth
             </div>
 
-            <!-- Settings Dropdown -->
+            <!-- Settings Dropdown - HANYA untuk user login -->
+            @auth
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -58,6 +61,15 @@
                     </x-slot>
                 </x-dropdown>
             </div>
+            @else
+            <!-- Menu untuk GUEST (belum login) -->
+            <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <a href="{{ route('login') }}" class="text-sm text-gray-700 underline mr-4">Log in</a>
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}" class="text-sm text-gray-700 underline">Register</a>
+                @endif
+            </div>
+            @endauth
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
@@ -77,9 +89,13 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
+        @auth
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Home Page') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('pemesanan.my-bookings')" :active="request()->routeIs('pemesanan.my-bookings')">
+                {{ __('My Bookings') }}
             </x-responsive-nav-link>
         </div>
 
@@ -107,5 +123,18 @@
                 </form>
             </div>
         </div>
+        @else
+        <!-- Menu mobile untuk GUEST -->
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('login')">
+                {{ __('Login') }}
+            </x-responsive-nav-link>
+            @if (Route::has('register'))
+                <x-responsive-nav-link :href="route('register')">
+                    {{ __('Register') }}
+                </x-responsive-nav-link>
+            @endif
+        </div>
+        @endauth
     </div>
 </nav>

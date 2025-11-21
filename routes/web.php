@@ -28,6 +28,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+    if (!auth()->check()) {
+        return redirect('/login');
+    }
+
     return app(FilmController::class)->index();
 })->name('home');
 
@@ -117,6 +121,14 @@ Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')
 
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    // Pemesanan Management (Admin & Kasir)
+    Route::prefix('pemesanan')->name('pemesanan.')->group(function () {
+        Route::get('/', [PaymentController::class, 'index'])->name('index');
+        Route::get('/{id}/edit', [PaymentController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [PaymentController::class, 'update'])->name('update');
+        Route::delete('/{id}', [PaymentController::class, 'destroy'])->name('destroy');
+    });
 
     // Studio Management (Admin & Kasir)
     Route::prefix('studio')->name('studio.')->group(function () {
