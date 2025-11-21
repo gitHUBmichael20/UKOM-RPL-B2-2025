@@ -7,6 +7,7 @@ use App\Models\JadwalTayang;
 use App\Models\Studio;
 use App\Models\Kursi;
 use App\Models\Pemesanan;
+use Illuminate\Support\Facades\Auth;
 use App\Models\DetailPemesanan;
 use App\Models\HargaTiket;
 use Illuminate\Http\Request;
@@ -200,5 +201,57 @@ class BookingController extends Controller
 
         $pemesanan->load(['jadwalTayang.film', 'jadwalTayang.studio', 'detailPemesanan.kursi', 'user']);
         return view('pemesanan.ticket', compact('pemesanan'));
+    }
+
+    /**
+     * Show user's booking history
+     */
+    public function myBookings()
+    {
+        $user = Auth::user();
+        $bookings = Pemesanan::where('user_id', $user->id)
+            ->with(['jadwalTayang', 'detailPemesanan']) // eager loading
+            ->orderBy('tanggal_pemesanan', 'desc')
+            ->get();
+
+        return view('pemesanan.my-bookings', compact('bookings'));
+    }
+
+    /**
+     * Show specific booking details
+     */
+    public function bookingDetails(Pemesanan $pemesanan)
+    {
+        if ($pemesanan->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $pemesanan->load([
+            'jadwalTayang.film.sutradara',
+            'jadwalTayang.studio',
+            'detailPemesanan.kursi',
+            'user'
+        ]);
+
+        return view('pemesanan.booking-details', compact('pemesanan'));
+    }
+
+    /**
+     * Show ticket for specific booking
+     */
+    public function viewTicket(Pemesanan $pemesanan)
+    {
+        if ($pemesanan->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $pemesanan->load([
+            'jadwalTayang.film.sutradara',
+            'jadwalTayang.studio',
+            'detailPemesanan.kursi',
+            'user'
+        ]);
+
+        return view('pemesanan.ticket-view', compact('pemesanan'));
     }
 }

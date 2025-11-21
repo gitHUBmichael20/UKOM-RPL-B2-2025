@@ -28,32 +28,49 @@ use Illuminate\Support\Facades\Route;
 
 // Dashboard Routes
 Route::get('/', function () {
-    $user = auth()->user();
-
-    if ($user->role === 'admin' || $user->role === 'kasir') {
-        return redirect()->route('admin.dashboard');
-    }
-
     return app(FilmController::class)->index();
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->name('home');
 
-Route::get('/dashboard', function () {
-    $user = auth()->user();
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
 
-    if ($user->role === 'admin' || $user->role === 'kasir') {
-        return redirect()->route('admin.dashboard');
-    }
+require __DIR__ . '/auth.php';
 
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| Authenticated User Routes
+|--------------------------------------------------------------------------
+*/
 
-// Profile Routes
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::post('/profile/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
-});
+Route::middleware(['auth'])->group(function () {
+
+    // Dashboard Routes
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+
+        if ($user->role === 'admin' || $user->role === 'kasir') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return app(FilmController::class)->index();
+    })->name('dashboard');
+
+    // Profile Routes
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+        Route::post('/delete-photo', [ProfileController::class, 'deletePhoto'])->name('deletePhoto');
+    });
+
+    // Film Booking Routes
+    Route::prefix('pemesanan')->name('pemesanan.')->group(function () {
+        // FIX: Letakkan rute STATIC di atas rute DYNAMIC
+        // My Bookings (STATIC - harus di atas)
+        Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('my-bookings');
 
 // Pemesanan Routes (User)
 Route::middleware(['auth'])->prefix('pemesanan')->name('pemesanan.')->group(function () {
@@ -83,14 +100,17 @@ Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')
         Route::get('/{id}/edit', StudioEdit::class)->name('edit');
     });
 
+    // Film Management (Admin & Kasir)
     Route::prefix('film')->name('film.')->group(function () {
         Route::get('/', FilmManagement::class)->name('index');
         Route::get('/create', FilmCreate::class)->name('create');
         Route::get('/{id}/edit', FilmEdit::class)->name('edit');
     });
 
+    // Genre Management (Admin & Kasir)
     Route::get('/genre', GenreManagement::class)->name('genre.index');
 
+    // Harga Tiket Management (Admin & Kasir)
     Route::prefix('harga-tiket')->name('harga-tiket.')->group(function () {
         Route::get('/', HargaTiketManagement::class)->name('index');
         Route::get('/create', HargaTiketCreate::class)->name('create');
@@ -112,6 +132,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/{id}/edit', UserEdit::class)->name('edit');
     });
 
+    // Sutradara Management (Admin Only)
     Route::prefix('sutradara')->name('sutradara.')->group(function () {
         Route::get('/', [SutradaraManagement::class, 'index'])->name('index');
         Route::get('/create', [SutradaraManagement::class, 'create'])->name('create');

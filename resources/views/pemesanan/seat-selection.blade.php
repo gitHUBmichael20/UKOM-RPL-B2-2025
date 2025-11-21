@@ -51,7 +51,7 @@
                     <div class="bg-white rounded-lg shadow-sm p-6">
                         <div class="flex flex-col md:flex-row gap-6">
                             <div class="flex-shrink-0">
-                                <img src="{{ $film->poster }}" alt="{{ $film->judul }}"
+                                <img src="{{ asset($film->poster) }}" alt="{{ $film->judul }}"
                                     class="w-40 rounded-lg shadow-md">
                             </div>
                             <div class="flex-grow">
