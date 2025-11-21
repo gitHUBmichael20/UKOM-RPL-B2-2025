@@ -145,7 +145,9 @@ class BookingController extends Controller
             $totalHarga = $hargaTiket->harga * count($selectedSeatIds);
 
             // Generate booking code
-            $kodeBooking = 'BK' . date('Ymd') . Str::random(6);
+            do {
+                $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(6));
+            } while (Pemesanan::where('kode_booking', $kodeBooking)->exists());
 
             // Create booking
             $pemesanan = Pemesanan::create([
