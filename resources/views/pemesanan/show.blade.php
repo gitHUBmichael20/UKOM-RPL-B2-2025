@@ -45,7 +45,7 @@
             <!-- Movie Info -->
             <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
                 <div class="flex gap-6">
-                    <img src="{{ $film->poster }}" alt="{{ $film->judul }}" class="w-32 rounded-lg">
+                    <img src="{{ asset($film->poster) }}" alt="{{ $film->judul }}" class="w-32 rounded-lg">
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">{{ $film->judul }}</h1>
                         <p class="text-gray-600 mt-2">{{ $film->genres->pluck('nama_genre')->implode(', ') }} •

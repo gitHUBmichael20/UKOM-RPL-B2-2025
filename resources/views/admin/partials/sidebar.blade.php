@@ -100,7 +100,6 @@
                     </a>
                 </li>
 
-
                 <!-- Users -->
                 <li>
                     <a href="{{ route('admin.users.index') }}"

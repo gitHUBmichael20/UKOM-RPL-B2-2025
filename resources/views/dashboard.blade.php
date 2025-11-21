@@ -46,7 +46,7 @@
                                 onclick="openModal({{ $movie['id'] }})">
                                 <!-- Poster -->
                                 <div class="relative overflow-hidden">
-                                    <img src="{{ $movie['poster'] }}"
+                                    <img src="{{ asset($movie['poster']) }}"
                                         class="w-full aspect-[3/4] object-cover group-hover:scale-105 transition duration-500"
                                         alt="{{ $movie['title'] }}" loading="lazy">
                                     <div
