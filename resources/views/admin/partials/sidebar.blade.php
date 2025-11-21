@@ -1,12 +1,10 @@
 <aside id="sidebar"
-       class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full lg:translate-x-0 bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700">
+    class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full lg:translate-x-0 bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700">
     <div class="h-full px-3 py-4 overflow-y-auto">
         <!-- Logo -->
         <div class="flex items-center justify-between mb-6 px-3">
             <div class="flex items-center space-x-3">
-                <img src="{{ asset('storage/logo.png') }}"
-                     width="60"
-                     alt="">
+                <img src="{{ asset('storage/logo.png') }}" width="60" alt="">
                 <span class="text-xl font-bold text-white">Absolute Cinema</span>
             </div>
         </div>
@@ -16,7 +14,7 @@
             <!-- Dashboard -->
             <li>
                 <a href="{{ route('admin.dashboard') }}"
-                   class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700' : '' }}">
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700' : '' }}">
                     <i class="fa-solid fa-gauge w-5 text-gray-300"></i>
                     <span class="ml-3">Dashboard</span>
                 </a>
@@ -25,7 +23,7 @@
             <!-- Films -->
             <li>
                 <a href="{{ route('admin.film.index') }}"
-                   class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.film.*') ? 'bg-gray-700' : '' }}">
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.film.*') ? 'bg-gray-700' : '' }}">
                     <i class="fa-solid fa-film w-5 text-gray-300"></i>
                     <span class="ml-3">Film</span>
                 </a>
@@ -34,7 +32,7 @@
             <!-- Jadwal Tayang -->
             <li>
                 <a href="{{ route('admin.jadwal-tayang.index') }}"
-                   class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
                     <i class="fa-solid fa-calendar-days w-5 text-gray-300"></i>
                     <span class="ml-3">Jadwal Tayang</span>
                 </a>
@@ -43,7 +41,7 @@
             <!-- Studio -->
             <li>
                 <a href="{{ route('admin.studio.index') }}"
-                   class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.studio.*') ? 'bg-gray-700' : '' }}">
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.studio.*') ? 'bg-gray-700' : '' }}">
                     <i class="fa-solid fa-video w-5 text-gray-300"></i>
                     <span class="ml-3">Studio</span>
                 </a>
@@ -52,20 +50,30 @@
             <!-- Harga Tiket -->
             <li>
                 <a href="{{ route('admin.harga-tiket.index') }}"
-                   class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.harga-tiket.*') ? 'bg-gray-700' : '' }}">
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.harga-tiket.*') ? 'bg-gray-700' : '' }}">
                     <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
                     <span class="ml-3">Harga Tiket</span>
                 </a>
             </li>
 
-            <!-- Pemesanan -->
-            <li>
-                <a href="#"
-                   class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
-                    <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
-                    <span class="ml-3">Pemesanan</span>
-                </a>
-            </li>
+<!-- Pemesanan -->
+@if (isRole('admin'))
+    <li>
+        <a href="{{ route('admin.pemesanan.index') }}"
+            class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.pemesanan.index') ? 'bg-gray-700' : '' }}">
+            <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
+            <span class="ml-3">Pemesanan</span>
+        </a>
+    </li>
+@elseif (isRole('kasir'))
+    <li>
+        <a href="{{ route('admin.kasir.pemesanan.index') }}"
+            class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.kasir.pemesanan.index') ? 'bg-gray-700' : '' }}">
+            <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
+            <span class="ml-3">Pemesanan</span>
+        </a>
+    </li>
+@endif
 
             @if (isRole('admin'))
                 <!-- Divider -->
@@ -76,7 +84,7 @@
                 <!-- Genre -->
                 <li>
                     <a href="{{ route('admin.genre.index') }}"
-                       class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+                        class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
                         <i class="fa-solid fa-tags w-5 text-gray-300"></i>
                         <span class="ml-3">Genre</span>
                     </a>
@@ -84,10 +92,9 @@
 
                 <!-- Sutradara -->
                 <li>
-                    <a href="{{ route('admin.sutradara.index') }}"
-                       class="flex items-center p-3 rounded-lg text-white 
-                        hover:bg-gray-700
-                        {{ request()->routeIs('admin.sutradara.*') ? 'bg-gray-700' : '' }}">
+                    <a href="{{ route('admin.sutradara.index') }}" class="flex items-center p-3 rounded-lg text-white 
+                            hover:bg-gray-700
+                            {{ request()->routeIs('admin.sutradara.*') ? 'bg-gray-700' : '' }}">
                         <i class="fa-solid fa-user-tie w-5 text-gray-300"></i>
                         <span class="ml-3">Sutradara</span>
                     </a>
@@ -97,7 +104,7 @@
                 <!-- Users -->
                 <li>
                     <a href="{{ route('admin.users.index') }}"
-                       class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700' : '' }}">
+                        class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700' : '' }}">
                         <i class="fa-solid fa-users w-5 text-gray-300"></i>
                         <span class="ml-3">Users</span>
                     </a>
@@ -105,8 +112,7 @@
 
                 <!-- Laporan -->
                 <li>
-                    <a href="#"
-                       class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+                    <a href="#" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
                         <i class="fa-solid fa-chart-column w-5 text-gray-300"></i>
                         <span class="ml-3">Laporan</span>
                     </a>
@@ -121,7 +127,7 @@
             <!-- Profile -->
             <li>
                 <a href="{{ route('profile.edit') }}"
-                   class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('profile.edit') ? 'bg-gray-700' : '' }}">
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('profile.edit') ? 'bg-gray-700' : '' }}">
                     <i class="fa-solid fa-user w-5 text-gray-300"></i>
                     <span class="ml-3">Profile</span>
                 </a>
