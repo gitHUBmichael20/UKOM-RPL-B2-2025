@@ -58,4 +58,17 @@ class JadwalTayang extends Model
             Carbon::parse($this->tanggal_tayang->format('Y-m-d') . ' ' . $this->jam_tayang)
         );
     }
+
+    public function getHargaTiketAttribute()
+    {
+        $tanggal = Carbon::parse($this->tanggal_tayang);
+        $isWeekend = in_array($tanggal->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY]);
+        $tipeHari = $isWeekend ? 'weekend' : 'weekday';
+
+        $harga = HargaTiket::where('tipe_studio', $this->studio->tipe_studio)
+            ->where('tipe_hari', $tipeHari)
+            ->value('harga');
+
+        return $harga;
+    }
 }

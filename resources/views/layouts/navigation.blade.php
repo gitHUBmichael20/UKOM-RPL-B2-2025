@@ -1,7 +1,4 @@
-{{-- GANTI SELURUH NAVBAR LAMA DENGAN INI --}}
-{{-- resources/views/components/application-nav.blade.php atau di layout utamamu --}}
-
-{{-- BOTTOM NAVIGATION MOBILE - Fixed di bawah (hanya muncul di hp) --}}
+{{-- BOTTOM NAVIGATION MOBILE --}}
 <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 lg:hidden shadow-2xl">
     <div class="flex justify-around items-stretch h-16">
         <!-- Home -->
@@ -22,7 +19,9 @@
         @auth
             <a href="{{ route('profile.edit') }}"
                class="flex flex-col items-center justify-center flex-1 gap-1 {{ request()->routeIs('profile.*') ? 'text-blue-600' : 'text-gray-500' }} hover:text-blue-600 transition">
-                <i class="fas fa-user text-2xl"></i>
+                <img src="{{ Auth::user()->profile_photo_url ?? asset('storage/default_profile.jpg') }}"
+                     alt="Profil"
+                     class="w-6 h-6 rounded-full object-cover">
                 <span class="text-xs font-medium">Profil</span>
             </a>
         @else
@@ -35,7 +34,7 @@
     </div>
 </div>
 
-{{-- TOP NAVBAR - Hanya muncul di tablet ke atas (lg+) --}}
+{{-- TOP NAVBAR DESKTOP --}}
 <nav class="bg-white border-b border-gray-100 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -49,7 +48,6 @@
                 </div>
 
                 <!-- Menu Home & Tiket Saya (hanya desktop) -->
-                @auth
                     <div class="hidden lg:flex items-center ml-10 space-x-8">
                         <x-nav-link :href="route('dashboard')"
                                     :active="request()->routeIs('dashboard')">
@@ -60,7 +58,6 @@
                             Tiket Saya
                         </x-nav-link>
                     </div>
-                @endauth
             </div>
 
             <!-- Profile Dropdown atau Login (Desktop) -->
@@ -70,15 +67,12 @@
                                 width="48">
                         <x-slot name="trigger">
                             <button
-                                    class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none transition">
+                                    class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none transition gap-2">
+                                <img class="w-8 h-8 rounded-full object-cover"
+                                     src="{{ Auth::user()->profile_photo_url }}"
+                                     alt="Profil">
                                 <div>{{ Auth::user()->name }}</div>
-                                <svg class="ml-2 h-4 w-4"
-                                     fill="currentColor"
-                                     viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                          clip-rule="evenodd" />
-                                </svg>
+                                <i class="fas fa-chevron-down text-xs"></i>
                             </button>
                         </x-slot>
 

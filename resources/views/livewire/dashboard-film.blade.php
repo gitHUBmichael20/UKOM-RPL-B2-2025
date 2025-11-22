@@ -39,13 +39,11 @@
 
             @if($sedangTayang->count() > 0)
                 <div class="relative group">
-                    <!-- Scroll Container -->
                     <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth"
                          id="tayang-container">
                         @foreach($sedangTayang as $film)
                                     <div wire:click="openModal({{ $film->id }})"
                                          class="flex-none w-40 sm:w-48 cursor-pointer relative overflow-hidden rounded-lg shadow-lg snap-start group/card">
-
                                         <img src="{{ $film->poster ? asset('storage/' . $film->poster) : asset('storage/default_poster.png') }}"
                                              alt="{{ $film->judul }}"
                                              class="w-full aspect-[2/3] object-cover group-hover/card:scale-110 transition duration-500">
@@ -59,28 +57,17 @@
                             $film->rating === 'SU' ? 'bg-green-500 text-white' :
                             ($film->rating === 'R13+' ? 'bg-yellow-500 text-white' :
                                 ($film->rating === 'D17+' ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'))
-                                                        }}">
-                                                    {{ $film->rating }}
-                                                </span>
+                                                        }}">{{ $film->rating }}</span>
                                             </div>
                                         </div>
                                     </div>
                         @endforeach
 
-                        <!-- Load More Card -->
                         @if($hasMoreTayang)
                             <div wire:click="loadMoreTayang"
                                  class="flex-none w-40 sm:w-48 cursor-pointer bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg shadow-lg snap-start flex items-center justify-center hover:scale-105 transition aspect-[2/3]">
                                 <div class="text-center text-white p-4">
-                                    <svg class="w-12 h-12 mx-auto mb-2"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              stroke-width="2"
-                                              d="M12 4v16m8-8H4"></path>
-                                    </svg>
+                                    <i class="fa-solid fa-plus text-5xl mb-2"></i>
                                     <p class="font-bold text-sm">Lihat Lebih</p>
                                     <p class="text-xs opacity-90 mt-1">{{ $totalTayang - $sedangTayang->count() }} lagi</p>
                                 </div>
@@ -91,27 +78,11 @@
                     <!-- Scroll Buttons -->
                     <button onclick="document.getElementById('tayang-container').scrollBy({left: -400, behavior: 'smooth'})"
                             class="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white shadow-xl rounded-full w-12 h-12 items-center justify-center opacity-0 group-hover:opacity-100 transition z-10">
-                        <svg class="w-6 h-6"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M15 19l-7-7 7-7"></path>
-                        </svg>
+                        <i class="fa-solid fa-chevron-left text-xl"></i>
                     </button>
                     <button onclick="document.getElementById('tayang-container').scrollBy({left: 400, behavior: 'smooth'})"
                             class="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white shadow-xl rounded-full w-12 h-12 items-center justify-center opacity-0 group-hover:opacity-100 transition z-10">
-                        <svg class="w-6 h-6"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M9 5l7 7-7 7"></path>
-                        </svg>
+                        <i class="fa-solid fa-chevron-right text-xl"></i>
                     </button>
                 </div>
             @else
@@ -133,13 +104,11 @@
 
             @if($segeraTayang->count() > 0)
                 <div class="relative group">
-                    <!-- Scroll Container -->
                     <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth"
                          id="segera-container">
                         @foreach($segeraTayang as $film)
                                     <div wire:click="openModal({{ $film->id }})"
                                          class="flex-none w-40 sm:w-48 cursor-pointer relative overflow-hidden rounded-lg shadow-lg snap-start group/card">
-
                                         <img src="{{ $film->poster ? asset('storage/' . $film->poster) : asset('storage/default_poster.png') }}"
                                              alt="{{ $film->judul }}"
                                              class="w-full aspect-[2/3] object-cover brightness-90 group-hover/card:scale-110 transition duration-500">
@@ -158,28 +127,17 @@
                             $film->rating === 'SU' ? 'bg-green-500 text-white' :
                             ($film->rating === 'R13+' ? 'bg-yellow-500 text-white' :
                                 ($film->rating === 'D17+' ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'))
-                                                        }}">
-                                                    {{ $film->rating }}
-                                                </span>
+                                                        }}">{{ $film->rating }}</span>
                                             </div>
                                         </div>
                                     </div>
                         @endforeach
 
-                        <!-- Load More Card -->
                         @if($hasMoreSegera)
                             <div wire:click="loadMoreSegera"
                                  class="flex-none w-40 sm:w-48 cursor-pointer bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg shadow-lg snap-start flex items-center justify-center hover:scale-105 transition aspect-[2/3]">
                                 <div class="text-center text-white p-4">
-                                    <svg class="w-12 h-12 mx-auto mb-2"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              stroke-width="2"
-                                              d="M12 4v16m8-8H4"></path>
-                                    </svg>
+                                    <i class="fa-solid fa-plus text-5xl mb-2"></i>
                                     <p class="font-bold text-sm">Lihat Lebih</p>
                                     <p class="text-xs opacity-90 mt-1">{{ $totalSegera - $segeraTayang->count() }} lagi</p>
                                 </div>
@@ -187,30 +145,13 @@
                         @endif
                     </div>
 
-                    <!-- Scroll Buttons -->
                     <button onclick="document.getElementById('segera-container').scrollBy({left: -400, behavior: 'smooth'})"
                             class="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white shadow-xl rounded-full w-12 h-12 items-center justify-center opacity-0 group-hover:opacity-100 transition z-10">
-                        <svg class="w-6 h-6"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M15 19l-7-7 7-7"></path>
-                        </svg>
+                        <i class="fa-solid fa-chevron-left text-xl"></i>
                     </button>
                     <button onclick="document.getElementById('segera-container').scrollBy({left: 400, behavior: 'smooth'})"
                             class="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white shadow-xl rounded-full w-12 h-12 items-center justify-center opacity-0 group-hover:opacity-100 transition z-10">
-                        <svg class="w-6 h-6"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M9 5l7 7-7 7"></path>
-                        </svg>
+                        <i class="fa-solid fa-chevron-right text-xl"></i>
                     </button>
                 </div>
             @else
@@ -219,50 +160,59 @@
         </section>
     </div>
 
-    <!-- Modal Detail Film -->
     @if($selectedFilm)
-        <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+        <div class="fixed inset-0 bg-black/80 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4 overflow-y-auto"
              wire:click="closeModal">
-            <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
-                 wire:click.stop>
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-6">
-                        <h2 class="text-3xl font-bold text-gray-900">{{ $selectedFilm->judul }}</h2>
+
+            <div class="lg:hidden absolute inset-0"
+                 wire:click="closeModal"></div>
+
+            <div class="bg-white rounded-t-3xl lg:rounded-2xl w-full max-w-5xl max-h-[92vh] lg:max-h-[90vh] overflow-y-auto relative flex flex-col"
+                 wire:click.stop
+                 x-data="{ dragged: false }"
+                 @touchstart="dragged = false"
+                 @touchmove="dragged = true"
+                 @touchend="if(!dragged) $event.target.closest('[wire\\:click]').click()">
+
+                <!-- Drag handle mobile -->
+                <div class="lg:hidden sticky top-0 z-10 flex justify-center pt-4 pb-2 bg-white">
+                    <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+                </div>
+
+                <div class="px-5 lg:px-8 pt-2 lg:pt-6 pb-8 lg:pb-10 flex-1">
+                    <div class="flex justify-between items-start mb-5 lg:mb-8">
+                        <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
+                            {{ $selectedFilm->judul }}
+                        </h2>
                         <button wire:click="closeModal"
-                                class="text-gray-500 hover:text-gray-700">
-                            <svg class="w-8 h-8"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="2"
-                                      d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+                                class="text-gray-500 hover:text-gray-800 transition shrink-0 ml-4">
+                            <i class="fa-solid fa-xmark text-3xl lg:text-4xl"></i>
                         </button>
                     </div>
 
-                    <div class="grid lg:grid-cols-3 gap-8">
-                        <div>
+                    <div class="grid lg:grid-cols-3 gap-6 lg:gap-8">
+                        <!-- Poster - diperkecil di mobile -->
+                        <div class="lg:col-span-1 flex justify-center">
                             <img src="{{ $selectedFilm->poster ? asset('storage/' . $selectedFilm->poster) : asset('storage/default_poster.png') }}"
                                  alt="{{ $selectedFilm->judul }}"
-                                 class="w-full rounded-xl shadow-xl aspect-[2/3] object-cover">
+                                 class="w-full max-w-[180px] lg:max-w-none rounded-xl lg:rounded-2xl shadow-2xl aspect-[2/3] object-cover">
                         </div>
 
-                        <div class="lg:col-span-2 space-y-6">
-                            <div class="grid grid-cols-2 gap-4 text-sm">
+                        <!-- Info -->
+                        <div class="lg:col-span-2 space-y-6 lg:space-y-7">
+                            <div class="grid grid-cols-2 gap-4 text-sm lg:text-base">
                                 <div>
-                                    <p class="text-gray-500">Durasi</p>
-                                    <p class="font-semibold">{{ $selectedFilm->durasi }} menit</p>
+                                    <p class="text-gray-500 text-xs lg:text-sm">Durasi</p>
+                                    <p class="font-semibold text-gray-900">{{ $selectedFilm->durasi }} menit</p>
                                 </div>
                                 <div>
-                                    <p class="text-gray-500">Tahun Rilis</p>
-                                    <p class="font-semibold">{{ $selectedFilm->tahun_rilis }}</p>
+                                    <p class="text-gray-500 text-xs lg:text-sm">Tahun Rilis</p>
+                                    <p class="font-semibold text-gray-900">{{ $selectedFilm->tahun_rilis }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-gray-500">Rating Usia</p>
+                                    <p class="text-gray-500 text-xs lg:text-sm">Rating Usia</p>
                                     <span
-                                          class="inline-block px-3 py-1 rounded-full text-sm font-bold
+                                          class="inline-block mt-1 px-3 py-1.5 rounded-full text-xs lg:text-sm font-bold
                                             {{ $selectedFilm->rating === 'SU' ? 'bg-green-100 text-green-800' :
             ($selectedFilm->rating === 'R13+' ? 'bg-yellow-100 text-yellow-800' :
                 ($selectedFilm->rating === 'D17+' ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800')) }}">
@@ -270,16 +220,18 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <p class="text-gray-500">Sutradara</p>
-                                    <p class="font-semibold">{{ $selectedFilm->sutradara?->nama_sutradara ?? '-' }}</p>
+                                    <p class="text-gray-500 text-xs lg:text-sm">Sutradara</p>
+                                    <p class="font-semibold text-gray-900">
+                                        {{ $selectedFilm->sutradara?->nama_sutradara ?? '-' }}
+                                    </p>
                                 </div>
                             </div>
 
                             <div>
-                                <p class="text-gray-500 text-sm">Genre</p>
-                                <div class="flex flex-wrap gap-2 mt-2">
+                                <p class="text-gray-500 text-xs lg:text-sm mb-2">Genre</p>
+                                <div class="flex flex-wrap gap-2">
                                     @foreach($selectedFilm->genres as $genre)
-                                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                                        <span class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs lg:text-sm">
                                             {{ $genre->nama_genre }}
                                         </span>
                                     @endforeach
@@ -287,29 +239,24 @@
                             </div>
 
                             <div>
-                                <p class="text-gray-500 text-sm mb-2">Sinopsis</p>
-                                <p class="text-gray-700 leading-relaxed">
+                                <p class="text-gray-500 text-xs lg:text-sm mb-3">Sinopsis</p>
+                                <p class="text-gray-700 leading-relaxed text-sm lg:text-base">
                                     {{ $selectedFilm->sinopsis ?? 'Tidak ada sinopsis.' }}
                                 </p>
                             </div>
 
-                            <div class="pt-6 border-t flex justify-end gap-4">
+                            <!-- Action Buttons -->
+                            <div
+                                 class="pt-6 lg:pt-8 border-t border-gray-200 flex flex-col sm:flex-row gap-3 lg:gap-4 
+                                                fixed lg:static bottom-0 left-0 right-0 bg-white p-4 lg:p-0 border-t lg:border-0 z-20">
                                 <button wire:click="closeModal"
-                                        class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                        class="w-full sm:w-auto px-6 py-3.5 border border-gray-300 rounded-xl hover:bg-gray-50 font-medium transition">
                                     Tutup
                                 </button>
                                 <a href="{{ route('pemesanan.show', $selectedFilm->id) }}"
-                                   class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-3 font-medium">
-                                    <svg class="w-5 h-5"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              stroke-width="2"
-                                              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
-                                        </path>
-                                    </svg>
+                                   class="w-full sm:w-auto px-8 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 
+                                              flex items-center justify-center gap-3 font-medium transition shadow-lg shadow-blue-600/30">
+                                    <i class="fa-solid fa-ticket-simple"></i>
                                     Pesan Tiket
                                 </a>
                             </div>
@@ -318,9 +265,26 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            document.addEventListener('livewire:init', () => {
+                let startY = 0;
+                const modal = document.querySelector('[wire\\:click="closeModal"] > div');
+
+                if (modal && window.innerWidth < 1024) {
+                    modal.addEventListener('touchstart', e => startY = e.touches[0].clientY);
+                    modal.addEventListener('touchmove', e => {
+                        const currentY = e.touches[0].clientY;
+                        if (currentY > startY + 50) {
+                            document.body.style.overflow = '';
+                            Livewire.emit('close-modal');
+                        }
+                    });
+                }
+            });
+        </script>
     @endif
 
-    <!-- CSS untuk scrollbar -->
     <style>
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
@@ -332,16 +296,10 @@
         }
     </style>
 
-    <!-- Listen to open modal -->
     <script>
         document.addEventListener('livewire:init', () => {
-            Livewire.on('open-modal', () => {
-                document.body.style.overflow = 'hidden';
-            });
-
-            Livewire.on('close-modal', () => {
-                document.body.style.overflow = '';
-            });
+            Livewire.on('open-modal', () => document.body.style.overflow = 'hidden');
+            Livewire.on('close-modal', () => document.body.style.overflow = '');
         });
     </script>
 </div>

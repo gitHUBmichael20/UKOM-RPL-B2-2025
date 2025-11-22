@@ -26,21 +26,20 @@ use App\Livewire\Admin\PemesananAdmin;
 use App\Livewire\Kasir\PemesananKasir;
 use Illuminate\Support\Facades\Route;
 
-// Auth routes
 require __DIR__ . '/auth.php';
 
-// Routes setelah login
+// Dashboard
+Route::get('/', fn() => redirect()->route('dashboard'));
+
+Route::get('/dashboard', function () {
+    if (isRole('admin', 'kasir')) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    return view('dashboard');
+})->name('dashboard');
+
 Route::middleware(['auth'])->group(function () {
-
-    // Dashboard
-    Route::get('/', fn() => redirect()->route('dashboard'));
-
-    Route::get('/dashboard', function () {
-        if (auth()->user()->role === 'admin' || auth()->user()->role === 'kasir') {
-            return redirect()->route('admin.dashboard');
-        }
-        return view('dashboard');
-    })->name('dashboard');
 
     // Profile
     Route::prefix('profile')->name('profile.')->group(function () {

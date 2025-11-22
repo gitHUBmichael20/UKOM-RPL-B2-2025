@@ -22,7 +22,7 @@ class BookingController extends Controller
     {
         $film->load(['sutradara', 'genres']);
 
-        $jadwalTayang = JadwalTayang::with(['studio.hargaTiket'])
+        $jadwalTayang = JadwalTayang::with(['studio'])
             ->where('film_id', $film->id)
             ->where('tanggal_tayang', '>=', now()->subDays(1)->format('Y-m-d'))
             ->orderBy('tanggal_tayang')

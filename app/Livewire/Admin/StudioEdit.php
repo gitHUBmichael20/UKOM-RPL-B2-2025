@@ -11,37 +11,84 @@ class StudioEdit extends Component
 {
     public $studioId;
     public $nama_studio;
-    public $kapasitas_kursi;
     public $tipe_studio;
+    public $jumlah_baris;
+    public $jumlah_kolom;
     public $kapasitas_lama;
+    public $kapasitasBaru = 0;
 
     public function mount($id)
     {
-        $studio = Studio::findOrFail($id);
+        $studio = Studio::with('kursi')->findOrFail($id);
 
-        $this->studioId = $studio->id;
-        $this->nama_studio = $studio->nama_studio;
-        $this->kapasitas_kursi = $studio->kapasitas_kursi;
-        $this->tipe_studio = $studio->tipe_studio;
+        $this->studioId      = $studio->id;
+        $this->nama_studio   = $studio->nama_studio;
+        $this->tipe_studio   = $studio->tipe_studio;
         $this->kapasitas_lama = $studio->kapasitas_kursi;
+
+        $this->detectCurrentLayout($studio);
+        $this->hitungKapasitasBaru();
+    }
+
+    private function detectCurrentLayout($studio)
+    {
+        $kursi = $studio->kursi;
+
+        if ($kursi->isEmpty()) {
+            $this->jumlah_baris = 5;
+            $this->jumlah_kolom = 10;
+            return;
+        }
+
+        $barisUnik = $kursi->pluck('nomor_kursi')
+            ->map(fn($n) => $n[0])
+            ->unique()
+            ->sort()
+            ->values();
+
+        $this->jumlah_baris = $barisUnik->count();
+
+        $firstRowSeats = $kursi->filter(fn($k) => $k->nomor_kursi[0] === $barisUnik->first())
+            ->pluck('nomor_kursi');
+
+        $kolomNumbers = $firstRowSeats->map(fn($n) => (int)substr($n, 1))->sort()->values();
+        $this->jumlah_kolom = $kolomNumbers->last() ?? 10;
+    }
+
+    public function updatedJumlahBaris()
+    {
+        $this->hitungKapasitasBaru();
+    }
+    public function updatedJumlahKolom()
+    {
+        $this->hitungKapasitasBaru();
+    }
+
+    private function hitungKapasitasBaru()
+    {
+        $this->kapasitasBaru = ($this->jumlah_baris && $this->jumlah_kolom)
+            ? $this->jumlah_baris * $this->jumlah_kolom
+            : 0;
     }
 
     protected function rules()
     {
         return [
             'nama_studio' => 'required|string|max:50|unique:studio,nama_studio,' . $this->studioId,
-            'kapasitas_kursi' => 'required|integer|min:20|max:200',
-            'tipe_studio' => 'required|in:regular,deluxe,imax',
+            'jumlah_baris' => 'required|integer|min:2|max:26',
+            'jumlah_kolom' => 'required|integer|min:4|max:20',
         ];
     }
 
     protected $messages = [
         'nama_studio.required' => 'Nama studio wajib diisi',
         'nama_studio.unique' => 'Nama studio sudah digunakan',
-        'kapasitas_kursi.required' => 'Kapasitas kursi wajib diisi',
-        'kapasitas_kursi.min' => 'Kapasitas minimal 20 kursi',
-        'kapasitas_kursi.max' => 'Kapasitas maksimal 200 kursi',
-        'tipe_studio.required' => 'Tipe studio wajib dipilih',
+        'jumlah_baris.required' => 'Jumlah baris wajib diisi',
+        'jumlah_baris.min' => 'Minimal 2 baris',
+        'jumlah_baris.max' => 'Maksimal 26 baris (A-Z)',
+        'jumlah_kolom.required' => 'Jumlah kolom wajib diisi',
+        'jumlah_kolom.min' => 'Minimal 4 kolom',
+        'jumlah_kolom.max' => 'Maksimal 20 kolom',
     ];
 
     public function update()
@@ -49,84 +96,92 @@ class StudioEdit extends Component
         $this->validate();
 
         DB::beginTransaction();
-
         try {
             $studio = Studio::findOrFail($this->studioId);
 
-            // Update studio
             $studio->update([
-                'nama_studio' => $this->nama_studio,
-                'kapasitas_kursi' => $this->kapasitas_kursi,
-                'tipe_studio' => $this->tipe_studio,
+                'nama_studio'     => $this->nama_studio,
+                'kapasitas_kursi' => $this->kapasitasBaru,
             ]);
 
-            // Regenerate kursi jika kapasitas berubah
-            if ($this->kapasitas_kursi != $this->kapasitas_lama) {
-                // Hapus kursi lama
+            // Regenerate kursi kalau kapasitas/layout berubah
+            if ($this->kapasitasBaru != $this->kapasitas_lama || $this->isLayoutChanged($studio)) {
                 $studio->kursi()->delete();
-
-                // Generate kursi baru
                 $this->generateKursi($studio);
             }
 
             DB::commit();
-
             session()->flash('success', 'Studio berhasil diperbarui!');
             return redirect()->route('admin.studio.index');
         } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('error', 'Gagal memperbarui studio: ' . $e->getMessage());
+            session()->flash('error', 'Gagal: ' . $e->getMessage());
         }
+    }
+
+    private function isLayoutChanged($studio)
+    {
+        $currentSeats = $studio->kursi()->pluck('nomor_kursi')->toArray();
+        $expectedSeats = $this->generateSeatNumbers();
+
+        sort($currentSeats);
+        sort($expectedSeats);
+
+        return $currentSeats !== $expectedSeats;
+    }
+
+    private function generateSeatNumbers()
+    {
+        $seats = [];
+        $hurufBaris = range('A', 'Z');
+
+        $kolomKiri = ceil($this->jumlah_kolom / 2);
+
+        for ($baris = 0; $baris < $this->jumlah_baris; $baris++) {
+            $huruf = $hurufBaris[$baris];
+
+            for ($i = 1; $i <= $kolomKiri; $i++) {
+                $seats[] = $huruf . $i;
+            }
+            for ($i = $kolomKiri + 1; $i <= $this->jumlah_kolom; $i++) {
+                $seats[] = $huruf . $i;
+            }
+        }
+
+        return $seats;
     }
 
     private function generateKursi($studio)
     {
-        $kapasitas = $studio->kapasitas_kursi;
-
-        // Hitung jumlah baris dan kolom
-        $seatsPerRow = 10; // 5 kiri + 5 kanan dengan gang tengah
-        $jumlahBaris = ceil($kapasitas / $seatsPerRow);
-
         $kursiData = [];
         $hurufBaris = range('A', 'Z');
-        $nomorKursi = 1;
+        $kolomKiri = ceil($this->jumlah_kolom / 2);
 
-        for ($baris = 0; $baris < $jumlahBaris; $baris++) {
+        for ($baris = 0; $baris < $this->jumlah_baris; $baris++) {
             $huruf = $hurufBaris[$baris];
 
-            // Sisi kiri (5 kursi)
-            for ($i = 1; $i <= 5; $i++) {
-                if ($nomorKursi > $kapasitas) break;
-
+            // Kiri
+            for ($i = 1; $i <= $kolomKiri; $i++) {
                 $kursiData[] = [
                     'studio_id' => $studio->id,
                     'nomor_kursi' => $huruf . $i,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
-                $nomorKursi++;
             }
 
-            if ($nomorKursi > $kapasitas) break;
-
-            // Sisi kanan (5 kursi)
-            for ($i = 6; $i <= 10; $i++) {
-                if ($nomorKursi > $kapasitas) break;
-
+            // Kanan
+            for ($i = $kolomKiri + 1; $i <= $this->jumlah_kolom; $i++) {
                 $kursiData[] = [
                     'studio_id' => $studio->id,
                     'nomor_kursi' => $huruf . $i,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
-                $nomorKursi++;
             }
         }
 
-        // Insert kursi in batch
-        if (!empty($kursiData)) {
-            Kursi::insert($kursiData);
-        }
+        Kursi::insert($kursiData);
     }
 
     public function render()
