@@ -13,6 +13,10 @@ class PemesananManagement extends Component
     public $search = '';
     public $filterStatus = '';
 
+    // 🔥 MODAL PROPERTIES (tambahan)
+    public $showTicketModal = false;
+    public $selectedTicket = null;
+
     protected $queryString = [
         'search' => ['except' => ''],
         'filterStatus' => ['except' => ''],
@@ -40,38 +44,57 @@ class PemesananManagement extends Component
         }
     }
 
+    // 🔥 OPEN MODAL (tambahan)
+    public function openTicketModal($id)
+    {
+        $this->selectedTicket = Pemesanan::with([
+            'user',
+            'jadwalTayang.film',
+            'jadwalTayang.studio',
+            'detailPemesanan.kursi',
+        ])->find($id);
+
+        $this->showTicketModal = true;
+    }
+
+    // 🔥 CLOSE MODAL (tambahan)
+    public function closeTicketModal()
+    {
+        $this->showTicketModal = false;
+        $this->selectedTicket = null;
+    }
+
     public function render()
-{
-    $query = Pemesanan::with([
-        'user', 
-        'jadwalTayang.film', 
-        'jadwalTayang.studio', 
-        'detailPemesanan.kursi'
-    ]);
+    {
+        $query = Pemesanan::with([
+            'user',
+            'jadwalTayang.film',
+            'jadwalTayang.studio',
+            'detailPemesanan.kursi'
+        ]);
 
-    // Filter search
-    if ($this->search) {
-        $query->where(function ($q) {
-            $q->where('kode_booking', 'like', '%' . $this->search . '%')
-              ->orWhereHas('jadwalTayang.film', function ($q) {
-                  $q->where('judul', 'like', '%' . $this->search . '%');
-              })
-              ->orWhereHas('user', function ($q) {
-                  $q->where('name', 'like', '%' . $this->search . '%');
-              });
-        });
+        // Filter search
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('kode_booking', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('jadwalTayang.film', function ($q) {
+                        $q->where('judul', 'like', '%' . $this->search . '%');
+                    })
+                    ->orWhereHas('user', function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%');
+                    });
+            });
+        }
+
+        // Filter status
+        if ($this->filterStatus) {
+            $query->where('status_pembayaran', $this->filterStatus);
+        }
+
+        $pemesanan = $query->orderBy('tanggal_pemesanan', 'desc')
+            ->paginate(10);
+
+        return view('livewire.admin.pemesanan-management', compact('pemesanan'))
+            ->layout('admin.layouts.app');
     }
-
-    // Filter status
-    if ($this->filterStatus) {
-        $query->where('status_pembayaran', $this->filterStatus);
-    }
-
-    $pemesanan = $query->orderBy('tanggal_pemesanan', 'desc')
-                      ->paginate(10);
-
-    return view('livewire.admin.pemesanan-management', compact('pemesanan'))
-        ->layout('admin.layouts.app'); // ← FIX PALING PENTING
-}
-
 }

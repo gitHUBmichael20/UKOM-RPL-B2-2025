@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.layouts.app')
 
 @section('content')
     <div class="p-6">
@@ -86,7 +86,7 @@
                                 <option value="pending" {{ $pemesanan->status_pembayaran == 'pending' ? 'selected' : '' }}>
                                     Pending
                                 </option>
-                                <option value="paid" {{ $pemesanan->status_pembayaran == 'paid' ? 'selected' : '' }}>
+                                <option value="lunas" {{ $pemesanan->status_pembayaran == 'lunas' ? 'selected' : '' }}>
                                     Lunas
                                 </option>
                                 <option value="failed" {{ $pemesanan->status_pembayaran == 'failed' ? 'selected' : '' }}>

@@ -199,9 +199,17 @@ class BookingController extends Controller
             abort(403);
         }
 
-        $pemesanan->load(['jadwalTayang.film', 'jadwalTayang.studio', 'detailPemesanan.kursi', 'user']);
+        $pemesanan->load([
+            'jadwalTayang.film',
+            'jadwalTayang.studio',
+            'detailPemesanan.kursi',
+            'user'
+        ]);
+
         return view('pemesanan.ticket', compact('pemesanan'));
     }
+
+    
 
     /**
      * Show user's booking history

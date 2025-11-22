@@ -549,7 +549,7 @@ class TheaterSeeder extends Seeder
                         'total_harga' => $totalHarga,
                         'metode_pembayaran' => 'transfer',
                         'jenis_pemesanan' => 'online',
-                        'status_pembayaran' => 'lunas', // Mark as paid for guaranteed seats
+                        'status_pembayaran' => 'lunas',
                         'tanggal_pemesanan' => Carbon::now()->subDays(rand(1, 3)),
                         'kasir_id' => null,
                         'created_at' => now(),

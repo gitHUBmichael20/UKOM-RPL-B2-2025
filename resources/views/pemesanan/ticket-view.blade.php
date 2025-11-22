@@ -1,9 +1,13 @@
-@extends('layout.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Your Movie Ticket') }}
+        </h2>
+    </x-slot>
 
-@section('content')
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
-        <div class="max-w-2xl mx-auto px-4">
-            <!-- Ticket -->
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Ticket Card -->
             <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-blue-200">
                 <!-- Ticket Header -->
                 <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
@@ -85,7 +89,8 @@
 
                 <!-- Customer Info -->
                 <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Customer Information</h3>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Customer Information
+                    </h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-gray-600">Name</p>
@@ -117,7 +122,7 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="mt-6 flex justify-center space-x-4">
+            <div class="mt-6 flex justify-center space-x-4 no-print">
                 <a href="{{ route('pemesanan.my-bookings') }}"
                     class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50">
                     Back to My Bookings
@@ -159,4 +164,4 @@
             }
         }
     </style>
-@endsection
+</x-app-layout>

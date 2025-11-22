@@ -69,7 +69,7 @@
                                                         </h3>
                                                         <span
                                                             class="px-3 py-1 text-sm font-medium rounded-full 
-                                                    @if ($booking->status_pembayaran === 'paid') bg-green-100 text-green-800
+                                                    @if ($booking->status_pembayaran === 'lunas') bg-green-100 text-green-800
                                                     @elseif($booking->status_pembayaran === 'pending') bg-yellow-100 text-yellow-800
                                                     @elseif($booking->status_pembayaran === 'failed') bg-red-100 text-red-800
                                                     @else bg-gray-100 text-gray-800 @endif">
@@ -155,7 +155,7 @@
 
                                         <!-- Action Buttons -->
                                         <div class="flex flex-col sm:flex-row gap-3">
-                                            @if ($booking->status_pembayaran === 'paid')
+                                            @if ($booking->status_pembayaran === 'lunas')
                                                 <a href="{{ route('pemesanan.view-ticket', $booking->id) }}"
                                                     class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition shadow-sm">
                                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
@@ -231,7 +231,7 @@
                                     <div class="ml-4">
                                         <p class="text-sm font-medium text-gray-600">Completed</p>
                                         <p class="text-2xl font-bold text-gray-900">
-                                            {{ $bookings->where('status_pembayaran', 'paid')->count() }}</p>
+                                            {{ $bookings->where('status_pembayaran', 'lunas')->count() }}</p>
                                     </div>
                                 </div>
                             </div>

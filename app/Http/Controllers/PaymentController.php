@@ -48,7 +48,7 @@ class PaymentController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'status_pembayaran' => 'required|in:pending,paid,failed,cancelled',
+            'status_pembayaran' => 'required|in:pending,lunas,failed,cancelled',
             'metode_pembayaran' => 'required|in:cash,transfer,qris,debit',
         ]);
 
@@ -89,7 +89,7 @@ class PaymentController extends Controller
 
         if ($pemesanan->status_pembayaran !== 'pending') {
             $message = match ($pemesanan->status_pembayaran) {
-                'paid' => 'Payment has already been completed for this booking.',
+                'lunas' => 'Payment has already been completed for this booking.',
                 'failed' => 'This booking has failed. Please contact support.',
                 'cancelled' => 'This booking has been cancelled.',
                 default => 'This booking cannot be processed for payment.'
@@ -125,7 +125,7 @@ class PaymentController extends Controller
             if ($paymentSuccess) {
                 $pemesanan->update([
                     'metode_pembayaran' => $request->metode_pembayaran,
-                    'status_pembayaran' => 'paid',
+                    'status_pembayaran' => 'lunas',
                     'tanggal_pemesanan' => now(),
                 ]);
 
@@ -163,7 +163,7 @@ class PaymentController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        if ($pemesanan->status_pembayaran !== 'paid') {
+        if ($pemesanan->status_pembayaran !== 'lunas') {
             return redirect()->route('pemesanan.my-bookings')
                 ->with('warning', 'Payment not completed yet.');
         }
@@ -181,7 +181,7 @@ class PaymentController extends Controller
 
         if ($pemesanan->status_pembayaran !== 'pending') {
             $message = match ($pemesanan->status_pembayaran) {
-                'paid' => 'Cannot cancel a completed payment. Please contact support for refund.',
+                'lunas' => 'Cannot cancel a completed payment. Please contact support for refund.',
                 'failed' => 'This booking has already failed.',
                 'cancelled' => 'This booking is already cancelled.',
                 default => 'This booking cannot be cancelled.'

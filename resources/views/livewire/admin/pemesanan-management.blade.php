@@ -21,7 +21,7 @@
                 class="px-4 py-2.5 pe-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <option value="">Semua Status</option>
                 <option value="pending">Pending</option>
-                <option value="paid">Lunas</option>
+                <option value="lunas">Lunas</option>
                 <option value="failed">Gagal</option>
                 <option value="cancelled">Dibatalkan</option>
             </select>
@@ -46,7 +46,7 @@
                         <th class="px-6 py-4">Kode Booking</th>
                         <th class="px-6 py-4">Film & Jadwal</th>
                         <th class="px-6 py-4">Customer</th>
-                        <th class="px-6 py-4">Studio</th>
+                        <th class="py-4 w-auto">Studio</th>
                         <th class="px-6 py-4">Tiket</th>
                         <th class="px-6 py-4">Total</th>
                         <th class="px-6 py-4">Status</th>
@@ -74,10 +74,14 @@
                                 </div>
                                 <div class="text-xs text-gray-500 mt-1">
                                     <i class="fa-solid fa-calendar mr-1"></i>
-                                    {{ $booking->jadwalTayang ? \Carbon\Carbon::parse($booking->jadwalTayang->tanggal_tayang)->format('d M Y') : 'N/A' }}
+                                    {{ optional($booking->jadwalTayang)->tanggal_tayang
+                                        ? \Carbon\Carbon::parse($booking->jadwalTayang->tanggal_tayang)->format('d M Y')
+                                        : 'N/A' }}
                                     •
                                     <i class="fa-solid fa-clock mr-1"></i>
-                                    {{ $booking->jadwalTayang ? \Carbon\Carbon::parse($booking->jadwalTayang->jam_tayang)->format('H:i') : 'N/A' }}
+                                    {{ optional($booking->jadwalTayang)->jam_tayang
+                                        ? \Carbon\Carbon::parse($booking->jadwalTayang->jam_tayang)->format('H:i')
+                                        : 'N/A' }}
                                 </div>
                             </td>
 
@@ -88,16 +92,18 @@
 
                             <!-- Studio -->
                             <td class="px-6 py-4 text-gray-700">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
-                                    {{ $booking->jadwalTayang->studio->nama_studio ?? 'N/A' }}
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md bg-blue-50 text-blue-600 border border-blue-200">
+                                    {{ $booking->jadwalTayang->studio->nama_studio ?? '-' }}
                                 </span>
+
                             </td>
 
                             <!-- Tiket -->
                             <td class="px-6 py-4">
                                 <div class="text-gray-900 font-semibold">{{ $booking->jumlah_tiket }} tiket</div>
                                 <div class="text-xs text-gray-500 mt-1 font-mono">
-                                    @if ($booking->detailPemesanan && $booking->detailPemesanan->count() > 0)
+                                    @if ($booking->detailPemesanan->count())
                                         {{ $booking->detailPemesanan->pluck('kursi.nomor_kursi')->join(', ') }}
                                     @else
                                         -
@@ -112,7 +118,7 @@
 
                             <!-- Status -->
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if ($booking->status_pembayaran == 'paid')
+                                @if ($booking->status_pembayaran == 'lunas')
                                     <span
                                         class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">
                                         <i class="fa-solid fa-check-circle mr-1"></i>Lunas
@@ -122,14 +128,9 @@
                                         class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">
                                         <i class="fa-solid fa-clock mr-1"></i>Pending
                                     </span>
-                                @elseif($booking->status_pembayaran == 'failed')
-                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
-                                        <i class="fa-solid fa-times-circle mr-1"></i>Gagal
-                                    </span>
                                 @else
-                                    <span
-                                        class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-700">
-                                        <i class="fa-solid fa-ban mr-1"></i>Dibatalkan
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                                        <i class="fa-solid fa-times-circle mr-1"></i>Gagal/Dibatalkan
                                     </span>
                                 @endif
                             </td>
@@ -137,21 +138,19 @@
                             <!-- Aksi -->
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-2">
+
                                     <a href="{{ route('admin.pemesanan.edit', $booking->id) }}"
                                         class="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
                                         title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
-                                    <a href="{{ url('/pemesanan/ticket/' . $booking->id) }}" target="_blank"
-                                        class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
-                                        title="Lihat Tiket">
-                                        <i class="fa-solid fa-ticket"></i>
-                                    </a>
+
                                     <button onclick="confirmDelete({{ $booking->id }})"
                                         class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
                                         title="Hapus">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
+
                                 </div>
                             </td>
                         </tr>
@@ -168,7 +167,6 @@
             </table>
         </div>
 
-        <!-- Pagination -->
         @if ($pemesanan->hasPages())
             <div class="px-6 py-4 border-t border-gray-200">
                 {{ $pemesanan->links() }}
@@ -196,7 +194,6 @@
             });
         }
 
-        // Listen untuk flash messages dari Livewire
         window.addEventListener('success', event => {
             Swal.fire({
                 icon: 'success',
