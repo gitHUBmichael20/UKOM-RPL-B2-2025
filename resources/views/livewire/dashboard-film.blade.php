@@ -27,40 +27,92 @@
 
         <!-- Sedang Tayang -->
         <section class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <span class="w-2 h-8 bg-blue-600 rounded"></span>
-                Sedang Tayang
-            </h2>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <span class="w-2 h-8 bg-blue-600 rounded"></span>
+                    Sedang Tayang
+                </h2>
+                <span class="text-sm text-gray-600">
+                    {{ $totalTayang }} film
+                </span>
+            </div>
+
             @if($sedangTayang->count() > 0)
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                    @foreach($sedangTayang as $film)
-                            <div wire:click="openModal({{ $film->id }})"
-                                 class="group cursor-pointer relative overflow-hidden rounded-lg shadow-lg">
+                <div class="relative group">
+                    <!-- Scroll Container -->
+                    <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+                         id="tayang-container">
+                        @foreach($sedangTayang as $film)
+                                    <div wire:click="openModal({{ $film->id }})"
+                                         class="flex-none w-40 sm:w-48 cursor-pointer relative overflow-hidden rounded-lg shadow-lg snap-start group/card">
 
-                                <img src="{{ $film->poster ? asset('storage/' . $film->poster) : asset('storage/default_poster.png') }}"
-                                     alt="{{ $film->judul }}"
-                                     class="w-full aspect-[2/3] object-cover group-hover:scale-110 transition duration-500">
+                                        <img src="{{ $film->poster ? asset('storage/' . $film->poster) : asset('storage/default_poster.png') }}"
+                                             alt="{{ $film->judul }}"
+                                             class="w-full aspect-[2/3] object-cover group-hover/card:scale-110 transition duration-500">
 
-                                <div
-                                     class="absolute inset-0 bg-gradient-to-t from-white/95 via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-5 flex flex-col justify-end">
-                                    <h3 class="font-bold text-gray-900 line-clamp-2">{{ $film->judul }}</h3>
-                                    <div class="flex justify-between items-center mt-2">
-                                        <span class="text-sm text-gray-700">{{ $film->durasi }} menit</span>
-                                        <span class="px-3 py-1 text-xs font-bold rounded-full {{
-                        $film->rating === 'SU' ? 'bg-green-100 text-green-800' :
-                        ($film->rating === 'R13+' ? 'bg-yellow-100 text-yellow-800' :
-                            ($film->rating === 'D17+' ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800'))
-                                                    }}">
-                                            {{ $film->rating }}
-                                        </span>
+                                        <div
+                                             class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end">
+                                            <h3 class="font-bold text-white text-sm line-clamp-2">{{ $film->judul }}</h3>
+                                            <div class="flex justify-between items-center mt-2">
+                                                <span class="text-xs text-white/90">{{ $film->durasi }}m</span>
+                                                <span class="px-2 py-0.5 text-xs font-bold rounded-full {{
+                            $film->rating === 'SU' ? 'bg-green-500 text-white' :
+                            ($film->rating === 'R13+' ? 'bg-yellow-500 text-white' :
+                                ($film->rating === 'D17+' ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'))
+                                                        }}">
+                                                    {{ $film->rating }}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
+                        @endforeach
+
+                        <!-- Load More Card -->
+                        @if($hasMoreTayang)
+                            <div wire:click="loadMoreTayang"
+                                 class="flex-none w-40 sm:w-48 cursor-pointer bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg shadow-lg snap-start flex items-center justify-center hover:scale-105 transition aspect-[2/3]">
+                                <div class="text-center text-white p-4">
+                                    <svg class="w-12 h-12 mx-auto mb-2"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              stroke-width="2"
+                                              d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    <p class="font-bold text-sm">Lihat Lebih</p>
+                                    <p class="text-xs opacity-90 mt-1">{{ $totalTayang - $sedangTayang->count() }} lagi</p>
                                 </div>
                             </div>
-                    @endforeach
-                </div>
+                        @endif
+                    </div>
 
-                <div class="mt-8">
-                    {{ $sedangTayang->withQueryString()->links() }}
+                    <!-- Scroll Buttons -->
+                    <button onclick="document.getElementById('tayang-container').scrollBy({left: -400, behavior: 'smooth'})"
+                            class="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white shadow-xl rounded-full w-12 h-12 items-center justify-center opacity-0 group-hover:opacity-100 transition z-10">
+                        <svg class="w-6 h-6"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button onclick="document.getElementById('tayang-container').scrollBy({left: 400, behavior: 'smooth'})"
+                            class="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white shadow-xl rounded-full w-12 h-12 items-center justify-center opacity-0 group-hover:opacity-100 transition z-10">
+                        <svg class="w-6 h-6"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
                 </div>
             @else
                 <p class="text-gray-500 text-center py-12">Tidak ada film yang sedang tayang saat ini.</p>
@@ -69,46 +121,97 @@
 
         <!-- Segera Tayang -->
         <section>
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <span class="w-2 h-8 bg-purple-600 rounded"></span>
-                Segera Tayang
-            </h2>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <span class="w-2 h-8 bg-purple-600 rounded"></span>
+                    Segera Tayang
+                </h2>
+                <span class="text-sm text-gray-600">
+                    {{ $totalSegera }} film
+                </span>
+            </div>
+
             @if($segeraTayang->count() > 0)
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                    @foreach($segeraTayang as $film)
-                            <div wire:click="openModal({{ $film->id }})"
-                                 class="group cursor-pointer relative overflow-hidden rounded-lg shadow-lg">
+                <div class="relative group">
+                    <!-- Scroll Container -->
+                    <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+                         id="segera-container">
+                        @foreach($segeraTayang as $film)
+                                    <div wire:click="openModal({{ $film->id }})"
+                                         class="flex-none w-40 sm:w-48 cursor-pointer relative overflow-hidden rounded-lg shadow-lg snap-start group/card">
 
-                                <img src="{{ $film->poster ? asset('storage/' . $film->poster) : asset('storage/default_poster.png') }}"
-                                     alt="{{ $film->judul }}"
-                                     class="w-full aspect-[2/3] object-cover brightness-90 group-hover:scale-110 transition duration-500">
+                                        <img src="{{ $film->poster ? asset('storage/' . $film->poster) : asset('storage/default_poster.png') }}"
+                                             alt="{{ $film->judul }}"
+                                             class="w-full aspect-[2/3] object-cover brightness-90 group-hover/card:scale-110 transition duration-500">
 
-                                <div class="absolute top-4 left-4 z-10">
-                                    <span class="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">Coming
-                                        Soon</span>
-                                </div>
+                                        <div class="absolute top-3 left-3 z-10">
+                                            <span class="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold">Coming
+                                                Soon</span>
+                                        </div>
 
-                                <div
-                                     class="absolute inset-0 bg-gradient-to-t from-white/95 via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-5 flex flex-col justify-end">
-                                    <h3 class="font-bold text-gray-900 line-clamp-2">{{ $film->judul }}</h3>
-                                    <div class="flex justify-between items-center mt-2">
-                                        <span class="text-sm text-gray-700">{{ $film->durasi }}
-                                            menit</span>
-                                        <span class="px-3 py-1 text-xs font-bold rounded-full {{
-                        $film->rating === 'SU' ? 'bg-green-100 text-green-800' :
-                        ($film->rating === 'R13+' ? 'bg-yellow-100 text-yellow-800' :
-                            ($film->rating === 'D17+' ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800'))
-                                                                }}">
-                                            {{ $film->rating }}
-                                        </span>
+                                        <div
+                                             class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end">
+                                            <h3 class="font-bold text-white text-sm line-clamp-2">{{ $film->judul }}</h3>
+                                            <div class="flex justify-between items-center mt-2">
+                                                <span class="text-xs text-white/90">{{ $film->durasi }}m</span>
+                                                <span class="px-2 py-0.5 text-xs font-bold rounded-full {{
+                            $film->rating === 'SU' ? 'bg-green-500 text-white' :
+                            ($film->rating === 'R13+' ? 'bg-yellow-500 text-white' :
+                                ($film->rating === 'D17+' ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'))
+                                                        }}">
+                                                    {{ $film->rating }}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
+                        @endforeach
+
+                        <!-- Load More Card -->
+                        @if($hasMoreSegera)
+                            <div wire:click="loadMoreSegera"
+                                 class="flex-none w-40 sm:w-48 cursor-pointer bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg shadow-lg snap-start flex items-center justify-center hover:scale-105 transition aspect-[2/3]">
+                                <div class="text-center text-white p-4">
+                                    <svg class="w-12 h-12 mx-auto mb-2"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              stroke-width="2"
+                                              d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    <p class="font-bold text-sm">Lihat Lebih</p>
+                                    <p class="text-xs opacity-90 mt-1">{{ $totalSegera - $segeraTayang->count() }} lagi</p>
                                 </div>
                             </div>
-                    @endforeach
-                </div>
+                        @endif
+                    </div>
 
-                <div class="mt-8">
-                    {{ $segeraTayang->withQueryString()->links() }}
+                    <!-- Scroll Buttons -->
+                    <button onclick="document.getElementById('segera-container').scrollBy({left: -400, behavior: 'smooth'})"
+                            class="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white shadow-xl rounded-full w-12 h-12 items-center justify-center opacity-0 group-hover:opacity-100 transition z-10">
+                        <svg class="w-6 h-6"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button onclick="document.getElementById('segera-container').scrollBy({left: 400, behavior: 'smooth'})"
+                            class="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white shadow-xl rounded-full w-12 h-12 items-center justify-center opacity-0 group-hover:opacity-100 transition z-10">
+                        <svg class="w-6 h-6"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
                 </div>
             @else
                 <p class="text-gray-500 text-center py-12">Belum ada film yang akan segera tayang.</p>
@@ -158,8 +261,9 @@
                                 </div>
                                 <div>
                                     <p class="text-gray-500">Rating Usia</p>
-                                    <span class="inline-block px-3 py-1 rounded-full text-sm font-bold
-                                                                            {{ $selectedFilm->rating === 'SU' ? 'bg-green-100 text-green-800' :
+                                    <span
+                                          class="inline-block px-3 py-1 rounded-full text-sm font-bold
+                                            {{ $selectedFilm->rating === 'SU' ? 'bg-green-100 text-green-800' :
             ($selectedFilm->rating === 'R13+' ? 'bg-yellow-100 text-yellow-800' :
                 ($selectedFilm->rating === 'D17+' ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800')) }}">
                                         {{ $selectedFilm->rating }}
@@ -215,6 +319,18 @@
             </div>
         </div>
     @endif
+
+    <!-- CSS untuk scrollbar -->
+    <style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
 
     <!-- Listen to open modal -->
     <script>

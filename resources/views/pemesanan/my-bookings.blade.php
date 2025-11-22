@@ -1,9 +1,4 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('My Bookings') }}
-        </h2>
-    </x-slot>
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -13,13 +8,6 @@
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">My Bookings</h1>
                         <p class="text-gray-600 mt-1">Manage and view your movie bookings</p>
-                    </div>
-                    <div class="flex items-center space-x-2 text-sm text-gray-500">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        <span>{{ Auth::user()->name }}</span>
                     </div>
                 </div>
             </div>

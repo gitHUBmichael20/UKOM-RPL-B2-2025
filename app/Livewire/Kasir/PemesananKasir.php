@@ -29,23 +29,23 @@ class PemesananKasir extends Component
     public $showDetailModal = false;
 
     // Form data untuk buat pemesanan
-   public $formStep = 1;
-public $selectedJadwal = null;
-public $selectedKursi = [];
-public $totalHarga = 0;
-public $hargaTiket = null;
-public $bookedSeats = [];
-public $jadwals = [];
+    public $formStep = 1;
+    public $selectedJadwal = null;
+    public $selectedKursi = [];
+    public $totalHarga = 0;
+    public $hargaTiket = null;
+    public $bookedSeats = [];
+    public $jadwals = [];
     protected $queryString = ['tab', 'search'];
 
-   public function mount()
-{
-    if (auth()->user()->role !== 'kasir') {
-        abort(403, 'Unauthorized');
+    public function mount()
+    {
+        if (auth()->user()->role !== 'kasir') {
+            abort(403, 'Unauthorized');
+        }
+
+        $this->loadJadwals();
     }
-    
-    $this->loadJadwals();
-}
 
     public function loadJadwals()
     {
@@ -74,7 +74,7 @@ public $jadwals = [];
     public function selectJadwal($jadwalId)
     {
         $jadwal = JadwalTayang::with(['film', 'studio'])->find($jadwalId);
-        
+
         if (!$jadwal) {
             session()->flash('error', 'Jadwal tidak ditemukan');
             return;
@@ -86,17 +86,17 @@ public $jadwals = [];
         $this->formStep = 2;
     }
 
-   public function loadBookedSeats()
-{
-    if (!$this->selectedJadwal) return;
+    public function loadBookedSeats()
+    {
+        if (!$this->selectedJadwal) return;
 
-    $this->bookedSeats = DetailPemesanan::where('jadwal_tayang_id', $this->selectedJadwal['id'])
-        ->whereHas('pemesanan', function ($q) {
-            $q->whereIn('status_pembayaran', ['pending', 'lunas']);
-        })
-        ->pluck('kursi_id')
-        ->toArray();
-}
+        $this->bookedSeats = DetailPemesanan::where('jadwal_tayang_id', $this->selectedJadwal['id'])
+            ->whereHas('pemesanan', function ($q) {
+                $q->whereIn('status_pembayaran', ['pending', 'lunas']);
+            })
+            ->pluck('kursi_id')
+            ->toArray();
+    }
 
     public function toggleKursi($kursiId)
     {
@@ -123,56 +123,61 @@ public $jadwals = [];
         }
     }
 
-public function proceedToConfirm()
-{
-    if (count($this->selectedKursi) === 0) {
-        session()->flash('error', 'Pilih minimal 1 kursi');
-        return;
-    }
-
-    $this->formStep = 3;
-}
-
-public function simpanPemesananOffline()
-{
-    if (count($this->selectedKursi) === 0) {
-        session()->flash('error', 'Tidak ada kursi yang dipilih');
-        return;
-    }
-
-    try {
-        $pemesanan = Pemesanan::create([
-    'user_id' => auth()->id(),
-    'kode_booking' => 'BK' . now()->format('YmdHi'),
-    'jadwal_tayang_id' => $this->selectedJadwal['id'],
-    'jumlah_tiket' => count($this->selectedKursi),
-    'total_harga' => $this->totalHarga,
-    'tanggal_pemesanan' => now(), // Tambahkan ini
-    'status_pemesanan' => 'dikonfirmasi',
-    'status_pembayaran' => 'lunas',
-    'metode_pembayaran' => 'cash',
-    'tanggal_pembayaran' => now(),
-    'jenis_pemesanan' => 'offline',
-    'kasir_id' => auth()->id(),
-    'catatan' => 'Pemesanan offline dari kasir'
-]);
-
-        foreach ($this->selectedKursi as $kursiId) {
-            DetailPemesanan::create([
-                'pemesanan_id' => $pemesanan->id,
-                'jadwal_tayang_id' => $this->selectedJadwal['id'],
-                'kursi_id' => $kursiId,
-                'harga' => $this->hargaTiket->harga
-            ]);
+    public function proceedToConfirm()
+    {
+        if (count($this->selectedKursi) === 0) {
+            session()->flash('error', 'Pilih minimal 1 kursi');
+            return;
         }
 
-        session()->flash('success', 'Pemesanan offline berhasil dibuat! Kode: ' . $pemesanan->kode_booking);
-        $this->resetForm();
-        $this->tab = 'hari-ini';
-    } catch (\Exception $e) {
-        session()->flash('error', 'Error: ' . $e->getMessage());
+        $this->formStep = 3;
     }
-}
+
+    public function simpanPemesananOffline()
+    {
+        if (count($this->selectedKursi) === 0) {
+            session()->flash('error', 'Tidak ada kursi yang dipilih');
+            return;
+        }
+
+        try {
+
+            do {
+                $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(6));
+            } while (Pemesanan::where('kode_booking', $kodeBooking)->exists());
+
+            $pemesanan = Pemesanan::create([
+                'user_id' => null,
+                'kode_booking' => $kodeBooking,
+                'jadwal_tayang_id' => $this->selectedJadwal['id'],
+                'jumlah_tiket' => count($this->selectedKursi),
+                'total_harga' => $this->totalHarga,
+                'tanggal_pemesanan' => now(),
+                'status_pemesanan' => 'dikonfirmasi',
+                'status_pembayaran' => 'lunas',
+                'metode_pembayaran' => 'cash',
+                'tanggal_pembayaran' => now(),
+                'jenis_pemesanan' => 'offline',
+                'kasir_id' => auth()->id(),
+                'catatan' => 'Pemesanan offline dari kasir'
+            ]);
+
+            foreach ($this->selectedKursi as $kursiId) {
+                DetailPemesanan::create([
+                    'pemesanan_id' => $pemesanan->id,
+                    'jadwal_tayang_id' => $this->selectedJadwal['id'],
+                    'kursi_id' => $kursiId,
+                    'harga' => $this->hargaTiket->harga
+                ]);
+            }
+
+            session()->flash('success', 'Pemesanan offline berhasil dibuat! Kode: ' . $pemesanan->kode_booking);
+            $this->resetForm();
+            $this->tab = 'hari-ini';
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error: ' . $e->getMessage());
+        }
+    }
 
     public function viewDetail($pemesananId)
     {
@@ -188,40 +193,38 @@ public function simpanPemesananOffline()
     }
 
     public function resetForm()
-{
-    $this->formStep = 1;
-    $this->selectedJadwal = null;
-    $this->selectedKursi = [];
-    $this->totalHarga = 0;
-    $this->hargaTiket = null;
-    $this->bookedSeats = [];
-}
+    {
+        $this->formStep = 1;
+        $this->selectedJadwal = null;
+        $this->selectedKursi = [];
+        $this->totalHarga = 0;
+        $this->hargaTiket = null;
+        $this->bookedSeats = [];
+    }
 
     public function render()
-{
-    if ($this->tab === 'buat-pemesanan') {
-        return view('livewire.kasir.pemesanan-kasir');
+    {
+        if ($this->tab === 'buat-pemesanan') {
+            return view('livewire.kasir.pemesanan-kasir');
+        }
+
+        $query = Pemesanan::with(['user', 'detailPemesanan']);
+
+        if ($this->filterHariIni) {
+            $query->whereDate('created_at', today());
+        }
+
+        if ($this->search) {
+            $query->where('kode_booking', 'like', '%' . $this->search . '%')
+                ->orWhereHas('user', function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%');
+                });
+        }
+
+        $pemesanans = $query->latest()->paginate($this->perPage);
+
+        return view('livewire.kasir.pemesanan-kasir', [
+            'pemesanans' => $pemesanans,
+        ])->layout('admin.layouts.app');
     }
-
-    $query = Pemesanan::with(['user', 'detailPemesanan']);
-
-    if ($this->filterHariIni) {
-        $query->whereDate('created_at', today());
-    }
-
-    if ($this->search) {
-        $query->where('kode_booking', 'like', '%' . $this->search . '%')
-            ->orWhereHas('user', function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%');
-            });
-    }
-
-    $pemesanans = $query->latest()->paginate($this->perPage);
-
-    return view('livewire.kasir.pemesanan-kasir', [
-        'pemesanans' => $pemesanans,
-    ])->layout('admin.layouts.app') ;
 }
-}
-
-

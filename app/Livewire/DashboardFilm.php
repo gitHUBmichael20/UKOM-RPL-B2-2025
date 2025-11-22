@@ -4,27 +4,42 @@ namespace App\Livewire;
 
 use App\Models\Film;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class DashboardFilm extends Component
 {
-    use WithPagination;
-
     public $search = '';
-    public $sortBy = 'terbaru'; // terbaru, terlama, judul-az, judul-za
+    public $sortBy = 'terbaru';
     public $selectedFilm = null;
+
+    // Pagination state
+    public $perPageTayang = 12;
+    public $perPageSegera = 12;
 
     protected $queryString = ['search'];
 
     public function updatingSearch()
     {
-        $this->resetPage();
+        // Reset pagination saat search berubah
+        $this->perPageTayang = 12;
+        $this->perPageSegera = 12;
+    }
+
+    public function loadMoreTayang()
+    {
+        $this->perPageTayang += 12;
+    }
+
+    public function loadMoreSegera()
+    {
+        $this->perPageSegera += 12;
     }
 
     public function sort($type)
     {
         $this->sortBy = $type;
-        $this->resetPage();
+        // Reset pagination saat sort berubah
+        $this->perPageTayang = 12;
+        $this->perPageSegera = 12;
     }
 
     public function openModal($filmId)
@@ -41,29 +56,63 @@ class DashboardFilm extends Component
 
     public function render()
     {
-        $baseQuery = Film::with(['sutradara', 'genres'])
-            ->whereIn('status', ['tayang', 'segera'])
+        // Base query untuk Sedang Tayang
+        $tayangQuery = Film::with(['sutradara', 'genres'])
+            ->where('status', 'tayang')
             ->when($this->search, function ($q) {
-                $q->where('judul', 'like', '%' . $this->search . '%')
-                    ->orWhere('sinopsis', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('sutradara', fn($sq) => $sq->where('nama_sutradara', 'like', '%' . $this->search . '%'));
+                $q->where(function ($query) {
+                    $query->where('judul', 'like', '%' . $this->search . '%')
+                        ->orWhere('sinopsis', 'like', '%' . $this->search . '%')
+                        ->orWhereHas('sutradara', fn($sq) => $sq->where('nama_sutradara', 'like', '%' . $this->search . '%'));
+                });
             });
 
-        $sortedQuery = match ($this->sortBy) {
-            'terlama'   => (clone $baseQuery)->orderBy('tahun_rilis', 'asc'),
-            'terbaru'   => (clone $baseQuery)->orderBy('tahun_rilis', 'desc'),
-            'judul-az'  => (clone $baseQuery)->orderBy('judul', 'asc'),
-            'judul-za'  => (clone $baseQuery)->orderBy('judul', 'desc'),
-            default     => (clone $baseQuery)->latest(),
+        // Base query untuk Segera Tayang
+        $segeraQuery = Film::with(['sutradara', 'genres'])
+            ->where('status', 'segera')
+            ->when($this->search, function ($q) {
+                $q->where(function ($query) {
+                    $query->where('judul', 'like', '%' . $this->search . '%')
+                        ->orWhere('sinopsis', 'like', '%' . $this->search . '%')
+                        ->orWhereHas('sutradara', fn($sq) => $sq->where('nama_sutradara', 'like', '%' . $this->search . '%'));
+                });
+            });
+
+        // Apply sorting
+        $sortedTayangQuery = match ($this->sortBy) {
+            'terlama'   => (clone $tayangQuery)->orderBy('tahun_rilis', 'asc'),
+            'terbaru'   => (clone $tayangQuery)->orderBy('tahun_rilis', 'desc'),
+            'judul-az'  => (clone $tayangQuery)->orderBy('judul', 'asc'),
+            'judul-za'  => (clone $tayangQuery)->orderBy('judul', 'desc'),
+            default     => (clone $tayangQuery)->latest(),
         };
 
+        $sortedSegeraQuery = match ($this->sortBy) {
+            'terlama'   => (clone $segeraQuery)->orderBy('tahun_rilis', 'asc'),
+            'terbaru'   => (clone $segeraQuery)->orderBy('tahun_rilis', 'desc'),
+            'judul-az'  => (clone $segeraQuery)->orderBy('judul', 'asc'),
+            'judul-za'  => (clone $segeraQuery)->orderBy('judul', 'desc'),
+            default     => (clone $segeraQuery)->latest(),
+        };
 
-        $sedangTayang = (clone $sortedQuery)->where('status', 'tayang')->paginate(8, ['*'], 'tayang_page');
-        $segeraTayang = (clone $sortedQuery)->where('status', 'segera')->paginate(8, ['*'], 'segera_page');
+        // Get films with limit
+        $sedangTayangAll = $sortedTayangQuery->get();
+        $segeraTayangAll = $sortedSegeraQuery->get();
+
+        $sedangTayang = $sedangTayangAll->take($this->perPageTayang);
+        $segeraTayang = $segeraTayangAll->take($this->perPageSegera);
+
+        // Check if there are more items
+        $hasMoreTayang = $sedangTayangAll->count() > $this->perPageTayang;
+        $hasMoreSegera = $segeraTayangAll->count() > $this->perPageSegera;
 
         return view('livewire.dashboard-film', [
             'sedangTayang' => $sedangTayang,
             'segeraTayang' => $segeraTayang,
+            'hasMoreTayang' => $hasMoreTayang,
+            'hasMoreSegera' => $hasMoreSegera,
+            'totalTayang' => $sedangTayangAll->count(),
+            'totalSegera' => $segeraTayangAll->count(),
         ]);
     }
 }
