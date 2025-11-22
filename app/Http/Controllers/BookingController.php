@@ -24,10 +24,15 @@ class BookingController extends Controller
 
         $jadwalTayang = JadwalTayang::with(['studio.hargaTiket'])
             ->where('film_id', $film->id)
-            ->where('tanggal_tayang', '>=', now()->format('Y-m-d'))
+            ->where('tanggal_tayang', '>=', now()->subDays(1)->format('Y-m-d'))
             ->orderBy('tanggal_tayang')
             ->orderBy('jam_tayang')
             ->get()
+            ->map(function ($jadwal) {
+                $jadwal->can_book = $jadwal->masihBisaPesan();
+                $jadwal->is_past = $jadwal->lewatJadwal();
+                return $jadwal;
+            })
             ->groupBy('tanggal_tayang');
 
         return view('pemesanan.show', compact('film', 'jadwalTayang'));
@@ -35,6 +40,10 @@ class BookingController extends Controller
 
     public function seatSelection(Film $film, JadwalTayang $jadwalTayang)
     {
+        if (! $jadwalTayang->masihBisaPesan()) {
+            return redirect()->route('pemesanan.show', $film)
+                ->withErrors(['error' => 'Maaf, booking untuk jadwal ini sudah ditutup.']);
+        }
         $jadwalTayang->load(['film', 'studio.kursi']);
 
         // Get booked seats for this schedule
@@ -153,6 +162,7 @@ class BookingController extends Controller
             $pemesanan = Pemesanan::create([
                 'kode_booking' => $kodeBooking,
                 'user_id' => $user->id,
+                'user_name' => $user->name,
                 'jadwal_tayang_id' => $jadwalTayang->id,
                 'jumlah_tiket' => count($selectedSeatIds),
                 'total_harga' => $totalHarga,

@@ -11,6 +11,7 @@ class Pemesanan extends Model
     protected $fillable = [
         'kode_booking',
         'user_id',
+        'user_name',
         'jadwal_tayang_id',
         'jumlah_tiket',
         'total_harga',

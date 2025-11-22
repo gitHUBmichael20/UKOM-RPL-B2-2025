@@ -406,7 +406,7 @@
                             @forelse ($pemesanans as $pemesanan)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 text-sm font-medium">{{ $pemesanan->kode_booking }}</td>
-                                    <td class="px-6 py-4 text-sm">{{ $pemesanan->user->name }}</td>
+                                    <td class="px-6 py-4 text-sm">{{ $pemesanan->user_name }}</td>
                                    <td class="px-6 py-4 text-sm">
     @if ($pemesanan->detailPemesanan->first() && $pemesanan->detailPemesanan->first()->jadwalTayang)
         {{ $pemesanan->detailPemesanan->first()->jadwalTayang->film->judul }}

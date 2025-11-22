@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('pemesanan', function (Blueprint $table) {
             $table->id();
             $table->char('kode_booking', 20)->unique();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('user_name')->nullable();
             $table->foreignId('jadwal_tayang_id')->constrained('jadwal_tayang')->onDelete('cascade');
             $table->integer('jumlah_tiket');
             $table->decimal('total_harga', 10, 2);
@@ -22,7 +23,7 @@ return new class extends Migration
             $table->enum('jenis_pemesanan', ['online', 'offline']);
             $table->enum('status_pembayaran', ['pending', 'lunas', 'batal', 'redeemed'])->default('pending');
             $table->dateTime('tanggal_pemesanan');
-            $table->foreignId('kasir_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('kasir_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

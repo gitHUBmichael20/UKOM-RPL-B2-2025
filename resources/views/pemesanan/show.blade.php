@@ -67,20 +67,46 @@
 
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             @foreach ($schedules as $schedule)
-                                <a href="{{ route('pemesanan.seats', ['film' => $film->id, 'jadwalTayang' => $schedule->id]) }}"
+                                @php
+                                    $canBook = $schedule->can_book;
+                                    $isPast = $schedule->is_past;
+                                @endphp
+
+                                @if($canBook)
+                                    <a href="{{ route('pemesanan.seats', ['film' => $film->id, 'jadwalTayang' => $schedule->id]) }}"
                                     class="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer">
-                                    <div class="text-center">
-                                        <div class="text-lg font-bold text-gray-900">
-                                            {{ \Carbon\Carbon::parse($schedule->jam_tayang)->format('g:i A') }}
+                                        <div class="text-center">
+                                            <div class="text-lg font-bold text-gray-900">
+                                                {{ \Carbon\Carbon::parse($schedule->jam_tayang)->format('g:i A') }}
+                                            </div>
+                                            <div class="text-sm text-gray-600 mt-1">{{ $schedule->studio->nama_studio }}</div>
+                                            <div class="text-xs text-blue-600 font-medium mt-1">
+                                                {{ strtoupper($schedule->studio->tipe_studio) }}
+                                            </div>
                                         </div>
-                                        <div class="text-sm text-gray-600 mt-1">
-                                            {{ $schedule->studio->nama_studio }}
-                                        </div>
-                                        <div class="text-xs text-blue-600 font-medium mt-1">
-                                            {{ strtoupper($schedule->studio->tipe_studio) }}
+                                    </a>
+                                @else
+                                    <div class="border-2 border-gray-200 rounded-lg p-4 bg-gray-50 opacity-60 relative cursor-not-allowed">
+                                        <div class="text-center">
+                                            <div class="text-lg font-bold text-gray-500 line-through">
+                                                {{ \Carbon\Carbon::parse($schedule->jam_tayang)->format('g:i A') }}
+                                            </div>
+                                            <div class="text-sm text-gray-500 mt-1">{{ $schedule->studio->nama_studio }}</div>
+                                            <div class="text-xs text-gray-400 font-medium mt-1">
+                                                {{ strtoupper($schedule->studio->tipe_studio) }}
+                                            </div>
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <span class="bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">
+                                                    @if($isPast && !$canBook)
+                                                        SEDANG TAYANG
+                                                    @else
+                                                        BOOKING DITUTUP
+                                                    @endif
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </a>
+                                @endif
                             @endforeach
                         </div>
                     </div>
