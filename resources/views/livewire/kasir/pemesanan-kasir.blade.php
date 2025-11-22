@@ -109,201 +109,231 @@
                 </div>
             @endif
 
-           <!-- STEP 2: Pilih Kursi -->
-            @if ($formStep === 2 && $selectedJadwal)
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Seat Selection -->
-                    <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-xl font-bold text-gray-900">Pilih Kursi</h2>
-                            <div class="flex gap-4 text-sm">
-                                <div class="flex items-center">
-                                    <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
-                                    <span>Tersedia</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
-                                    <span>Terpesan</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
-                                    <span>Dipilih</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Screen -->
-                        <div class="mb-8 text-center">
-                            <div class="bg-gray-800 text-white py-3 rounded-lg mx-auto max-w-md">
-                                <span class="font-semibold">SCREEN</span>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-2">Layar Utama</p>
-                        </div>
-
-                      <!-- Seat Map -->
-<div class="flex justify-center overflow-x-auto">
-    <div class="space-y-2">
-        @php
-            $kursis = \App\Models\Kursi::where('studio_id', $selectedJadwal['studio']['id'])
-                ->get()
-                ->sortBy(function($item) {
-                    $row = substr($item->nomor_kursi, 0, 1);
-                    $col = (int)substr($item->nomor_kursi, 1);
-                    return $row . str_pad($col, 3, '0', STR_PAD_LEFT);
-                });
-            
-            $kursiByBaris = $kursis->groupBy(function ($kursi) {
-                return substr($kursi->nomor_kursi, 0, 1);
-            })->sortKeys();
-
-            $totalKolom = $kursis->max(function ($kursi) {
-                return (int) substr($kursi->nomor_kursi, 1);
-            });
-
-            // Hitung posisi gang (setelah kursi ke berapa)
-            $gangPosition = ceil($totalKolom / 2);
-        @endphp
-
-        @foreach($kursiByBaris as $baris => $kursiList)
-            <div class="flex items-center justify-center gap-2">
-                <!-- Row Label Left -->
-                <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
-                    {{ $baris }}
-                </div>
-
-                <!-- Seats Container -->
-                <div class="flex items-center gap-1.5">
-                    @php
-                        $sortedKursi = $kursiList->sortBy(function ($kursi) {
-                            return (int) substr($kursi->nomor_kursi, 1);
-                        });
-                    @endphp
-
-                    @foreach($sortedKursi as $kursi)
-                        @php
-                            $nomorKolom = (int) substr($kursi->nomor_kursi, 1);
-                            $isBooked = in_array($kursi->id, $bookedSeats);
-                            $isSelected = in_array($kursi->id, $selectedKursi);
-                        @endphp
-
-                        <!-- Seat -->
-                        <button wire:click.prevent="toggleKursi({{ $kursi->id }})"
-                                type="button"
-                                class="w-8 h-8 rounded text-xs font-semibold transition
-                                {{ $isBooked ? 'bg-red-500 cursor-not-allowed' : ($isSelected ? 'bg-blue-500 text-white' : 'bg-green-500 hover:bg-green-600 text-white') }}"
-                                {{ $isBooked ? 'disabled' : '' }}
-                                title="{{ $kursi->nomor_kursi }}">
-                                {{ $nomorKolom }}
-                        </button>
-
-                        <!-- Gang setelah kursi ke-gangPosition -->
-                        @if($nomorKolom == $gangPosition)
-                            <div class="w-6 flex items-center justify-center text-gray-400 flex-shrink-0">
-                                <i class="fa-solid fa-grip-lines-vertical text-sm"></i>
-                            </div>
-                        @endif
-                    @endforeach
-                </div>
-
-                <!-- Row Label Right -->
-                <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
-                    {{ $baris }}
+           <!-- Bagian STEP 2: Pilih Kursi - GANTI INI -->
+@if ($formStep === 2 && $selectedJadwal)
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Seat Selection -->
+        <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Pilih Kursi</h2>
+                <div class="flex gap-4 text-sm">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                        <span>Tersedia</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                        <span>Terpesan</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
+                        <span>Dipilih</span>
+                    </div>
                 </div>
             </div>
-        @endforeach
-    </div>
-</div>
 
-<!-- Legend -->
-<div class="mt-6 pt-4 border-t flex justify-center gap-8">
-    <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-green-500 rounded"></div>
-        <span class="text-sm text-gray-700">Tersedia</span>
-    </div>
-    <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-red-500 rounded"></div>
-        <span class="text-sm text-gray-700">Terpesan</span>
-    </div>
-    <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-blue-500 rounded"></div>
-        <span class="text-sm text-gray-700">Dipilih</span>
-    </div>
-    <div class="flex items-center gap-2">
-        <i class="fa-solid fa-grip-lines-vertical text-gray-400"></i>
-        <span class="text-sm text-gray-700">Gang</span>
-    </div>
-</div>
-                        <!-- Selected Seats -->
-                        @if (count($selectedKursi) > 0)
-                            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
-                                <h3 class="font-semibold text-blue-800 mb-2">Kursi Terpilih</h3>
-                                <div class="flex flex-wrap gap-2">
+            <!-- Screen -->
+            <div class="mb-8 text-center">
+                <div class="bg-gray-800 text-white py-3 rounded-lg mx-auto max-w-md">
+                    <span class="font-semibold">SCREEN</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Layar Utama</p>
+            </div>
+
+            <!-- Seat Map - Layout Grid 12 Kolom (seperti online) -->
+            <div class="flex justify-center overflow-x-auto">
+                <div class="space-y-3">
+                    @if($selectedJadwal && isset($selectedJadwal['studio']['id']))
+                        @php
+                            // Ambil semua kursi berdasarkan studio
+                            $kursis = \App\Models\Kursi::where('studio_id', $selectedJadwal['studio']['id'])
+                                ->get()
+                                ->sortBy(function($item) {
+                                    $row = substr($item->nomor_kursi, 0, 1);
+                                    $col = (int)substr($item->nomor_kursi, 1);
+                                    return $row . str_pad($col, 3, '0', STR_PAD_LEFT);
+                                });
+                            
+                            // Group by baris
+                            $kursiByBaris = $kursis->groupBy(function ($kursi) {
+                                return substr($kursi->nomor_kursi, 0, 1);
+                            })->sortKeys();
+
+                            // Hitung max kolom untuk gang position
+                            $totalKolom = $kursis->max(function ($kursi) {
+                                return (int) substr($kursi->nomor_kursi, 1);
+                            });
+
+                            $gangPosition = $totalKolom ? ceil($totalKolom / 2) : 6;
+                        @endphp
+
+                        @foreach($kursiByBaris as $baris => $kursiList)
+                            <div class="flex items-center justify-center gap-2">
+                                <!-- Label Baris Kiri -->
+                                <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
+                                    {{ $baris }}
+                                </div>
+
+                                <!-- Kursi Bagian Kiri (Sebelum Gang) -->
+                                <div class="flex items-center gap-1.5">
                                     @php
-                                        $selectedSeatsNumbers = \App\Models\Kursi::whereIn('id', $selectedKursi)->pluck('nomor_kursi')->toArray();
+                                        $sortedKursi = $kursiList->sortBy(function ($kursi) {
+                                            return (int) substr($kursi->nomor_kursi, 1);
+                                        });
                                     @endphp
-                                    @foreach ($selectedSeatsNumbers as $seatNum)
-                                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                                            {{ $seatNum }}
-                                        </span>
+
+                                    @foreach($sortedKursi as $kursi)
+                                        @php
+                                            $nomorKolom = (int) substr($kursi->nomor_kursi, 1);
+                                            $isBooked = in_array($kursi->id, $bookedSeats);
+                                            $isSelected = in_array($kursi->id, $selectedKursi);
+                                        @endphp
+
+                                        @if($nomorKolom <= $gangPosition)
+                                            <button wire:click.prevent="toggleKursi({{ $kursi->id }})"
+                                                    type="button"
+                                                    class="w-8 h-8 rounded text-xs font-semibold transition
+                                                    {{ $isBooked ? 'bg-red-500 cursor-not-allowed' : ($isSelected ? 'bg-blue-500 text-white' : 'bg-green-500 hover:bg-green-600 text-white') }}"
+                                                    {{ $isBooked ? 'disabled' : '' }}
+                                                    title="{{ $kursi->nomor_kursi }}">
+                                                    {{ $nomorKolom }}
+                                            </button>
+                                        @endif
                                     @endforeach
                                 </div>
-                            </div>
-                        @endif
-                    </div>
 
-                    <!-- Summary -->
-                    <div class="bg-white rounded-lg shadow p-6 h-fit">
-                        <h3 class="font-bold text-gray-900 mb-4">Ringkasan</h3>
-                        
-                        <div class="space-y-3 text-sm mb-4">
-                            <div>
-                                <span class="text-gray-600">Film</span>
-                                <p class="font-semibold">{{ $selectedJadwal['film']['judul'] }}</p>
-                            </div>
-                            <div>
-                                <span class="text-gray-600">Tanggal & Waktu</span>
-                                <p class="font-semibold">
-                                    {{ \Carbon\Carbon::parse($selectedJadwal['tanggal_tayang'])->format('d M Y') }},
-                                    {{ \Carbon\Carbon::parse($selectedJadwal['jam_tayang'])->format('H:i') }}
-                                </p>
-                            </div>
-                            <div>
-                                <span class="text-gray-600">Studio</span>
-                                <p class="font-semibold">{{ $selectedJadwal['studio']['nama_studio'] }}</p>
-                            </div>
-                        </div>
+                                <!-- Gang / Aisle -->
+                                <div class="w-8 flex items-center justify-center text-gray-400 flex-shrink-0">
+                                    <i class="fa-solid fa-grip-lines-vertical text-sm"></i>
+                                </div>
 
-                        <div class="border-t pt-4 space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Jumlah Tiket</span>
-                                <span class="font-semibold">{{ count($selectedKursi) }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Harga per Tiket</span>
-                                <span class="font-semibold">
-                                    Rp {{ number_format($hargaTiket->harga ?? 0, 0, ',', '.') }}
-                                </span>
-                            </div>
-                            <div class="border-t pt-2 flex justify-between font-bold">
-                                <span>Total</span>
-                                <span class="text-teal-600">Rp {{ number_format($totalHarga, 0, ',', '.') }}</span>
-                            </div>
-                        </div>
+                                <!-- Kursi Bagian Kanan (Setelah Gang) -->
+                                <div class="flex items-center gap-1.5">
+                                    @foreach($sortedKursi as $kursi)
+                                        @php
+                                            $nomorKolom = (int) substr($kursi->nomor_kursi, 1);
+                                            $isBooked = in_array($kursi->id, $bookedSeats);
+                                            $isSelected = in_array($kursi->id, $selectedKursi);
+                                        @endphp
 
-                        <div class="mt-6 space-y-2">
-                            <button wire:click="proceedToConfirm"
-                                    {{ count($selectedKursi) === 0 ? 'disabled' : '' }}
-                                    class="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition">
-                                Lanjut ke Konfirmasi
-                            </button>
-                            <button wire:click="switchTab('buat-pemesanan')"
-                                    class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg transition">
-                                Batal
-                            </button>
+                                        @if($nomorKolom > $gangPosition)
+                                            <button wire:click.prevent="toggleKursi({{ $kursi->id }})"
+                                                    type="button"
+                                                    class="w-8 h-8 rounded text-xs font-semibold transition
+                                                    {{ $isBooked ? 'bg-red-500 cursor-not-allowed' : ($isSelected ? 'bg-blue-500 text-white' : 'bg-green-500 hover:bg-green-600 text-white') }}"
+                                                    {{ $isBooked ? 'disabled' : '' }}
+                                                    title="{{ $kursi->nomor_kursi }}">
+                                                    {{ $nomorKolom }}
+                                            </button>
+                                        @endif
+                                    @endforeach
+                                </div>
+
+                                <!-- Label Baris Kanan -->
+                                <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
+                                    {{ $baris }}
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="py-10 text-center text-gray-500">
+                            Memuat kursi...
                         </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="mt-6 pt-4 border-t flex justify-center gap-8">
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-green-500 rounded"></div>
+                    <span class="text-sm text-gray-700">Tersedia</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-red-500 rounded"></div>
+                    <span class="text-sm text-gray-700">Terpesan</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-blue-500 rounded"></div>
+                    <span class="text-sm text-gray-700">Dipilih</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-grip-lines-vertical text-gray-400"></i>
+                    <span class="text-sm text-gray-700">Gang</span>
+                </div>
+            </div>
+
+            <!-- Selected Seats -->
+            @if (count($selectedKursi) > 0)
+                <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="font-semibold text-blue-800 mb-2">Kursi Terpilih</h3>
+                    <div class="flex flex-wrap gap-2">
+                        @php
+                            $selectedSeatsNumbers = \App\Models\Kursi::whereIn('id', $selectedKursi)->pluck('nomor_kursi')->toArray();
+                        @endphp
+                        @foreach ($selectedSeatsNumbers as $seatNum)
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                                {{ $seatNum }}
+                            </span>
+                        @endforeach
                     </div>
                 </div>
             @endif
+        </div>
+
+        <!-- Summary -->
+        <div class="bg-white rounded-lg shadow p-6 h-fit">
+            <h3 class="font-bold text-gray-900 mb-4">Ringkasan</h3>
+            
+            <div class="space-y-3 text-sm mb-4">
+                <div>
+                    <span class="text-gray-600">Film</span>
+                    <p class="font-semibold">{{ $selectedJadwal['film']['judul'] }}</p>
+                </div>
+                <div>
+                    <span class="text-gray-600">Tanggal & Waktu</span>
+                    <p class="font-semibold">
+                        {{ \Carbon\Carbon::parse($selectedJadwal['tanggal_tayang'])->format('d M Y') }},
+                        {{ \Carbon\Carbon::parse($selectedJadwal['jam_tayang'])->format('H:i') }}
+                    </p>
+                </div>
+                <div>
+                    <span class="text-gray-600">Studio</span>
+                    <p class="font-semibold">{{ $selectedJadwal['studio']['nama_studio'] }}</p>
+                </div>
+            </div>
+
+            <div class="border-t pt-4 space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Jumlah Tiket</span>
+                    <span class="font-semibold">{{ count($selectedKursi) }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Harga per Tiket</span>
+                    <span class="font-semibold">
+                        Rp {{ number_format($hargaTiket->harga ?? 0, 0, ',', '.') }}
+                    </span>
+                </div>
+                <div class="border-t pt-2 flex justify-between font-bold">
+                    <span>Total</span>
+                    <span class="text-teal-600">Rp {{ number_format($totalHarga, 0, ',', '.') }}</span>
+                </div>
+            </div>
+
+            <div class="mt-6 space-y-2">
+                <button wire:click="proceedToConfirm"
+                        {{ count($selectedKursi) === 0 ? 'disabled' : '' }}
+                        class="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition">
+                    Lanjut ke Konfirmasi
+                </button>
+                <button wire:click="switchTab('buat-pemesanan')"
+                        class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg transition">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+@endif
 
             <!-- STEP 3: Konfirmasi -->
             @if ($formStep === 3 && $selectedJadwal)
@@ -318,7 +348,7 @@
                         <div class="space-y-3 text-sm mb-4">
                             <div>
                                 <span class="text-gray-600">Film</span>
-                                <p class="font-semibold text-sm">{{ $selectedJadwal['film']['judul'] }}</p>
+                             <p class="font-semibold text-sm">{{ $selectedJadwal['film']['judul'] }}</p>
                             </div>
                             <div>
                                 <span class="text-gray-600">Jadwal</span>
@@ -328,7 +358,7 @@
                             </div>
                             <div>
                                 <span class="text-gray-600">Studio</span>
-                                <p class="font-semibold text-sm">{{ $selectedJadwal['studio']['nama_studio'] }}</p>
+                              <p class="font-semibold text-sm">{{ $selectedJadwal['studio']['nama_studio'] }}</p>
                             </div>
                         </div>
 

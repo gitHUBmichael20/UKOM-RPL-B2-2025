@@ -44,6 +44,25 @@
                 </div>
             </div>
 
+            <!-- Offline Badge -->
+            @if ($pemesanan->jenis_pemesanan === 'offline')
+                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6 rounded">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fa-solid fa-info-circle text-orange-500 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-orange-800">
+                                Pemesanan Offline - Pembayaran Lunas
+                            </p>
+                            <p class="text-sm text-orange-700 mt-1">
+                                Tiket ini sudah dibayar melalui kasir. Silakan tunjukkan tiket ini di bioskop.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Ticket -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-200">
                 <!-- Ticket Header -->
@@ -119,10 +138,18 @@
                                         <span
                                             class="font-semibold capitalize">{{ $pemesanan->metode_pembayaran }}</span>
                                     </div>
-                                    <div class="flex justify-between">
-                                        <span>Type:</span>
-                                        <span class="font-semibold capitalize">{{ $pemesanan->jenis_pemesanan }}</span>
-                                    </div>
+                                    @if ($pemesanan->jenis_pemesanan === 'offline')
+                                        <div class="flex justify-between">
+                                            <span>Type:</span>
+                                            <span class="font-semibold capitalize text-orange-600">{{ $pemesanan->jenis_pemesanan }}</span>
+                                        </div>
+                                        @if ($pemesanan->kasir_id)
+                                            <div class="flex justify-between">
+                                                <span>Cashier:</span>
+                                                <span class="font-semibold">{{ \App\Models\User::find($pemesanan->kasir_id)->name ?? 'N/A' }}</span>
+                                            </div>
+                                        @endif
+                                    @endif
                                 </div>
                             </div>
 
@@ -136,179 +163,60 @@
                         </div>
                     </div>
 
-<!-- QR Code Section -->
-<div class="mt-8 border-t pt-6">
-    <div class="text-center">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4">
-            <i class="fas fa-qrcode mr-2"></i>SCAN THIS QR CODE AT THE CINEMA
-        </h3>
-        
-        <div class="bg-gray-100 p-6 rounded-lg inline-block" id="qr-container">
-            @php
-                $qrCode = new \Endroid\QrCode\QrCode(
-                    data: $pemesanan->kode_booking,
-                    encoding: new \Endroid\QrCode\Encoding\Encoding('UTF-8'),
-                    errorCorrectionLevel: \Endroid\QrCode\ErrorCorrectionLevel::High,
-                    size: 300,
-                    margin: 10
-                );
-                $writer = new \Endroid\QrCode\Writer\PngWriter();
-                $result = $writer->write($qrCode);
-                $qrBase64 = base64_encode($result->getString());
-            @endphp
-            
-            <img id="qr-image" 
-                 src="data:image/png;base64,{{ $qrBase64 }}" 
-                 alt="QR Code" 
-                 width="300" 
-                 height="300" 
-                 class="mx-auto"
-                 style="display: block; max-width: 300px; height: auto;">
-            
-            <div class="text-sm font-mono font-bold tracking-wider mt-4">
-                {{ $pemesanan->kode_booking }}
+                    <!-- Barcode Area -->
+                    <div class="mt-8 border-t pt-6">
+                        <div class="text-center">
+                            <div class="bg-gray-100 p-4 rounded-lg inline-block">
+                                <!-- Simple Barcode Representation -->
+                                <div class="text-xs font-mono tracking-widest opacity-50">
+                                    {{ $pemesanan->kode_booking }}
+                                </div>
+                                <div class="flex justify-center mt-2 space-x-1">
+                                    @for ($i = 0; $i < 20; $i++)
+                                        <div class="w-1 h-8 bg-black"></div>
+                                    @endfor
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Present this ticket at the cinema</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div class="mt-6 flex justify-center gap-3 no-print">
-            <button onclick="downloadTicketFixed()"
-                    id="download-btn"
-                    class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-semibold transition inline-flex items-center gap-2">
-                <i class="fas fa-download"></i>
-                Download Ticket
-            </button>
-            
-            <button onclick="window.print()"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition inline-flex items-center gap-2">
-                <i class="fas fa-print"></i>
-                Print Ticket
-            </button>
-        </div>
-        
-        <p class="text-sm text-gray-600 mt-4">
-            <i class="fas fa-info-circle mr-2"></i>
-            Show this QR code to the cashier to confirm and redeem your ticket
-        </p>
-    </div>
-</div>
+
             <!-- Action Buttons -->
             <div class="mt-6 flex justify-center space-x-4 no-print">
                 <a href="{{ route('dashboard') }}"
                     class="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition">
                     Back to Dashboard
                 </a>
+                <button onclick="window.print()"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                    Print Ticket
+                </button>
             </div>
         </div>
     </div>
 
-<style>
-    @media print {
-        .no-print,
-        x-slot,
-        header,
-        nav {
-            display: none !important;
-        }
-        body {
-            background: white !important;
-        }
-        .bg-white {
-            background: white !important;
-        }
-        .rounded-xl {
-            box-shadow: none !important;
-            border: 1px solid #e5e7eb !important;
-        }
-    }
-</style>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script>
-    async function downloadTicketFixed() {
-        const btn = document.getElementById('download-btn');
-        const originalHTML = btn.innerHTML;
-        
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Preparing...';
-        btn.disabled = true;
-        
-        try {
-            await new Promise(resolve => setTimeout(resolve, 300));
-            
-            const ticket = document.querySelector('.bg-white.rounded-xl.shadow-lg');
-            const qrImg = document.getElementById('qr-image');
-            
-            // Pastikan QR loaded
-            if (!qrImg.complete) {
-                await new Promise((resolve) => {
-                    qrImg.onload = resolve;
-                });
+    <style>
+        @media print {
+            .no-print {
+                display: none !important;
             }
-            
-            console.log('Capturing ticket...');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Capturing...';
-            
-            const canvas = await html2canvas(ticket, {
-                backgroundColor: '#ffffff',
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                logging: false,
-                imageTimeout: 0,
-                onclone: function(clonedDoc) {
-                    const clonedQr = clonedDoc.getElementById('qr-image');
-                    if (clonedQr) {
-                        clonedQr.style.display = 'block';
-                        clonedQr.style.visibility = 'visible';
-                    }
-                }
-            });
-            
-            console.log('Canvas created:', canvas.width, 'x', canvas.height);
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
-            
-            // METHOD BARU: Konversi langsung tanpa blob
-            // Ini lebih compatible dengan browser security
-            const dataURL = canvas.toDataURL('image/jpeg', 0.95);
-            
-            // Create download link dengan cara yang lebih aman
-            const link = document.createElement('a');
-            link.href = dataURL;
-            link.download = 'Ticket_{{ $pemesanan->kode_booking }}.jpg';
-            
-            // Trick: Append ke body dulu baru click
-            document.body.appendChild(link);
-            
-            // Use setTimeout untuk avoid browser blocking
-            setTimeout(() => {
-                link.click();
-                
-                // Cleanup setelah download
-                setTimeout(() => {
-                    document.body.removeChild(link);
-                }, 100);
-                
-                btn.innerHTML = '<i class="fas fa-check mr-2"></i>Downloaded!';
-                console.log('Download completed successfully');
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                }, 2000);
-            }, 100);
-            
-        } catch (err) {
-            console.error('Download error:', err);
-            alert('Download failed: ' + err.message + '\n\nPlease try:\n1. Right-click the ticket → Save image as...\n2. Or use Print button → Save as PDF');
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
+
+            body {
+                background: white !important;
+            }
+
+            .bg-white {
+                background: white !important;
+            }
         }
-    }
-    
-    window.addEventListener('load', function() {
-        const qrImg = document.getElementById('qr-image');
-        if (qrImg && qrImg.complete && qrImg.naturalHeight > 0) {
-            console.log('✓ QR Code loaded successfully');
-        }
-    });
-</script>
+    </style>
+    @if (session('auto_print_ticket'))
+    <script>
+        window.addEventListener('load', function() {
+            window.print();
+        });
+    </script>
+@endif
 </x-app-layout>

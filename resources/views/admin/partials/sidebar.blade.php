@@ -56,6 +56,17 @@
                 </a>
             </li>
 
+            @if (isRole('kasir'))
+    <!-- Redeem Tiket -->
+    <li>
+        <a href="{{ route('admin.kasir.redeem.index') }}"
+           class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.kasir.redeem.*') ? 'bg-gray-700' : '' }}">
+            <i class="fa-solid fa-check-circle w-5 text-gray-300"></i>
+            <span class="ml-3">Redeem Tiket</span>
+        </a>
+    </li>
+@endif
+
 <!-- Pemesanan -->
 @if (isRole('admin'))
     <li>

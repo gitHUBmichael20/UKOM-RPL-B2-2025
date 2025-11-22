@@ -11,34 +11,22 @@
             <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center space-x-2">
-                        <div
-                            class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
-                            ✓
-                        </div>
+                        <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">✓</div>
                         <span class="font-medium text-green-600">Movie & Time</span>
                     </div>
                     <div class="h-1 w-12 bg-green-500"></div>
                     <div class="flex items-center space-x-2">
-                        <div
-                            class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">
-                            2
-                        </div>
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">2</div>
                         <span class="font-medium text-blue-600">Seat Selection</span>
                     </div>
                     <div class="h-1 w-12 bg-gray-300"></div>
                     <div class="flex items-center space-x-2">
-                        <div
-                            class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold">
-                            3
-                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold">3</div>
                         <span class="font-medium text-gray-500">Payment</span>
                     </div>
                     <div class="h-1 w-12 bg-gray-300"></div>
                     <div class="flex items-center space-x-2">
-                        <div
-                            class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold">
-                            4
-                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold">4</div>
                         <span class="font-medium text-gray-500">Your Ticket</span>
                     </div>
                 </div>
@@ -51,16 +39,14 @@
                     <div class="bg-white rounded-lg shadow-sm p-6">
                         <div class="flex flex-col md:flex-row gap-6">
                             <div class="flex-shrink-0">
-                                <img src="{{ $film->poster }}" alt="{{ $film->judul }}"
-                                    class="w-40 rounded-lg shadow-md">
+                                <img src="{{ $film->poster }}" alt="{{ $film->judul }}" class="w-40 rounded-lg shadow-md">
                             </div>
                             <div class="flex-grow">
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <h1 class="text-2xl font-bold text-gray-900">{{ $film->judul }}</h1>
                                         <div class="flex items-center space-x-4 mt-2">
-                                            <span
-                                                class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
                                                 {{ $film->rating }}
                                             </span>
                                             <span class="text-gray-600">
@@ -135,27 +121,96 @@
                             <div class="text-sm text-gray-500 mt-2">All eyes this way please</div>
                         </div>
 
-                        <!-- Seat Map -->
-                        <div class="flex flex-col items-center">
-                            <form id="seatForm" action="{{ route('pemesanan.payment', [$film, $jadwalTayang]) }}"
-                                method="GET">
-                                <div id="seatMap" class="grid grid-cols-12 gap-2 mb-4">
-                                    @foreach ($seats as $seat)
-                                        @php
-                                            $isBooked = in_array($seat->id, $bookedSeats);
-                                        @endphp
-                                        <div class="seat-container text-center">
-                                            <input type="checkbox" name="selected_seats[]" value="{{ $seat->id }}"
-                                                id="seat-{{ $seat->id }}" class="hidden seat-checkbox"
-                                                {{ $isBooked ? 'disabled' : '' }}>
-                                            <label for="seat-{{ $seat->id }}"
-                                                class="seat-label w-8 h-8 rounded-sm flex items-center justify-center text-xs font-medium cursor-pointer transition-all
-                                                          {{ $isBooked ? 'bg-red-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600' }}"
-                                                data-seat-id="{{ $seat->id }}"
-                                                data-seat-number="{{ $seat->nomor_kursi }}">
-                                                {{ substr($seat->nomor_kursi, 1) }}
-                                            </label>
-                                            <div class="text-xs text-gray-500 mt-1">{{ $seat->nomor_kursi }}</div>
+                        <!-- Seat Map - Layout Sesuai dengan Offline -->
+                        <div class="flex justify-center overflow-x-auto pb-4">
+                            <form id="seatForm" action="{{ route('pemesanan.payment', [$film, $jadwalTayang]) }}" method="GET">
+                                <div class="space-y-3">
+                                    @php
+                                        // Group seats by row (baris)
+                                        $seatsByRow = $seats->groupBy(function ($seat) {
+                                            return substr($seat->nomor_kursi, 0, 1);
+                                        })->sortKeys();
+
+                                        // Hitung max kolom untuk gang position
+                                        $maxCol = $seats->max(function ($seat) {
+                                            return (int) substr($seat->nomor_kursi, 1);
+                                        });
+
+                                        $gangPosition = $maxCol ? ceil($maxCol / 2) : 6;
+                                    @endphp
+
+                                    @foreach($seatsByRow as $row => $rowSeats)
+                                        <div class="flex items-center justify-center gap-2">
+                                            <!-- Label Baris Kiri -->
+                                            <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
+                                                {{ $row }}
+                                            </div>
+
+                                            <!-- Kursi Bagian Kiri -->
+                                            <div class="flex items-center gap-1.5">
+                                                @foreach($rowSeats->sortBy(function($s) { return (int)substr($s->nomor_kursi, 1); }) as $seat)
+                                                    @php
+                                                        $colNum = (int) substr($seat->nomor_kursi, 1);
+                                                        $isBooked = in_array($seat->id, $bookedSeats);
+                                                    @endphp
+
+                                                    @if($colNum <= $gangPosition)
+                                                        <div class="seat-container">
+                                                            <input type="checkbox" 
+                                                                   name="selected_seats[]" 
+                                                                   value="{{ $seat->id }}"
+                                                                   id="seat-{{ $seat->id }}" 
+                                                                   class="hidden seat-checkbox"
+                                                                   {{ $isBooked ? 'disabled' : '' }}>
+                                                            <label for="seat-{{ $seat->id }}"
+                                                                class="seat-label w-8 h-8 rounded flex items-center justify-center text-xs font-semibold cursor-pointer transition-all
+                                                                {{ $isBooked ? 'bg-red-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600 text-white' }}"
+                                                                data-seat-id="{{ $seat->id }}"
+                                                                data-seat-number="{{ $seat->nomor_kursi }}">
+                                                                {{ $colNum }}
+                                                            </label>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+
+                                            <!-- Gang / Aisle -->
+                                            <div class="w-8 flex items-center justify-center text-gray-400 flex-shrink-0">
+                                                <i class="fa-solid fa-grip-lines-vertical text-sm"></i>
+                                            </div>
+
+                                            <!-- Kursi Bagian Kanan -->
+                                            <div class="flex items-center gap-1.5">
+                                                @foreach($rowSeats->sortBy(function($s) { return (int)substr($s->nomor_kursi, 1); }) as $seat)
+                                                    @php
+                                                        $colNum = (int) substr($seat->nomor_kursi, 1);
+                                                        $isBooked = in_array($seat->id, $bookedSeats);
+                                                    @endphp
+
+                                                    @if($colNum > $gangPosition)
+                                                        <div class="seat-container">
+                                                            <input type="checkbox" 
+                                                                   name="selected_seats[]" 
+                                                                   value="{{ $seat->id }}"
+                                                                   id="seat-{{ $seat->id }}" 
+                                                                   class="hidden seat-checkbox"
+                                                                   {{ $isBooked ? 'disabled' : '' }}>
+                                                            <label for="seat-{{ $seat->id }}"
+                                                                class="seat-label w-8 h-8 rounded flex items-center justify-center text-xs font-semibold cursor-pointer transition-all
+                                                                {{ $isBooked ? 'bg-red-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600 text-white' }}"
+                                                                data-seat-id="{{ $seat->id }}"
+                                                                data-seat-number="{{ $seat->nomor_kursi }}">
+                                                                {{ $colNum }}
+                                                            </label>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+
+                                            <!-- Label Baris Kanan -->
+                                            <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
+                                                {{ $row }}
+                                            </div>
                                         </div>
                                     @endforeach
                                 </div>
@@ -180,7 +235,6 @@
 
                 <!-- Right Column - Order Summary -->
                 <div class="space-y-6 sticky top-6 h-fit">
-                    <!-- Order Summary -->
                     <div class="bg-white rounded-lg shadow-sm p-6">
                         <h2 class="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
 
@@ -212,8 +266,7 @@
                                 </div>
                                 <div class="flex justify-between mb-2">
                                     <span class="text-gray-600">Price per ticket</span>
-                                    <span class="font-medium">Rp
-                                        {{ number_format($hargaTiket->harga, 0, ',', '.') }}</span>
+                                    <span class="font-medium">Rp {{ number_format($hargaTiket->harga, 0, ',', '.') }}</span>
                                 </div>
                             </div>
 
@@ -243,7 +296,12 @@
 
             let selectedSeats = [];
 
-            // Seat selection handler
+            // AUTO-REFRESH setiap 3 detik untuk update status kursi dari DB
+            setInterval(function() {
+                // Optional: bisa reload halaman atau fetch data kursi yang booked
+                // Untuk sekarang, cukup dengan header no-cache sudah cukup
+            }, 3000);
+
             seatCheckboxes.forEach(checkbox => {
                 if (!checkbox.disabled) {
                     checkbox.addEventListener('change', function() {
@@ -252,10 +310,7 @@
                         const seatNumber = seatLabel.dataset.seatNumber;
 
                         if (this.checked) {
-                            selectedSeats.push({
-                                id: seatId,
-                                number: seatNumber
-                            });
+                            selectedSeats.push({ id: seatId, number: seatNumber });
                             seatLabel.classList.remove('bg-green-500', 'hover:bg-green-600');
                             seatLabel.classList.add('bg-blue-500');
                         } else {
@@ -269,7 +324,6 @@
                 }
             });
 
-            // Update order summary
             function updateOrderSummary() {
                 const count = selectedSeats.length;
 
@@ -279,8 +333,7 @@
 
                     selectedSeats.forEach(seat => {
                         const seatBadge = document.createElement('div');
-                        seatBadge.className =
-                            'bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded';
+                        seatBadge.className = 'bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded';
                         seatBadge.textContent = seat.number;
                         selectedSeatsList.appendChild(seatBadge);
                     });
@@ -297,6 +350,14 @@
                     continueBtn.disabled = true;
                 }
             }
+
+            // Handle refresh message jika ada
+            @if(session('refresh'))
+                // Reload halaman untuk refresh data kursi
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            @endif
         });
     </script>
 </x-app-layout>
