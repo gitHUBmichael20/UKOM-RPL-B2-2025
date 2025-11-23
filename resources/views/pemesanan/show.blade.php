@@ -13,28 +13,28 @@
                 <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-sm">
                     ✓
                 </div>
-                <span class="font-medium text-green-600 text-sm lg:text-base">Current Movie</span>
+                <span class="font-medium text-green-600 text-sm lg:text-base">Film & Jadwal</span>
             </div>
             <div class="h-1 w-8 lg:w-12 bg-green-500"></div>
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-sm">
                     2
                 </div>
-                <span class="font-medium text-blue-600 text-sm lg:text-base">Showing Time</span>
+                <span class="font-medium text-blue-600 text-sm lg:text-base">Pilih Kursi</span>
             </div>
             <div class="h-1 w-8 lg:w-12 bg-gray-300"></div>
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-sm">
                     3
                 </div>
-                <span class="font-medium text-gray-500 text-sm lg:text-base">Seat & Payment</span>
+                <span class="font-medium text-gray-500 text-sm lg:text-base">Pembayaran</span>
             </div>
             <div class="h-1 w-8 lg:w-12 bg-gray-300"></div>
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-sm">
                     4
                 </div>
-                <span class="font-medium text-gray-500 text-sm lg:text-base">Your Ticket</span>
+                <span class="font-medium text-gray-500 text-sm lg:text-base">Tiket Anda</span>
             </div>
         </div>
 
@@ -139,7 +139,7 @@
                                             <div class="absolute inset-0 flex items-center justify-center">
                                                 <span class="bg-red-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-bold">
                                                     @if($isPast && !$canBook)
-                                                        SEDANG TAYANG
+                                                        SUDAH TAYANG
                                                     @else
                                                         BOOKING DITUTUP
                                                     @endif

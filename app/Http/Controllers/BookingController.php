@@ -24,7 +24,7 @@ class BookingController extends Controller
 
         $jadwalTayang = JadwalTayang::with(['studio'])
             ->where('film_id', $film->id)
-            ->where('tanggal_tayang', '>=', now()->subDays(1)->format('Y-m-d'))
+            ->where('tanggal_tayang', '>=', now()->startOfDay()->format('Y-m-d'))
             ->orderBy('tanggal_tayang')
             ->orderBy('jam_tayang')
             ->get()
@@ -46,16 +46,13 @@ class BookingController extends Controller
         }
         $jadwalTayang->load(['film', 'studio.kursi']);
 
-        // Get booked seats for this schedule
         $bookedSeats = DetailPemesanan::whereHas('pemesanan', function ($query) use ($jadwalTayang) {
             $query->where('jadwal_tayang_id', $jadwalTayang->id)
                 ->whereIn('status_pembayaran', ['pending', 'lunas']);
         })->pluck('kursi_id')->toArray();
 
-        // Get all seats for this studio
         $seats = $jadwalTayang->studio->kursi ?? collect();
 
-        // Calculate price
         $isWeekend = in_array(Carbon::parse($jadwalTayang->tanggal_tayang)->dayOfWeek, [0, 6]);
         $tipeHari = $isWeekend ? 'weekend' : 'weekday';
 
@@ -72,126 +69,175 @@ class BookingController extends Controller
 
     public function payment(Request $request, Film $film, JadwalTayang $jadwalTayang)
     {
-        $request->validate([
-            'selected_seats' => 'required|array|min:1',
-            'selected_seats.*' => 'exists:kursi,id'
-        ]);
+        $selectedSeatIds = $request->has('selected_seats')
+            ? $request->input('selected_seats')
+            : session('booking_data.selected_seats', []);
+
+        if (empty($selectedSeatIds)) {
+            return redirect()->route('pemesanan.seats', [$film, $jadwalTayang])
+                ->withErrors(['error' => 'Tidak ada kursi yang dipilih.']);
+        }
 
         $jadwalTayang->load(['film', 'studio']);
 
-        $selectedSeatIds = $request->selected_seats;
-        $seats = Kursi::whereIn('id', $selectedSeatIds)->get();
-
-        // Check if seats are still available
+        // Validasi kursi masih available
         $alreadyBooked = DetailPemesanan::whereIn('kursi_id', $selectedSeatIds)
-            ->whereHas('pemesanan', function ($query) use ($jadwalTayang) {
-                $query->where('jadwal_tayang_id', $jadwalTayang->id)
+            ->whereHas('pemesanan', function ($q) use ($jadwalTayang) {
+                $q->where('jadwal_tayang_id', $jadwalTayang->id)
                     ->whereIn('status_pembayaran', ['pending', 'lunas']);
             })->exists();
 
         if ($alreadyBooked) {
-            return back()->withErrors(['error' => 'Some selected seats are no longer available. Please try again.']);
+            return redirect()->route('pemesanan.seats', [$film, $jadwalTayang])
+                ->withErrors(['error' => 'Maaf, salah satu kursi sudah dipesan orang lain.']);
         }
 
-        // Calculate price
+        $seats = Kursi::whereIn('id', $selectedSeatIds)->get();
+
         $isWeekend = in_array(Carbon::parse($jadwalTayang->tanggal_tayang)->dayOfWeek, [0, 6]);
         $tipeHari = $isWeekend ? 'weekend' : 'weekday';
+
         $hargaTiket = HargaTiket::where('tipe_studio', $jadwalTayang->studio->tipe_studio)
             ->where('tipe_hari', $tipeHari)
-            ->first();
+            ->firstOrFail();
 
         $totalHarga = $hargaTiket->harga * count($selectedSeatIds);
 
-        // Store selected seats in session for the store method
-        session()->put('selected_seats', $selectedSeatIds);
-        session()->put('jadwal_tayang_id', $jadwalTayang->id);
-
-        return view('pemesanan.payment', compact('film', 'jadwalTayang', 'seats', 'totalHarga', 'hargaTiket'));
-    }
-
-    public function store(Request $request, Film $film, JadwalTayang $jadwalTayang)
-    {
-        $request->validate([
-            'metode_pembayaran' => 'required|in:cash,transfer,qris,debit'
+        // SIMPAN KE SESSION
+        session()->put('booking_data', [
+            'selected_seats'    => $selectedSeatIds,
+            'jadwal_tayang_id'  => $jadwalTayang->id,
+            'total_harga'       => $totalHarga,
         ]);
 
+        return view('pemesanan.payment', compact(
+            'film',
+            'jadwalTayang',
+            'seats',
+            'totalHarga',
+            'hargaTiket'
+        ));
+    }
+
+    /**
+     * GABUNGAN: Create booking + Generate snap token + Return JSON
+     */
+    public function store(Request $request, Film $film, JadwalTayang $jadwalTayang)
+    {
+        $bookingData = session('booking_data');
+        if (!$bookingData) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sesi habis. Silakan pilih kursi ulang.'
+            ], 400);
+        }
+
+        // Cek kursi masih available
+        $alreadyBooked = DetailPemesanan::whereIn('kursi_id', $bookingData['selected_seats'])
+            ->whereHas('pemesanan', function ($q) use ($jadwalTayang) {
+                $q->where('jadwal_tayang_id', $jadwalTayang->id)
+                    ->whereIn('status_pembayaran', ['pending', 'lunas']);
+            })->exists();
+
+        if ($alreadyBooked) {
+            session()->forget('booking_data');
+            return response()->json([
+                'success' => false,
+                'message' => 'Kursi sudah dipesan orang lain!'
+            ], 400);
+        }
+
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
-            // Get data dari session atau langsung dari request
-            $selectedSeatIds = session()->get('selected_seats');
-
-            // Fallback: jika session hilang, coba dari form hidden (optional)
-            if (!$selectedSeatIds && $request->has('selected_seats')) {
-                $selectedSeatIds = $request->selected_seats;
-            }
-
-            if (!$selectedSeatIds) {
-                return redirect()->route('pemesanan.seats', [$film, $jadwalTayang])
-                    ->withErrors(['error' => 'Please select seats first.']);
-            }
-
             $user = auth()->user();
 
-            // Check if seats are still available
-            $alreadyBooked = DetailPemesanan::whereIn('kursi_id', $selectedSeatIds)
-                ->whereHas('pemesanan', function ($query) use ($jadwalTayang) {
-                    $query->where('jadwal_tayang_id', $jadwalTayang->id)
-                        ->whereIn('status_pembayaran', ['pending', 'lunas']);
-                })->exists();
-
-            if ($alreadyBooked) {
-                return back()->withErrors(['error' => 'Some selected seats are no longer available. Please try again.']);
-            }
-
-            // Calculate price
-            $isWeekend = in_array(Carbon::parse($jadwalTayang->tanggal_tayang)->dayOfWeek, [0, 6]);
-            $tipeHari = $isWeekend ? 'weekend' : 'weekday';
-            $hargaTiket = HargaTiket::where('tipe_studio', $jadwalTayang->studio->tipe_studio)
-                ->where('tipe_hari', $tipeHari)
-                ->first();
-
-            $totalHarga = $hargaTiket->harga * count($selectedSeatIds);
-
-            // Generate booking code
+            // Generate kode booking unik
             do {
                 $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(6));
             } while (Pemesanan::where('kode_booking', $kodeBooking)->exists());
 
-            // Create booking
+            // MIDTRANS CONFIG
+            \Midtrans\Config::$serverKey    = config('midtrans.server_key');
+            \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+            \Midtrans\Config::$isSanitized  = true;
+            \Midtrans\Config::$is3ds        = true;
+
+            // CREATE SNAP TOKEN
+            $params = [
+                'transaction_details' => [
+                    'order_id'     => $kodeBooking,
+                    'gross_amount' => (int) $bookingData['total_harga'],
+                ],
+                'customer_details' => [
+                    'first_name' => $user->name,
+                    'email'      => $user->email,
+                ],
+                'enabled_payments' => [
+                    'credit_card',
+                    'qris',
+                    'gopay',
+                    'shopeepay',
+                    'dana',
+                    'linkaja',
+                    'ovo',
+                    'bca_va',
+                    'bri_va',
+                    'bni_va',
+                    'permata_va',
+                    'mandiri_va',
+                    'cimb_va'
+                ],
+                'expiry' => [
+                    'start_time' => now()->format('Y-m-d H:i:s O'),
+                    'unit'       => 'hour',
+                    'duration'   => 2
+                ]
+            ];
+
+            $snapToken = \Midtrans\Snap::createTransaction($params)->token;
+
+            // BUAT PEMESANAN
             $pemesanan = Pemesanan::create([
-                'kode_booking' => $kodeBooking,
-                'user_id' => $user->id,
-                'user_name' => $user->name,
-                'jadwal_tayang_id' => $jadwalTayang->id,
-                'jumlah_tiket' => count($selectedSeatIds),
-                'total_harga' => $totalHarga,
-                'metode_pembayaran' => $request->metode_pembayaran,
-                'jenis_pemesanan' => 'online',
-                'status_pembayaran' => 'pending',
-                'tanggal_pemesanan' => now(),
-                'kasir_id' => null,
+                'kode_booking'       => $kodeBooking,
+                'user_id'            => $user->id,
+                'user_name'          => $user->name,
+                'jadwal_tayang_id'   => $jadwalTayang->id,
+                'jumlah_tiket'       => count($bookingData['selected_seats']),
+                'total_harga'        => $bookingData['total_harga'],
+                'metode_pembayaran'  => null,
+                'jenis_pemesanan'    => 'online',
+                'status_pembayaran'  => 'pending',
+                'tanggal_pemesanan'  => now(),
+                'snap_token'         => $snapToken,
+                'expired_at'         => now()->addHours(2),
             ]);
 
-            // Create seat details
-            foreach ($selectedSeatIds as $kursiId) {
+            // Simpan detail kursi
+            foreach ($bookingData['selected_seats'] as $seatId) {
                 DetailPemesanan::create([
                     'pemesanan_id' => $pemesanan->id,
-                    'kursi_id' => $kursiId,
+                    'kursi_id'     => $seatId,
                 ]);
             }
 
-            // Clear session
-            session()->forget(['selected_seats', 'jadwal_tayang_id']);
-
             DB::commit();
+            session()->forget('booking_data');
 
-            return redirect()->route('pemesanan.success', $pemesanan->id)
-                ->with('success', 'Booking confirmed successfully!');
+            // RETURN SNAP TOKEN UNTUK FRONTEND
+            return response()->json([
+                'success' => true,
+                'snap_token' => $snapToken,
+                'booking_id' => $pemesanan->id,
+                'success_url' => route('pemesanan.success', $pemesanan),
+                'bookings_url' => route('pemesanan.my-bookings')
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Booking error: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to create booking: ' . $e->getMessage()]);
+            \Log::error('Midtrans Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat pembayaran: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -215,55 +261,14 @@ class BookingController extends Controller
         return view('pemesanan.ticket', compact('pemesanan'));
     }
 
-    /**
-     * Show user's booking history
-     */
     public function myBookings()
     {
         $user = Auth::user();
         $bookings = Pemesanan::where('user_id', $user->id)
-            ->with(['jadwalTayang', 'detailPemesanan']) // eager loading
+            ->with(['jadwalTayang.film', 'jadwalTayang.studio', 'detailPemesanan'])
             ->orderBy('tanggal_pemesanan', 'desc')
             ->get();
 
         return view('pemesanan.my-bookings', compact('bookings'));
-    }
-
-    /**
-     * Show specific booking details
-     */
-    public function bookingDetails(Pemesanan $pemesanan)
-    {
-        if ($pemesanan->user_id !== auth()->id()) {
-            abort(403);
-        }
-
-        $pemesanan->load([
-            'jadwalTayang.film.sutradara',
-            'jadwalTayang.studio',
-            'detailPemesanan.kursi',
-            'user'
-        ]);
-
-        return view('pemesanan.booking-details', compact('pemesanan'));
-    }
-
-    /**
-     * Show ticket for specific booking
-     */
-    public function viewTicket(Pemesanan $pemesanan)
-    {
-        if ($pemesanan->user_id !== auth()->id()) {
-            abort(403);
-        }
-
-        $pemesanan->load([
-            'jadwalTayang.film.sutradara',
-            'jadwalTayang.studio',
-            'detailPemesanan.kursi',
-            'user'
-        ]);
-
-        return view('pemesanan.ticket-view', compact('pemesanan'));
     }
 }

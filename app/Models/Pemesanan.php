@@ -19,11 +19,14 @@ class Pemesanan extends Model
         'jenis_pemesanan',
         'status_pembayaran',
         'tanggal_pemesanan',
-        'kasir_id'
+        'kasir_id',
+        'snap_token',
+        'expired_at'
     ];
 
     protected $casts = [
         'tanggal_pemesanan' => 'datetime',
+        'expired_at' => 'datetime',
         'total_harga' => 'decimal:2',
     ];
 
@@ -52,5 +55,15 @@ class Pemesanan extends Model
         $last = self::latest('id')->first();
         $number = $last ? $last->id + 1 : 1;
         return 'BK' . now()->format('Ymd') . str_pad($number, 4, '0', STR_PAD_LEFT);
+    }
+
+    public function getNamaPembayaranAttribute()
+    {
+        return nama_pembayaran($this->metode_pembayaran);
+    }
+
+    public function getIkonPembayaranAttribute()
+    {
+        return ikon_pembayaran($this->metode_pembayaran);
     }
 }

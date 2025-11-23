@@ -15,28 +15,28 @@
                         <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-sm">
                             ✓
                         </div>
-                        <span class="font-medium text-green-600 text-sm lg:text-base">Movie & Time</span>
+                        <span class="font-medium text-green-600 text-sm lg:text-base">Film & Jadwal</span>
                     </div>
                     <div class="h-1 w-8 lg:w-12 bg-green-500"></div>
                     <div class="flex items-center space-x-2">
                         <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-sm">
                             2
                         </div>
-                        <span class="font-medium text-blue-600 text-sm lg:text-base">Seat Selection</span>
+                        <span class="font-medium text-blue-600 text-sm lg:text-base">Pilih Kursi</span>
                     </div>
                     <div class="h-1 w-8 lg:w-12 bg-gray-300"></div>
                     <div class="flex items-center space-x-2">
                         <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-sm">
                             3
                         </div>
-                        <span class="font-medium text-gray-500 text-sm lg:text-base">Payment</span>
+                        <span class="font-medium text-gray-500 text-sm lg:text-base">Pembayaran</span>
                     </div>
                     <div class="h-1 w-8 lg:w-12 bg-gray-300"></div>
                     <div class="flex items-center space-x-2">
                         <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-sm">
                             4
                         </div>
-                        <span class="font-medium text-gray-500 text-sm lg:text-base">Your Ticket</span>
+                        <span class="font-medium text-gray-500 text-sm lg:text-base">Tiket Anda</span>
                     </div>
                 </div>
 
@@ -73,7 +73,7 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                <!-- Left Column - Movie Details & Seat Selection -->
+                <!-- Left Column - Movie Details & Pilih Kursi -->
                 <div class="lg:col-span-2 space-y-4 sm:space-y-6">
                     <!-- Movie Details Card - Responsive -->
                     <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
@@ -139,7 +139,7 @@
                         </div>
                     </div>
 
-                    <!-- Seat Selection - Responsive -->
+                    <!-- Pilih Kursi - Responsive -->
                     <div class="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-6">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
                             <h2 class="text-base sm:text-lg md:text-xl font-bold text-gray-900">Select Your Seats</h2>
@@ -161,7 +161,8 @@
 
                         <!-- Seat Map - Responsive -->
                         <div class="flex flex-col items-center">
-                            <form id="seatForm" action="{{ route('pemesanan.payment', [$film, $jadwalTayang]) }}" method="GET" class="w-full">
+                            <form method="POST" action="{{ route('pemesanan.payment', [$film, $jadwalTayang]) }}" id="seatForm" class="w-full">
+                                @csrf
                                 @php
                                     $kursiByBaris = $seats->groupBy(function ($kursi) {
                                         return substr($kursi->nomor_kursi, 0, 1);
@@ -352,14 +353,16 @@
         const seatsList = document.getElementById('seatsList');
         const totalPrice = document.getElementById('totalPrice');
         const continueBtn = document.getElementById('continueBtn');
+        const form = document.getElementById('seatForm');
 
         let selectedSeats = [];
 
+        // Handle checkbox change
         document.querySelectorAll('.seat-checkbox').forEach(checkbox => {
             if (checkbox.disabled) return;
 
             checkbox.addEventListener('change', function () {
-                const label = this.nextElementSibling.querySelector('.seat-label > div');
+                const label = this.nextElementSibling.querySelector('div');
                 const seatNumber = this.nextElementSibling.dataset.seatNumber;
 
                 if (this.checked) {
@@ -384,7 +387,7 @@
                 selectedSeatsList.innerHTML = '';
                 selectedSeats.forEach(seat => {
                     const badge = document.createElement('span');
-                    badge.className = 'bg-blue-600 text-white px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full font-bold text-[10px] sm:text-xs md:text-sm';
+                    badge.className = 'bg-blue-600 text-white px-3 py-1.5 rounded-full font-bold text-xs';
                     badge.textContent = seat.number;
                     selectedSeatsList.appendChild(badge);
                 });
@@ -402,11 +405,32 @@
             }
         }
 
-        // Restore selection dari URL (jika kembali dari payment)
+        // INI YANG PENTING BANGET! KIRIM DATA KE SERVER!
+        form.addEventListener('submit', function(e) {
+            if (selectedSeats.length === 0) {
+                e.preventDefault();
+                alert('Pilih minimal 1 kursi dulu!');
+                return;
+            }
+
+            // Hapus hidden input lama (kalau ada)
+            document.querySelectorAll('input[name="selected_seats[]"]').forEach(el => el.remove());
+
+            // Tambah hidden input baru
+            selectedSeats.forEach(seat => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'selected_seats[]';
+                input.value = seat.id;
+                form.appendChild(input);
+            });
+        });
+
+        // Restore selection dari URL (kalau kembali dari payment)
         @if(request()->has('selected_seats'))
             @foreach(request()->input('selected_seats') as $id)
                 const checkbox = document.getElementById('seat-{{ $id }}');
-                if (checkbox) {
+                if (checkbox && !checkbox.disabled) {
                     checkbox.checked = true;
                     checkbox.dispatchEvent(new Event('change'));
                 }

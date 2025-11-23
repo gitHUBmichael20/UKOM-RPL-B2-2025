@@ -112,7 +112,7 @@
            <!-- STEP 2: Pilih Kursi -->
             @if ($formStep === 2 && $selectedJadwal)
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Seat Selection -->
+                    <!-- Pilih Kursi -->
                     <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-xl font-bold text-gray-900">Pilih Kursi</h2>

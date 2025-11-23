@@ -4,8 +4,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FilmController;
+use App\Http\Controllers\MidtransWebhookController;
 use App\Http\Controllers\SutradaraManagement;
-use App\Http\Controllers\PaymentController;
 use App\Livewire\Admin\UserManagement;
 use App\Livewire\Admin\UserCreate;
 use App\Livewire\Admin\UserEdit;
@@ -26,6 +26,9 @@ use App\Livewire\Admin\PemesananAdmin;
 use App\Livewire\Kasir\PemesananKasir;
 use Illuminate\Support\Facades\Route;
 
+Route::post('/midtrans/webhook', [MidtransWebhookController::class, 'handle'])
+    ->name('midtrans.webhook');
+
 require __DIR__ . '/auth.php';
 
 // Dashboard
@@ -39,6 +42,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
+
 Route::middleware(['auth'])->group(function () {
 
     // Profile
@@ -49,26 +53,23 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/delete-photo', [ProfileController::class, 'deletePhoto'])->name('deletePhoto');
     });
 
-    // Pemesanan user
+    // Pemesanan user (CHECKOUT ROUTE DIHAPUS)
     Route::prefix('pemesanan')->name('pemesanan.')->group(function () {
-        // static route
+        // Static routes
         Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('my-bookings');
 
-        // dynamic route
+        // Dynamic routes
         Route::get('/{film}', [BookingController::class, 'show'])->name('show');
         Route::get('/{film}/schedule/{jadwalTayang}/seat', [BookingController::class, 'seatSelection'])->name('seats');
         Route::get('/{film}/schedule/{jadwalTayang}/payment', [BookingController::class, 'payment'])->name('payment');
+        Route::post('/{film}/schedule/{jadwalTayang}/payment', [BookingController::class, 'payment'])->name('payment.post');
+
+        // Store endpoint sekarang return JSON untuk AJAX
         Route::post('/{film}/schedule/{jadwalTayang}/store', [BookingController::class, 'store'])->name('store');
+
+        // Success & ticket pages
         Route::get('/success/{pemesanan}', [BookingController::class, 'success'])->name('success');
         Route::get('/ticket/{pemesanan}', [BookingController::class, 'ticket'])->name('ticket');
-    });
-
-    // Payment
-    Route::prefix('payment')->name('payment.')->group(function () {
-        Route::get('/payment/{pemesanan}', [PaymentController::class, 'show'])->name('show');
-        Route::post('/{pemesanan}/process', [PaymentController::class, 'process'])->name('process');
-        Route::get('/{pemesanan}/success', [PaymentController::class, 'success'])->name('success');
-        Route::post('/{pemesanan}/cancel', [PaymentController::class, 'cancel'])->name('cancel');
     });
 });
 
