@@ -9,19 +9,20 @@ use App\Models\Pemesanan;
 use App\Models\DetailPemesanan;
 use App\Models\JadwalTayang;
 use App\Models\HargaTiket;
+use App\Models\Kursi;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Redirect;
 
 #[Layout('admin.layouts.app')]
-
 
 class PemesananKasir extends Component
 {
     use WithPagination;
 
-    public $tab = 'buat-pemesanan'; // buat-pemesanan, hari-ini, detail
+    public $tab = 'buat-pemesanan';
     public $search = '';
     public $filterHariIni = true;
     public $perPage = 10;
@@ -31,19 +32,22 @@ class PemesananKasir extends Component
     // Form data untuk buat pemesanan
     public $formStep = 1;
     public $selectedJadwal = null;
+    public $selectedJadwalId = null; 
     public $selectedKursi = [];
     public $totalHarga = 0;
     public $hargaTiket = null;
     public $bookedSeats = [];
     public $jadwals = [];
+    
     protected $queryString = ['tab', 'search'];
+    protected $listeners = ['$refresh'];
 
     public function mount()
     {
         if (auth()->user()->role !== 'kasir') {
             abort(403, 'Unauthorized');
         }
-
+        
         $this->loadJadwals();
     }
 
@@ -52,14 +56,6 @@ class PemesananKasir extends Component
         $this->jadwals = JadwalTayang::with(['film', 'studio'])
             ->where('tanggal_tayang', '>=', now()->toDateString())
             ->orderBy('tanggal_tayang')
-            ->get()
-            ->toArray();
-    }
-
-    public function loadUsers()
-    {
-        $this->users = User::where('role', 'user')
-            ->select('id', 'name', 'email', 'phone')
             ->get()
             ->toArray();
     }
@@ -81,21 +77,26 @@ class PemesananKasir extends Component
         }
 
         $this->selectedJadwal = $jadwal->toArray();
-        $this->loadBookedSeats();
+        $this->selectedJadwalId = $jadwal->id;
         $this->hargaTiket = HargaTiket::where('tipe_studio', $jadwal->studio->tipe_studio)->first();
+        
+        $this->loadBookedSeats();
+        $this->calculateTotal();
         $this->formStep = 2;
     }
 
     public function loadBookedSeats()
     {
-        if (!$this->selectedJadwal) return;
+        if (!$this->selectedJadwalId) return;
 
-        $this->bookedSeats = DetailPemesanan::where('jadwal_tayang_id', $this->selectedJadwal['id'])
-            ->whereHas('pemesanan', function ($q) {
-                $q->whereIn('status_pembayaran', ['pending', 'lunas']);
-            })
+        // AMBIL SEMUA KURSI YANG SUDAH DIPESAN (BAIK STATUS APA PUN)
+        // Karena kursi yang sudah di-detail tidak boleh dipesan ulang
+        $this->bookedSeats = DetailPemesanan::where('jadwal_tayang_id', $this->selectedJadwalId)
             ->pluck('kursi_id')
             ->toArray();
+
+        // DEBUG: Log untuk cek
+        \Log::info('Booked seats for jadwal ' . $this->selectedJadwalId . ':', $this->bookedSeats);
     }
 
     public function toggleKursi($kursiId)
@@ -116,11 +117,9 @@ class PemesananKasir extends Component
 
     public function calculateTotal()
     {
-        if ($this->hargaTiket && count($this->selectedKursi) > 0) {
-            $this->totalHarga = count($this->selectedKursi) * $this->hargaTiket->harga;
-        } else {
-            $this->totalHarga = 0;
-        }
+        $this->totalHarga = $this->hargaTiket 
+            ? count($this->selectedKursi) * $this->hargaTiket->harga 
+            : 0;
     }
 
     public function proceedToConfirm()
@@ -141,15 +140,10 @@ class PemesananKasir extends Component
         }
 
         try {
-
-            do {
-                $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(6));
-            } while (Pemesanan::where('kode_booking', $kodeBooking)->exists());
-
             $pemesanan = Pemesanan::create([
-                'user_id' => null,
-                'kode_booking' => $kodeBooking,
-                'jadwal_tayang_id' => $this->selectedJadwal['id'],
+                'user_id' => auth()->id(),
+                'kode_booking' => 'BK' . now()->format('YmdHi') . rand(1000, 9999),
+                'jadwal_tayang_id' => $this->selectedJadwalId,
                 'jumlah_tiket' => count($this->selectedKursi),
                 'total_harga' => $this->totalHarga,
                 'tanggal_pemesanan' => now(),
@@ -165,16 +159,32 @@ class PemesananKasir extends Component
             foreach ($this->selectedKursi as $kursiId) {
                 DetailPemesanan::create([
                     'pemesanan_id' => $pemesanan->id,
-                    'jadwal_tayang_id' => $this->selectedJadwal['id'],
+                    'jadwal_tayang_id' => $this->selectedJadwalId,
                     'kursi_id' => $kursiId,
                     'harga' => $this->hargaTiket->harga
                 ]);
             }
 
-            session()->flash('success', 'Pemesanan offline berhasil dibuat! Kode: ' . $pemesanan->kode_booking);
             $this->resetForm();
+            session()->flash('success', 'Pemesanan berhasil! Tiket siap dicetak.');
             $this->tab = 'hari-ini';
+
+            // Redirect ke tab hari-ini atau route khusus tiket jika ada
+            // return redirect()->route('ticket.show', $pemesanan->kode_booking);
+            // Jika route ticket.show tidak ada, gunakan salah satu di bawah:
+            
+            // OPSI 1: Redirect ke halaman hari-ini (paling aman)
+            return redirect()->to(route('livewire', ['component' => 'kasir.pemesanan-kasir']) . '?tab=hari-ini')
+                ->with('success', 'Pemesanan berhasil! Tiket siap dicetak. Kode: ' . $pemesanan->kode_booking);
+            
+            // OPSI 2: Jika ada route untuk print tiket
+            // return redirect()->route('ticket.print', $pemesanan->id);
+            
+            // OPSI 3: Refresh halaman dengan flash message
+            // return redirect()->back()->with('success', 'Pemesanan berhasil! Kode: ' . $pemesanan->kode_booking);
+
         } catch (\Exception $e) {
+            \Log::error('Error simpan pemesanan offline: ' . $e->getMessage());
             session()->flash('error', 'Error: ' . $e->getMessage());
         }
     }
@@ -196,6 +206,7 @@ class PemesananKasir extends Component
     {
         $this->formStep = 1;
         $this->selectedJadwal = null;
+        $this->selectedJadwalId = null;
         $this->selectedKursi = [];
         $this->totalHarga = 0;
         $this->hargaTiket = null;

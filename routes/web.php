@@ -24,6 +24,7 @@ use App\Livewire\Admin\JadwalTayangCreate;
 use App\Livewire\Admin\JadwalTayangEdit;
 use App\Livewire\Admin\PemesananAdmin;
 use App\Livewire\Kasir\PemesananKasir;
+use App\Livewire\Kasir\RedeemTiket;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/midtrans/webhook', [MidtransWebhookController::class, 'handle'])
@@ -122,7 +123,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Sutradara
     Route::prefix('sutradara')->name('sutradara.')->group(function () {
-        Route::get('/', [SutradaraManagement::class, 'index'])->name('index');
         Route::get('/create', [SutradaraManagement::class, 'create'])->name('create');
         Route::post('/', [SutradaraManagement::class, 'store'])->name('store');
         Route::get('/{id}/edit', [SutradaraManagement::class, 'edit'])->name('edit');
@@ -130,10 +130,39 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::delete('/{id}', [SutradaraManagement::class, 'destroy'])->name('destroy');
     });
 
+    // Pemesanan Admin Routes
     Route::get('/pemesanan-admin', PemesananAdmin::class)->name('pemesanan.index');
 });
 
 // Kasir only
 Route::middleware(['auth', 'role:kasir'])->prefix('admin')->name('admin.')->group(function () {
+    // Pemesanan Kasir Routes
     Route::get('/pemesanan-kasir', PemesananKasir::class)->name('kasir.pemesanan.index');
+    
+    // Redeem Tiket Routes
+    Route::get('/redeem', RedeemTiket::class)->name('kasir.redeem.index');
+});
+
+
+Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Sutradara Lihat saja (kasir & admin)
+    Route::prefix('sutradara')->name('sutradara.')->group(function () {
+        Route::get('/', [SutradaraManagement::class, 'index'])->name('index');
+    });
+});
+
+
+
+// Laporan - Admin Only
+Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/laporan', \App\Livewire\Admin\Laporan\Index::class)->name('laporan.index');
+    Route::get('/laporan/export-penjualan', [\App\Http\Controllers\Admin\LaporanController::class, 'exportPenjualan'])->name('laporan.export-penjualan');
+    Route::get('/laporan/export-transaksi', [\App\Http\Controllers\Admin\LaporanController::class, 'exportTransaksi'])->name('laporan.export-transaksi');
+});
+
+// Laporan Transaksi Harian - Kasir
+Route::middleware(['role:kasir'])->prefix('admin/kasir')->name('admin.kasir.')->group(function () {
+    Route::get('/laporan', \App\Livewire\Admin\Kasir\LaporanHarian::class)->name('laporan.index');
+    Route::get('/laporan/export', [\App\Http\Controllers\Admin\Kasir\LaporanController::class, 'exportHarian'])->name('laporan.export');
 });

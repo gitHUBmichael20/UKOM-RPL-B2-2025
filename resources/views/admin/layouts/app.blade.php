@@ -54,7 +54,6 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 
     @livewireScripts
-    @stack('scripts')
 
     <script>
         const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -93,6 +92,7 @@
             });
         @endif
     </script>
+       @stack('scripts')
 </body>
 
 </html>

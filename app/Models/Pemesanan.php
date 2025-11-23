@@ -3,7 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
 class Pemesanan extends Model
 {
     protected $table = 'pemesanan';
@@ -56,6 +60,37 @@ class Pemesanan extends Model
         $number = $last ? $last->id + 1 : 1;
         return 'BK' . now()->format('Ymd') . str_pad($number, 4, '0', STR_PAD_LEFT);
     }
+public function generateQRCode()
+{
+    if ($this->jenis_pemesanan !== 'online') {
+        return null;
+    }
+
+    $qrCode = new QrCode(
+        data: $this->kode_booking,
+        encoding: new Encoding('UTF-8'),
+        errorCorrectionLevel: ErrorCorrectionLevel::High,
+        size: 300,
+        margin: 10
+    );
+    
+    $writer = new PngWriter();
+    $result = $writer->write($qrCode);
+    
+    // Convert ke base64
+    return 'data:image/png;base64,' . base64_encode($result->getString());
+}
+
+protected static function booted()
+{
+    static::created(function ($pemesanan) {
+        if ($pemesanan->jenis_pemesanan === 'online') {
+            $qrCode = $pemesanan->generateQRCode();
+            $pemesanan->update(['qr_code' => $qrCode]);
+        }
+    });
+}
+
 
     public function getNamaPembayaranAttribute()
     {

@@ -28,11 +28,13 @@
         </div>
 
         <!-- Add Button -->
+        @if(auth()->user()->role === 'admin')
         <a href="{{ route('admin.film.create') }}"
            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg flex items-center gap-2 transition-colors">
             <i class="fa-solid fa-plus"></i>
             Tambah Film
         </a>
+        @endif
     </div>
 
     <!-- Table -->
@@ -49,7 +51,9 @@
                         <th class="px-6 py-4">Rating</th>
                         <th class="px-6 py-4">Tahun</th>
                         <th class="px-6 py-4">Status</th>
-                        <th class="px-6 py-4 text-center">Aksi</th>
+                        @if(auth()->user()->role === 'admin')
+    <th class="px-6 py-4 text-center">Aksi</th>
+@endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -118,20 +122,24 @@
                             </td>
 
                             <!-- Aksi -->
-                            <td class="px-6 py-4">
-                                <div class="flex items-center justify-center gap-2">
-                                    <a href="{{ route('admin.film.edit', $film->id) }}"
-                                       class="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
-                                       title="Edit">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </a>
-                                    <button onclick="confirmDelete({{ $film->id }})"
-                                            class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-                                            title="Hapus">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
+                            @if(auth()->user()->role === 'admin')
+<td class="px-6 py-4">
+    <div class="flex items-center justify-center gap-2">
+        <a href="{{ route('admin.film.edit', $film->id) }}"
+           class="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+           title="Edit">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+
+        <button onclick="confirmDelete({{ $film->id }})"
+                class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                title="Hapus">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
+</td>
+@endif
+
                         </tr>
                     @empty
                         <tr>

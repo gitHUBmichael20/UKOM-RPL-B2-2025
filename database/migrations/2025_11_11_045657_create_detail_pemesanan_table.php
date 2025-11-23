@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pemesanan_id')->constrained('pemesanan')->onDelete('cascade');
             $table->foreignId('kursi_id')->constrained('kursi')->onDelete('cascade');
+             $table->foreignId('jadwal_tayang_id')->nullable()->constrained('jadwal_tayang')->nullOnDelete();
             $table->timestamps();
             $table->unique(['pemesanan_id', 'kursi_id']);
         });

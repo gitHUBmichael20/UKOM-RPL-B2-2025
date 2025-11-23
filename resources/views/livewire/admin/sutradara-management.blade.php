@@ -10,10 +10,12 @@
 
     <!-- Header Actions -->
     <div class="flex justify-end mb-4">
-        <a href="{{ route('admin.sutradara.create') }}"
-            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow">
-            + Tambah Sutradara
-        </a>
+        @if(auth()->user()->role === 'admin')
+    <a href="{{ route('admin.sutradara.create') }}"
+       class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow">
+        + Tambah Sutradara
+    </a>
+@endif
     </div>
 
     <!-- Table -->
@@ -25,7 +27,9 @@
                         <th class="px-6 py-3">Nama</th>
                         <th class="px-6 py-3">Foto</th>
                         <th class="px-6 py-3">Biografi</th>
-                        <th class="px-6 py-3 text-right">Aksi</th>
+                         @if(auth()->user()->role === 'admin')
+            <th class="px-6 py-3 text-right">Aksi</th>
+        @endif
                     </tr>
                 </thead>
 
@@ -44,16 +48,24 @@
                             </td>
 
                             <td class="px-6 py-4 text-right whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.sutradara.edit', $s->id) }}" class="text-blue-600 hover:text-blue-800 mr-3">
-                                    Edit
-                                </a>
 
-                                <form action="{{ route('admin.sutradara.destroy', $s->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus sutradara ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="text-red-600 hover:text-red-800">Hapus</button>
-                                </form>
-                            </td>
+    @if(auth()->user()->role === 'admin')
+        <a href="{{ route('admin.sutradara.edit', $s->id) }}"
+           class="text-blue-600 hover:text-blue-800 mr-3">
+            Edit
+        </a>
+
+        <form action="{{ route('admin.sutradara.destroy', $s->id) }}"
+              method="POST"
+              class="inline-block"
+              onsubmit="return confirm('Hapus sutradara ini?')">
+            @csrf
+            @method('DELETE')
+            <button class="text-red-600 hover:text-red-800">Hapus</button>
+        </form>
+    @endif
+
+</td>
                         </tr>
                     @empty
                         <tr>
