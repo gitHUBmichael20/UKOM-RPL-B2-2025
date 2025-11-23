@@ -22,7 +22,7 @@
                             class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
                             ✓
                         </div>
-                        <span class="font-medium text-green-600">Movie & Time</span>
+                        <span class="font-medium text-green-600">Film & Jadwal</span>
                     </div>
                     <div class="h-1 w-12 bg-green-500"></div>
                     <div class="flex items-center space-x-2">
@@ -30,7 +30,7 @@
                             class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
                             ✓
                         </div>
-                        <span class="font-medium text-green-600">Seat Selection</span>
+                        <span class="font-medium text-green-600">Pilih Kursi</span>
                     </div>
                     <div class="h-1 w-12 bg-green-500"></div>
                     <div class="flex items-center space-x-2">
@@ -38,7 +38,7 @@
                             class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
                             ✓
                         </div>
-                        <span class="font-medium text-green-600">Payment</span>
+                        <span class="font-medium text-green-600">Pembayaran</span>
                     </div>
                     <div class="h-1 w-12 bg-green-500"></div>
                     <div class="flex items-center space-x-2">
@@ -46,7 +46,7 @@
                             class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">
                             4
                         </div>
-                        <span class="font-medium text-blue-600">Finish</span>
+                        <span class="font-medium text-blue-600">Tiket Anda</span>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@
                                 </svg>
                             </div>
                             <h1 class="text-2xl font-bold text-gray-900">Booking Confirmed!</h1>
-                            <p class="text-gray-600 mt-2">Your tickets have been reserved successfully</p>
+                            <p class="text-gray-600 mt-2">Tiket Andas have been reserved successfully</p>
                         </div>
 
                         <div class="border-t border-gray-200 pt-6">

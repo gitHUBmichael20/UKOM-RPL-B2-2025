@@ -43,8 +43,8 @@ class JadwalTayangEdit extends Component
         $this->jadwalId = $jadwal->id;
         $this->film_id = $jadwal->film_id;
         $this->studio_id = $jadwal->studio_id;
-        $this->tanggal_tayang = $jadwal->tanggal_tayang->format('Y-m-d');
-        $this->jam_tayang = $jadwal->jam_tayang->format('H:i');
+        $this->tanggal_tayang = Carbon::parse($jadwal->tanggal_tayang)->format('Y-m-d');
+        $this->jam_tayang = Carbon::parse($jadwal->jam_tayang)->format('H:i');
 
         $film = Film::find($this->film_id);
         $this->film_duration = $film ? $film->durasi : 0;

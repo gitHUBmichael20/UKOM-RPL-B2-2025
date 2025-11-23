@@ -15,6 +15,7 @@ class Pemesanan extends Model
     protected $fillable = [
         'kode_booking',
         'user_id',
+        'user_name',
         'jadwal_tayang_id',
         'jumlah_tiket',
         'total_harga',
@@ -22,11 +23,14 @@ class Pemesanan extends Model
         'jenis_pemesanan',
         'status_pembayaran',
         'tanggal_pemesanan',
-        'kasir_id'
+        'kasir_id',
+        'snap_token',
+        'expired_at'
     ];
 
     protected $casts = [
         'tanggal_pemesanan' => 'datetime',
+        'expired_at' => 'datetime',
         'total_harga' => 'decimal:2',
     ];
 
@@ -87,4 +91,14 @@ protected static function booted()
     });
 }
 
+
+    public function getNamaPembayaranAttribute()
+    {
+        return nama_pembayaran($this->metode_pembayaran);
+    }
+
+    public function getIkonPembayaranAttribute()
+    {
+        return ikon_pembayaran($this->metode_pembayaran);
+    }
 }

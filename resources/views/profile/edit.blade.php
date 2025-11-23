@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends(isRole('pelanggan') ? 'layouts.app' : 'admin.layouts.app')
 
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')

@@ -92,7 +92,7 @@
                                 {{ \Carbon\Carbon::parse($jadwal->tanggal_tayang)->format('d M Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $jadwal->jam_tayang->format('H:i') }} WIB
+                                {{ \Carbon\Carbon::parse($jadwal->jam_tayang)->format('H:i') }} WIB
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $jadwal->film->durasi }} menit

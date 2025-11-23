@@ -18,7 +18,7 @@
                                     <div class="flex-1">
                                         <div class="flex items-start space-x-4">
                                             <!-- Movie Poster -->
-                                            <img src="{{ $order->jadwalTayang->film->poster ?? '/placeholder-poster.jpg' }}"
+                                            <img src="{{ $order->jadwalTayang->film->poster ?? 'storage/default_poster.png' }}"
                                                 alt="{{ $order->jadwalTayang->film->judul ?? 'Movie' }}"
                                                 class="w-20 h-28 object-cover rounded-lg">
 

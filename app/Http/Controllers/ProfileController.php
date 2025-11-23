@@ -7,13 +7,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
+
     public function edit(Request $request): View
     {
         return view('profile.edit', [
@@ -21,13 +20,38 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $user = $request->user();
+        return $this->updateProfile($request, 'profile.edit');
+    }
 
+
+    public function editCustomer(Request $request): View
+    {
+        return view('profile.customer-edit', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    public function updateCustomer(ProfileUpdateRequest $request): RedirectResponse
+    {
+        return $this->updateProfile($request, 'profile.customer.edit');
+    }
+
+    public function destroyCustomer(Request $request): RedirectResponse
+    {
+        return $this->destroyProfile($request);
+    }
+
+    public function deletePhotoCustomer(Request $request)
+    {
+        return $this->deletePhoto($request);
+    }
+
+
+    private function updateProfile(ProfileUpdateRequest $request, string $routeName): RedirectResponse
+    {
+        $user = $request->user();
         $data = $request->validated();
 
         $request->validate([
@@ -36,12 +60,11 @@ class ProfileController extends Controller
         ]);
 
         if ($request->hasFile('foto_profil')) {
-            if ($user->foto_profil && \Storage::disk('public')->exists($user->foto_profil)) {
-                \Storage::disk('public')->delete($user->foto_profil);
+            if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+                Storage::disk('public')->delete($user->foto_profil);
             }
 
-            $path = $request->file('foto_profil')->store('profile-photos', 'public');
-            $data['foto_profil'] = $path;
+            $data['foto_profil'] = $request->file('foto_profil')->store('profile-photos', 'public');
         }
 
         $user->fill($data);
@@ -52,14 +75,15 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route($routeName)->with('status', 'profile-updated');
     }
 
-
-    /**
-     * Delete the user's account.
-     */
     public function destroy(Request $request): RedirectResponse
+    {
+        return $this->destroyProfile($request);
+    }
+
+    private function destroyProfile(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
@@ -68,9 +92,7 @@ class ProfileController extends Controller
         $user = $request->user();
 
         Auth::logout();
-
         $user->delete();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -81,11 +103,11 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        if ($user->foto_profil && \Storage::disk('public')->exists($user->foto_profil)) {
-            \Storage::disk('public')->delete($user->foto_profil);
+        if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+            Storage::disk('public')->delete($user->foto_profil);
             $user->update(['foto_profil' => null]);
         }
 
-        return response()->json(['status' => 'success']);
+        return response()->json(['success' => true]);
     }
 }

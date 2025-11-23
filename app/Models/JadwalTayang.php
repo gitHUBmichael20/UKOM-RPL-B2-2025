@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class JadwalTayang extends Model
@@ -16,7 +17,6 @@ class JadwalTayang extends Model
 
     protected $casts = [
         'tanggal_tayang' => 'date',
-        'jam_tayang' => 'datetime:H:i',
     ];
 
     public function film()
@@ -42,5 +42,33 @@ class JadwalTayang extends Model
                     ->whereIn('status_pembayaran', ['lunas', 'pending']);
             });
         });
+    }
+
+    public function masihBisaPesan(): bool
+    {
+        $batasAkhir = Carbon::parse($this->tanggal_tayang->format('Y-m-d') . ' ' . $this->jam_tayang)
+            ->addMinutes(15);
+
+        return now()->lessThan($batasAkhir);
+    }
+
+    public function lewatJadwal(): bool
+    {
+        return now()->greaterThanOrEqualTo(
+            Carbon::parse($this->tanggal_tayang->format('Y-m-d') . ' ' . $this->jam_tayang)
+        );
+    }
+
+    public function getHargaTiketAttribute()
+    {
+        $tanggal = Carbon::parse($this->tanggal_tayang);
+        $isWeekend = in_array($tanggal->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY]);
+        $tipeHari = $isWeekend ? 'weekend' : 'weekday';
+
+        $harga = HargaTiket::where('tipe_studio', $this->studio->tipe_studio)
+            ->where('tipe_hari', $tipeHari)
+            ->value('harga');
+
+        return $harga;
     }
 }

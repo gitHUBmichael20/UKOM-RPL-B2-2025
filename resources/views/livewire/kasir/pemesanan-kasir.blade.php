@@ -109,26 +109,66 @@
                 </div>
             @endif
 
-           <!-- Bagian STEP 2: Pilih Kursi - GANTI INI -->
-@if ($formStep === 2 && $selectedJadwal)
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Seat Selection -->
-        <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Pilih Kursi</h2>
-                <div class="flex gap-4 text-sm">
-                    <div class="flex items-center">
-                        <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
-                        <span>Tersedia</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
-                        <span>Terpesan</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
-                        <span>Dipilih</span>
-                    </div>
+           <!-- STEP 2: Pilih Kursi -->
+            @if ($formStep === 2 && $selectedJadwal)
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Pilih Kursi -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">Pilih Kursi</h2>
+                            <div class="flex gap-4 text-sm">
+                                <div class="flex items-center">
+                                    <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                                    <span>Tersedia</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                                    <span>Terpesan</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
+                                    <span>Dipilih</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Screen -->
+                        <div class="mb-8 text-center">
+                            <div class="bg-gray-800 text-white py-3 rounded-lg mx-auto max-w-md">
+                                <span class="font-semibold">SCREEN</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Layar Utama</p>
+                        </div>
+
+                      <!-- Seat Map -->
+<div class="flex justify-center overflow-x-auto">
+    <div class="space-y-2">
+        @php
+            $kursis = \App\Models\Kursi::where('studio_id', $selectedJadwal['studio']['id'])
+                ->get()
+                ->sortBy(function($item) {
+                    $row = substr($item->nomor_kursi, 0, 1);
+                    $col = (int)substr($item->nomor_kursi, 1);
+                    return $row . str_pad($col, 3, '0', STR_PAD_LEFT);
+                });
+            
+            $kursiByBaris = $kursis->groupBy(function ($kursi) {
+                return substr($kursi->nomor_kursi, 0, 1);
+            })->sortKeys();
+
+            $totalKolom = $kursis->max(function ($kursi) {
+                return (int) substr($kursi->nomor_kursi, 1);
+            });
+
+            // Hitung posisi gang (setelah kursi ke berapa)
+            $gangPosition = ceil($totalKolom / 2);
+        @endphp
+
+        @foreach($kursiByBaris as $baris => $kursiList)
+            <div class="flex items-center justify-center gap-2">
+                <!-- Row Label Left -->
+                <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
+                    {{ $baris }}
                 </div>
             </div>
 
@@ -436,7 +476,7 @@
                             @forelse ($pemesanans as $pemesanan)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 text-sm font-medium">{{ $pemesanan->kode_booking }}</td>
-                                    <td class="px-6 py-4 text-sm">{{ $pemesanan->user->name }}</td>
+                                    <td class="px-6 py-4 text-sm">{{ $pemesanan->user_name }}</td>
                                    <td class="px-6 py-4 text-sm">
     @if ($pemesanan->detailPemesanan->first() && $pemesanan->detailPemesanan->first()->jadwalTayang)
         {{ $pemesanan->detailPemesanan->first()->jadwalTayang->film->judul }}

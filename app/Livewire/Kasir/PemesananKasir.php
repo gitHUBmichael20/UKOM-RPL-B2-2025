@@ -70,7 +70,7 @@ class PemesananKasir extends Component
     public function selectJadwal($jadwalId)
     {
         $jadwal = JadwalTayang::with(['film', 'studio'])->find($jadwalId);
-        
+
         if (!$jadwal) {
             session()->flash('error', 'Jadwal tidak ditemukan');
             return;

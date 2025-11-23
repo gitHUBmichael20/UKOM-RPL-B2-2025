@@ -65,10 +65,6 @@ class FilmManagement extends Component
                 Storage::disk('public')->delete($film->poster);
             }
 
-            // HAPUS baris ini karena cascade sudah menangani
-            // $film->genres()->detach();
-
-            // Hapus film (cascade akan otomatis hapus film_genre)
             $film->delete();
 
             $this->dispatch('success', 'Film berhasil dihapus!');

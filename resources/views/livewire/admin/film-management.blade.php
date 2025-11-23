@@ -65,15 +65,9 @@
 
                             <!-- Poster -->
                             <td class="px-6 py-4">
-                                @if ($film->poster)
-                                    <img src="{{ asset('storage/' . $film->poster) }}"
-                                         alt="{{ $film->judul }}"
-                                         class="w-12 h-16 object-cover rounded-md shadow-sm">
-                                @else
-                                    <div class="w-12 h-16 bg-gray-100 rounded-md flex items-center justify-center">
-                                        <i class="fa-solid fa-image text-gray-400 text-xl"></i>
-                                    </div>
-                                @endif
+                                <img src="{{ $film->poster ? asset('storage/' . $film->poster) : asset('storage/default_poster.png') }}"
+                                     alt="{{ $film->judul }}"
+                                     class="w-12 h-16 object-cover rounded-md shadow-sm">
                             </td>
 
                             <!-- Judul + Durasi -->

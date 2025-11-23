@@ -15,7 +15,7 @@
                             class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
                             ✓
                         </div>
-                        <span class="font-medium text-green-600">Movie & Time</span>
+                        <span class="font-medium text-green-600">Film & Jadwal</span>
                     </div>
                     <div class="h-1 w-12 bg-green-500"></div>
                     <div class="flex items-center space-x-2">
@@ -23,7 +23,7 @@
                             class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
                             ✓
                         </div>
-                        <span class="font-medium text-green-600">Seat Selection</span>
+                        <span class="font-medium text-green-600">Pilih Kursi</span>
                     </div>
                     <div class="h-1 w-12 bg-green-500"></div>
                     <div class="flex items-center space-x-2">
@@ -31,7 +31,7 @@
                             class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
                             ✓
                         </div>
-                        <span class="font-medium text-green-600">Payment</span>
+                        <span class="font-medium text-green-600">Pembayaran</span>
                     </div>
                     <div class="h-1 w-12 bg-green-500"></div>
                     <div class="flex items-center space-x-2">
@@ -39,7 +39,7 @@
                             class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
                             ✓
                         </div>
-                        <span class="font-medium text-green-600">Your Ticket</span>
+                        <span class="font-medium text-green-600">Tiket Anda</span>
                     </div>
                 </div>
             </div>
