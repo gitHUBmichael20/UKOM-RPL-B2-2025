@@ -157,8 +157,8 @@ Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')
 // Laporan - Admin Only
 Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/laporan', \App\Livewire\Admin\Laporan\Index::class)->name('laporan.index');
-    Route::get('/laporan/export-penjualan', [\App\Http\Controllers\Admin\LaporanController::class, 'exportPenjualan'])->name('laporan.export-penjualan');
-    Route::get('/laporan/export-transaksi', [\App\Http\Controllers\Admin\LaporanController::class, 'exportTransaksi'])->name('laporan.export-transaksi');
+    Route::get('/laporan/export-penjualan', [\App\Http\Controllers\LaporanController::class, 'exportPenjualan'])->name('laporan.export-penjualan');
+    Route::get('/laporan/export-transaksi', [\App\Http\Controllers\LaporanController::class, 'exportTransaksi'])->name('laporan.export-transaksi');
 });
 
 // Laporan Transaksi Harian - Kasir

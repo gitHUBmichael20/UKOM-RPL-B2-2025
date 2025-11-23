@@ -12,7 +12,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             GenreSeeder::class,
             HargaTiketSeeder::class,
-            CinemaFullSeeder::class,  
         ]);
     }
 }

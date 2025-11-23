@@ -67,7 +67,7 @@
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Pelanggan</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Tanggal</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Total Harga</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status Pemesanan</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Jenis Pemesanan</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status Pembayaran</th>
                         <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700">Aksi</th>
                     </tr>
@@ -90,15 +90,13 @@
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="px-3 py-1 text-xs font-semibold rounded-full
-                                    @if ($pemesanan->status_pemesanan === 'pending')
+                                    @if ($pemesanan->jenis_pemesanan === 'offline')
                                         bg-yellow-100 text-yellow-800
-                                    @elseif ($pemesanan->status_pemesanan === 'dikonfirmasi')
-                                        bg-green-100 text-green-800
                                     @else
-                                        bg-red-100 text-red-800
+                                        bg-green-100 text-green-800
                                     @endif
                                 ">
-                                    {{ ucfirst($pemesanan->status_pemesanan) }}
+                                    {{ ucfirst($pemesanan->jenis_pemesanan) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm">

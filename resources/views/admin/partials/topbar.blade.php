@@ -16,12 +16,6 @@
 
             <!-- Right Side -->
             <div class="flex items-center space-x-4">
-                <!-- Notifications -->
-                <button type="button"
-                    class="relative p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
-                    <i class="fa-solid fa-bell text-base"></i>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
 
                 <!-- User Profile Dropdown -->
                 <div class="relative" x-data="{ open: false }">

@@ -6,32 +6,37 @@
     </x-slot>
 
     <!-- Progress Steps - Responsive -->
-    <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mt-4 sm:mt-8 mb-4 sm:mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div
+         class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mt-4 sm:mt-8 mb-4 sm:mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Desktop View -->
         <div class="hidden md:flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-sm">
+                <div
+                     class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-sm">
                     ✓
                 </div>
                 <span class="font-medium text-green-600 text-sm lg:text-base">Film & Jadwal</span>
             </div>
             <div class="h-1 w-8 lg:w-12 bg-green-500"></div>
             <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-sm">
+                <div
+                     class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-sm">
                     ✓
                 </div>
                 <span class="font-medium text-green-600 text-sm lg:text-base">Pilih Kursi</span>
             </div>
             <div class="h-1 w-8 lg:w-12 bg-green-500"></div>
             <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-sm">
+                <div
+                     class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-sm">
                     3
                 </div>
                 <span class="font-medium text-blue-600 text-sm lg:text-base">Pembayaran</span>
             </div>
             <div class="h-1 w-8 lg:w-12 bg-gray-300"></div>
             <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-sm">
+                <div
+                     class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-sm">
                     4
                 </div>
                 <span class="font-medium text-gray-500 text-sm lg:text-base">Tiket Anda</span>
@@ -41,28 +46,32 @@
         <!-- Mobile View -->
         <div class="flex md:hidden justify-between items-center">
             <div class="flex flex-col items-center flex-1">
-                <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-xs">
+                <div
+                     class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-xs">
                     ✓
                 </div>
                 <span class="font-medium text-green-600 text-xs mt-1 text-center">Movie</span>
             </div>
             <div class="h-0.5 w-6 bg-green-500 -mt-4"></div>
             <div class="flex flex-col items-center flex-1">
-                <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-xs">
+                <div
+                     class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-xs">
                     ✓
                 </div>
                 <span class="font-medium text-green-600 text-xs mt-1 text-center">Seat</span>
             </div>
             <div class="h-0.5 w-6 bg-green-500 -mt-4"></div>
             <div class="flex flex-col items-center flex-1">
-                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-xs">
+                <div
+                     class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-xs">
                     3
                 </div>
                 <span class="font-medium text-blue-600 text-xs mt-1 text-center">Pay</span>
             </div>
             <div class="h-0.5 w-6 bg-gray-300 -mt-4"></div>
             <div class="flex flex-col items-center flex-1">
-                <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-xs">
+                <div
+                     class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-xs">
                     4
                 </div>
                 <span class="font-medium text-gray-500 text-xs mt-1 text-center">Ticket</span>
@@ -85,7 +94,8 @@
                                      class="w-24 sm:w-32 rounded-lg shadow-md mx-auto sm:mx-0">
                             </div>
                             <div class="flex-grow">
-                                <h3 class="text-base sm:text-lg font-semibold text-gray-900 text-center sm:text-left">{{ $film->judul }}</h3>
+                                <h3 class="text-base sm:text-lg font-semibold text-gray-900 text-center sm:text-left">
+                                    {{ $film->judul }}</h3>
                                 <div class="mt-3 space-y-2 text-sm">
                                     <div class="flex flex-col sm:flex-row sm:items-center">
                                         <span class="text-gray-500 w-32">Tanggal & Jam:</span>
@@ -100,7 +110,8 @@
                                     </div>
                                     <div class="flex flex-col sm:flex-row sm:items-center">
                                         <span class="text-gray-500 w-32">Kursi:</span>
-                                        <span class="font-medium">{{ $seats->pluck('nomor_kursi')->implode(', ') }}</span>
+                                        <span
+                                              class="font-medium">{{ $seats->pluck('nomor_kursi')->implode(', ') }}</span>
                                     </div>
                                     <div class="flex flex-col sm:flex-row sm:items-center">
                                         <span class="text-gray-500 w-32">Jumlah Tiket:</span>
@@ -114,21 +125,30 @@
                     <!-- Payment Button - Responsive -->
                     <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 lg:p-8 text-center">
                         <div class="mb-6 sm:mb-8">
-                            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Konfirmasi Pembayaran</h2>
+                            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Konfirmasi Pembayaran
+                            </h2>
                             <p class="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto px-2">
                                 Klik tombol di bawah untuk melanjutkan ke pembayaran aman via
                                 <strong>Midtrans</strong>.<br class="hidden sm:block">
                                 Kamu bisa bayar dengan:
                             </p>
                             <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mt-4 sm:mt-6 text-lg sm:text-2xl">
-                                <span title="QRIS" class="text-base sm:text-2xl">💳 QRIS</span>
-                                <span title="GoPay" class="text-base sm:text-2xl">🟢 GoPay</span>
-                                <span title="ShopeePay" class="text-base sm:text-2xl">🟠 ShopeePay</span>
-                                <span title="DANA" class="text-base sm:text-2xl">🔵 DANA</span>
-                                <span title="OVO" class="text-base sm:text-2xl">🟣 OVO</span>
-                                <span title="LinkAja" class="text-base sm:text-2xl">🔴 LinkAja</span>
-                                <span title="Kartu Kredit/Debit" class="text-base sm:text-2xl">💳 Credit</span>
-                                <span title="Virtual Account" class="text-base sm:text-2xl">🏦 Bank</span>
+                                <span title="QRIS"
+                                      class="text-base sm:text-2xl">💳 QRIS</span>
+                                <span title="GoPay"
+                                      class="text-base sm:text-2xl">🟢 GoPay</span>
+                                <span title="ShopeePay"
+                                      class="text-base sm:text-2xl">🟠 ShopeePay</span>
+                                <span title="DANA"
+                                      class="text-base sm:text-2xl">🔵 DANA</span>
+                                <span title="OVO"
+                                      class="text-base sm:text-2xl">🟣 OVO</span>
+                                <span title="LinkAja"
+                                      class="text-base sm:text-2xl">🔴 LinkAja</span>
+                                <span title="Kartu Kredit/Debit"
+                                      class="text-base sm:text-2xl">💳 Credit</span>
+                                <span title="Virtual Account"
+                                      class="text-base sm:text-2xl">🏦 Bank</span>
                             </div>
                         </div>
 
@@ -137,7 +157,8 @@
                                 id="payButton"
                                 class="w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-base sm:text-xl font-bold rounded-xl shadow-lg hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95">
                             <i class="fas fa-credit-card text-xl sm:text-2xl mr-2 sm:mr-3"></i>
-                            <span id="buttonText" class="text-sm sm:text-base lg:text-xl">Lanjut ke Pembayaran • Rp
+                            <span id="buttonText"
+                                  class="text-sm sm:text-base lg:text-xl">Lanjut ke Pembayaran • Rp
                                 {{ number_format($totalHarga, 0, ',', '.') }}</span>
                         </button>
 
@@ -178,7 +199,8 @@
                     </div>
 
                     <!-- Security Info -->
-                    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 sm:p-6 border border-indigo-200">
+                    <div
+                         class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 sm:p-6 border border-indigo-200">
                         <div class="flex items-center mb-2 sm:mb-3">
                             <i class="fas fa-lock text-indigo-600 text-lg sm:text-xl mr-2"></i>
                             <span class="font-semibold text-indigo-900 text-sm sm:text-base">Transaksi Aman</span>

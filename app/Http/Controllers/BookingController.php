@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Film;
@@ -149,7 +150,7 @@ class BookingController extends Controller
 
             // Generate kode booking unik
             do {
-                $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(6));
+                $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(4));
             } while (Pemesanan::where('kode_booking', $kodeBooking)->exists());
 
             // MIDTRANS CONFIG
@@ -224,10 +225,9 @@ class BookingController extends Controller
                 'success' => true,
                 'snap_token' => $snapToken,
                 'booking_id' => $pemesanan->id,
-                'success_url' => route('pemesanan.success', $pemesanan),
+                'success_url' => route('pemesanan.ticket', $pemesanan),
                 'bookings_url' => route('pemesanan.my-bookings')
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Midtrans Error: ' . $e->getMessage());
@@ -244,9 +244,13 @@ class BookingController extends Controller
             abort(403);
         }
 
-        $pemesanan->load(['jadwalTayang.film', 'jadwalTayang.studio', 'detailPemesanan.kursi']);
+        if ($pemesanan->status_pembayaran !== 'lunas') {
+            $pemesanan->refresh();
+        }
 
-        return view('pemesanan.success', compact('pemesanan'));
+        $pemesanan->load(['jadwalTayang.film', 'jadwalTayang.studio', 'detailPemesanan.kursi', 'user']);
+
+        return view('pemesanan.ticket-view', compact('pemesanan'));
     }
 
     public function ticket(Pemesanan $pemesanan)
@@ -287,7 +291,7 @@ class BookingController extends Controller
 
         // Path ke file QR code
         $qrPath = storage_path('app/public/' . $pemesanan->qr_code);
-        
+
         if (!file_exists($qrPath)) {
             abort(404, 'QR Code file not found');
         }

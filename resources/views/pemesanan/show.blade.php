@@ -75,7 +75,7 @@
             <!-- Movie Info - Responsive -->
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
                 <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                    <img src="{{ $film->poster ? asset($film->poster) : asset('storage/default_poster.png') }}" 
+                    <img src="{{ $film->poster ? asset('storage/' . $film->poster) : asset('storage/default_poster.png') }}" 
                          alt="{{ $film->judul }}" 
                          class="w-24 sm:w-32 rounded-lg mx-auto sm:mx-0">
                     <div class="flex-1">
