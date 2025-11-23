@@ -59,7 +59,7 @@
                             @foreach ($sutradaras as $sutradara)
                                 <option value="{{ $sutradara->id }}"
                                         {{ $sutradara_id == $sutradara->id ? 'selected' : '' }}>
-                                    {{ $skutradara->nama_sutradara }}
+                                    {{ $sutradara->nama_sutradara }}
                                 </option>
                             @endforeach
                         </select>

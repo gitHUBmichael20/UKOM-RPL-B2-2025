@@ -32,7 +32,7 @@
             <!-- Jadwal Tayang -->
             <li>
                 <a href="{{ route('admin.jadwal-tayang.index') }}"
-                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.jadwal-tayang.*') ? 'bg-gray-700' : '' }}">
                     <i class="fa-solid fa-calendar-days w-5 text-gray-300"></i>
                     <span class="ml-3">Jadwal Tayang</span>
                 </a>
@@ -57,34 +57,53 @@
             </li>
 
             @if (isRole('kasir'))
-    <!-- Redeem Tiket -->
-    <li>
-        <a href="{{ route('admin.kasir.redeem.index') }}"
-           class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.kasir.redeem.*') ? 'bg-gray-700' : '' }}">
-            <i class="fa-solid fa-check-circle w-5 text-gray-300"></i>
-            <span class="ml-3">Redeem Tiket</span>
-        </a>
-    </li>
-@endif
+                <!-- Redeem Tiket -->
+                <li>
+                    <a href="{{ route('admin.kasir.redeem.index') }}"
+                       class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.kasir.redeem.*') ? 'bg-gray-700' : '' }}">
+                        <i class="fa-solid fa-check-circle w-5 text-gray-300"></i>
+                        <span class="ml-3">Redeem Tiket</span>
+                    </a>
+                </li>
+            @endif
 
-<!-- Pemesanan -->
-@if (isRole('admin'))
-    <li>
-        <a href="{{ route('admin.pemesanan.index') }}"
-            class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.pemesanan.index') ? 'bg-gray-700' : '' }}">
-            <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
-            <span class="ml-3">Pemesanan</span>
-        </a>
-    </li>
-@elseif (isRole('kasir'))
-    <li>
-        <a href="{{ route('admin.kasir.pemesanan.index') }}"
-            class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.kasir.pemesanan.index') ? 'bg-gray-700' : '' }}">
-            <i class="fa-solid fa-ticket w-5 text-gray-300"></i>
-            <span class="ml-3">Pemesanan</span>
-        </a>
-    </li>
-@endif
+            <!-- Pemesanan -->
+            @if (isRole('admin'))
+                <li>
+                    <a href="{{ route('admin.pemesanan.index') }}"
+                        class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.pemesanan.index') ? 'bg-gray-700' : '' }}">
+                        <i class="fa-solid fa-shopping-cart w-5 text-gray-300"></i>
+                        <span class="ml-3">Pemesanan</span>
+                    </a>
+                </li>
+            @elseif (isRole('kasir'))
+                <li>
+                    <a href="{{ route('admin.kasir.pemesanan.index') }}"
+                        class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.kasir.pemesanan.index') ? 'bg-gray-700' : '' }}">
+                        <i class="fa-solid fa-shopping-cart w-5 text-gray-300"></i>
+                        <span class="ml-3">Pemesanan</span>
+                    </a>
+                </li>
+            @endif
+
+            <!-- Laporan -->
+            @if (isRole('admin'))
+                <li>
+                    <a href="{{ route('admin.laporan.index') }}"
+                        class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.laporan.*') ? 'bg-gray-700' : '' }}">
+                        <i class="fa-solid fa-chart-line w-5 text-gray-300"></i>
+                        <span class="ml-3">Laporan</span>
+                    </a>
+                </li>
+            @elseif (isRole('kasir'))
+                <li>
+                    <a href="{{ route('admin.kasir.laporan.index') }}"
+                        class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.kasir.laporan.*') ? 'bg-gray-700' : '' }}">
+                        <i class="fa-solid fa-chart-simple w-5 text-gray-300"></i>
+                        <span class="ml-3">Laporan Harian</span>
+                    </a>
+                </li>
+            @endif
 
             @if (isRole('admin'))
                 <!-- Divider -->
@@ -95,7 +114,7 @@
                 <!-- Genre -->
                 <li>
                     <a href="{{ route('admin.genre.index') }}"
-                        class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
+                        class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.genre.*') ? 'bg-gray-700' : '' }}">
                         <i class="fa-solid fa-tags w-5 text-gray-300"></i>
                         <span class="ml-3">Genre</span>
                     </a>
@@ -111,21 +130,12 @@
                     </a>
                 </li>
 
-
                 <!-- Users -->
                 <li>
                     <a href="{{ route('admin.users.index') }}"
                         class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700' : '' }}">
                         <i class="fa-solid fa-users w-5 text-gray-300"></i>
                         <span class="ml-3">Users</span>
-                    </a>
-                </li>
-
-                <!-- Laporan -->
-                <li>
-                    <a href="#" class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700">
-                        <i class="fa-solid fa-chart-column w-5 text-gray-300"></i>
-                        <span class="ml-3">Laporan</span>
                     </a>
                 </li>
             @endif

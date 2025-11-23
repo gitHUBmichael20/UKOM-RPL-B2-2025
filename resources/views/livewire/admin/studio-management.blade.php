@@ -5,11 +5,13 @@
             <h2 class="text-2xl font-bold text-gray-800">Manajemen Studio</h2>
             <p class="text-gray-600 mt-1">Kelola studio dan kursi bioskop</p>
         </div>
+         @if(auth()->user()->role === 'admin')
         <a href="{{ route('admin.studio.create') }}"
            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
             <i class="fa-solid fa-plus"></i>
             Tambah Studio
         </a>
+        @endif
     </div>
 
     <!-- Search Bar -->
@@ -84,16 +86,19 @@
                                         <i class="fa-solid fa-eye mr-1"></i>
                                         Layout
                                     </button>
+                                     @if(auth()->user()->role === 'admin')
                                     <a href="{{ route('admin.studio.edit', $s->id) }}"
                                        class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
                                         <i class="fa-solid fa-edit mr-1"></i>
                                         Edit
                                     </a>
+                                    
                                     <button onclick="confirmDelete({{ $s->id }}, '{{ $s->nama_studio }}')"
                                             class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">
                                         <i class="fa-solid fa-trash mr-1"></i>
                                         Hapus
                                     </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

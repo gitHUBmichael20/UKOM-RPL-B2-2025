@@ -129,7 +129,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Sutradara Routes
     Route::prefix('sutradara')->name('sutradara.')->group(function () {
-        Route::get('/', [SutradaraManagement::class, 'index'])->name('index');
         Route::get('/create', [SutradaraManagement::class, 'create'])->name('create');
         Route::post('/', [SutradaraManagement::class, 'store'])->name('store');
         Route::get('/{id}/edit', [SutradaraManagement::class, 'edit'])->name('edit');
@@ -150,5 +149,31 @@ Route::middleware(['auth', 'role:kasir'])->prefix('admin')->name('admin.')->grou
     // Redeem Tiket Routes
     Route::get('/redeem', RedeemTiket::class)->name('kasir.redeem.index');
 });
+
+
+Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Sutradara Lihat saja (kasir & admin)
+    Route::prefix('sutradara')->name('sutradara.')->group(function () {
+        Route::get('/', [SutradaraManagement::class, 'index'])->name('index');
+    });
+});
+
+
+
+// Laporan - Admin Only
+Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/laporan', \App\Livewire\Admin\Laporan\Index::class)->name('laporan.index');
+    Route::get('/laporan/export-penjualan', [\App\Http\Controllers\Admin\LaporanController::class, 'exportPenjualan'])->name('laporan.export-penjualan');
+    Route::get('/laporan/export-transaksi', [\App\Http\Controllers\Admin\LaporanController::class, 'exportTransaksi'])->name('laporan.export-transaksi');
+});
+
+// Laporan Transaksi Harian - Kasir
+Route::middleware(['role:kasir'])->prefix('admin/kasir')->name('admin.kasir.')->group(function () {
+    Route::get('/laporan', \App\Livewire\Admin\Kasir\LaporanHarian::class)->name('laporan.index');
+    Route::get('/laporan/export', [\App\Http\Controllers\Admin\Kasir\LaporanController::class, 'exportHarian'])->name('laporan.export');
+});
+
+
 
 require __DIR__ . '/auth.php';

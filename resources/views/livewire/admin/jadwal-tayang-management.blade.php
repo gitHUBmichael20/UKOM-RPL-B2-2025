@@ -34,10 +34,12 @@
             </div>
 
             <div class="flex items-end">
+                 @if(auth()->user()->role === 'admin')
                 <a href="{{ route('admin.jadwal-tayang.create') }}"
                    class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-center">
                     <i class="fas fa-plus mr-2"></i>Tambah Jadwal
                 </a>
+                @endif
             </div>
         </div>
     </div>
@@ -58,8 +60,10 @@
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Durasi</th>
+                             @if(auth()->user()->role === 'admin')
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi</th>
+                            @endif
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -95,17 +99,20 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                 <div class="flex gap-2">
+                                     @if(auth()->user()->role === 'admin')
                                     <a href="{{ route('admin.jadwal-tayang.edit', $jadwal->id) }}"
                                        class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
                                         <i class="fa-solid fa-edit mr-1"></i>
                                         Edit
                                     </a>
+                                   
                                     <button onclick="confirmDeleteJadwal({{ $jadwal->id }})"
                                             wire:confirm="Apakah Anda yakin ingin menghapus jadwal ini?"
                                             class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">
                                         <i class="fa-solid fa-trash mr-1"></i>
                                         Hapus
                                     </button>
+                                     @endif
                                 </div>
                             </td>
                         </tr>
