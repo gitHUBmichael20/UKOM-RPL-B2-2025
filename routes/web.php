@@ -71,6 +71,9 @@ Route::middleware(['auth'])->group(function () {
         // Success & ticket pages
         Route::get('/success/{pemesanan}', [BookingController::class, 'success'])->name('success');
         Route::get('/ticket/{pemesanan}', [BookingController::class, 'ticket'])->name('ticket');
+
+        Route::post('/cancel/{pemesanan}', [BookingController::class, 'cancel'])
+            ->name('cancel');
     });
 });
 
@@ -138,7 +141,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:kasir'])->prefix('admin')->name('admin.')->group(function () {
     // Pemesanan Kasir Routes
     Route::get('/pemesanan-kasir', PemesananKasir::class)->name('kasir.pemesanan.index');
-    
+
     // Redeem Tiket Routes
     Route::get('/redeem', RedeemTiket::class)->name('kasir.redeem.index');
 });

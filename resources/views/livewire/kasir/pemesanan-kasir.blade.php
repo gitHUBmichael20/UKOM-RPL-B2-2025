@@ -395,68 +395,79 @@
                 </div>
             </div>
 
-            <!-- Table -->
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-100 border-b">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Kode Booking</th>
-                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Pelanggan</th>
-                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Film</th>
-                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Total Harga</th>
-                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                                <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y">
-                            @forelse ($pemesanans as $pemesanan)
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 text-sm font-medium">{{ $pemesanan->kode_booking }}</td>
-                                    <td class="px-6 py-4 text-sm">{{ $pemesanan->user_name }}</td>
-                                    <td class="px-6 py-4 text-sm">
-                                        @if ($pemesanan->detailPemesanan->first() && $pemesanan->detailPemesanan->first()->jadwalTayang)
-                                            {{ $pemesanan->detailPemesanan->first()->jadwalTayang->film->judul }}
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 text-sm font-semibold">
-                                        Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}
-                                    </td>
-                                    <td class="px-6 py-4 text-sm">
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full
-                                            {{ $pemesanan->status_pembayaran === 'lunas' ? 'bg-green-100 text-green-800' : 
-                                            ($pemesanan->status_pembayaran === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-700') }}">
-                                            @if($pemesanan->jenis_pemesanan === 'offline')
-                                                Lunas (Offline)
-                                            @elseif($pemesanan->status_pembayaran === 'lunas')
-                                                Lunas
-                                            @elseif($pemesanan->status_pembayaran === 'pending')
-                                                Menunggu Pembayaran
-                                            @else
-                                                {{ ucfirst($pemesanan->status_pembayaran) }}
-                                            @endif
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-center text-sm">
-                                        <button wire:click="viewDetail({{ $pemesanan->id }})"
-                                                class="text-teal-600 hover:text-teal-900 font-medium">
-                                            Detail
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                                        Tidak ada pemesanan hari ini
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<!-- Table -->
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-100 border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Kode Booking</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Pelanggan</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Tanggal</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Film</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Total Harga</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Jenis Pemesanan</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status Pembayaran</th>
+                    <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @forelse ($pemesanans as $pemesanan)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                            {{ $pemesanan->kode_booking }}
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <div class="font-medium">
+                                {{ $pemesanan->user?->name ?? $pemesanan->user_name ?? 'Offline' }}
+                            </div>
+                            @if($pemesanan->user?->email)
+                                <div class="text-xs text-gray-500">{{ $pemesanan->user->email }}</div>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-700">
+                            {{ $pemesanan->created_at->format('d M Y H:i') }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-700">
+                            @if($pemesanan->jadwalTayang?->film)
+                                {{ $pemesanan->jadwalTayang->film->judul }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                            Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full
+                                {{ $pemesanan->jenis_pemesanan === 'offline' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
+                                {{ $pemesanan->jenis_pemesanan === 'offline' ? 'Offline' : 'Online' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full
+                                {{ $pemesanan->status_pembayaran === 'lunas' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                {{ $pemesanan->status_pembayaran === 'lunas' ? 'Lunas' : 'Pending' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center text-sm">
+                            <button wire:click="viewDetail({{ $pemesanan->id }})"
+                                    class="text-teal-600 hover:text-teal-900 font-medium">
+                                Detail
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                            Tidak ada pemesanan hari ini
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 
             <!-- Pagination -->
             <div class="mt-6">
@@ -491,39 +502,83 @@
                         </div>
                     </div>
 
-                    <!-- Customer Info -->
+                    <!-- Data Pelanggan -->
                     <div class="border-t pt-4">
                         <h3 class="text-lg font-semibold mb-4">Data Pelanggan</h3>
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <span class="text-gray-600">Nama</span>
-                                <p class="font-semibold">{{ $selectedPemesanan->user->name }}</p>
+                                <p class="font-semibold">
+                                    {{ $selectedPemesanan->user?->name ?? $selectedPemesanan->user_name ?? 'Offline' }}
+                                </p>
                             </div>
                             <div>
                                 <span class="text-gray-600">Email</span>
-                                <p class="font-semibold">{{ $selectedPemesanan->user->email }}</p>
+                                <p class="font-semibold">
+                                    {{ $selectedPemesanan->user?->email ?? '-' }}
+                                </p>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">No. Telepon</span>
+                                <p class="font-semibold">
+                                    {{ $selectedPemesanan->user?->phone ?? '-' }}
+                                </p>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Jenis Pemesanan</span>
+                                <p class="font-semibold">
+                                    <span
+                                          class="px-3 py-1 text-xs font-semibold rounded-full
+                            {{ $selectedPemesanan->jenis_pemesanan === 'offline' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
+                                        {{ $selectedPemesanan->jenis_pemesanan === 'offline' ? 'Offline (Kasir)' : 'Online' }}
+                                    </span>
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Ticket Details -->
+                    <!-- Ticket Detail -->
                     <div class="border-t pt-4">
                         <h3 class="text-lg font-semibold mb-4">Detail Tiket</h3>
                         <div class="space-y-3">
+                            @php
+                                $jadwal = $selectedPemesanan->jadwalTayang;
+                                $hargaPerTiket = $selectedPemesanan->jumlah_tiket > 0 
+                                    ? $selectedPemesanan->total_harga / $selectedPemesanan->jumlah_tiket 
+                                    : 0;
+                            @endphp
+
                             @foreach ($selectedPemesanan->detailPemesanan as $detail)
-                                @if ($detail->jadwalTayang)
-                                    <div class="bg-gray-50 p-4 rounded-lg text-sm">
-                                        <div class="font-semibold">{{ $detail->jadwalTayang->film->judul }}</div>
-                                        <p class="text-gray-600">{{ $detail->jadwalTayang->tanggal_tayang }} - {{ $detail->jadwalTayang->jam_tayang }}</p>
-                                        <p class="text-gray-600">Studio: {{ $detail->jadwalTayang->studio->nama_studio }}</p>
-                                        <p class="text-gray-600">Kursi: 
-                                            @php
-                                                $kursi = \App\Models\Kursi::find($detail->kursi_id);
-                                            @endphp
-                                            {{ $kursi->nomor_kursi ?? $detail->kursi_id }}
-                                        </p>
+                                @php
+                                    $kursi = \App\Models\Kursi::find($detail->kursi_id);
+                                @endphp
+                                <div class="bg-gray-50 p-4 rounded-lg text-sm">
+                                    <div class="font-bold text-teal-600">{{ $jadwal->film->judul }}</div>
+                                    <div class="grid grid-cols-2 gap-4 mt-2">
+                                        <div>
+                                            <span class="text-gray-600">Tanggal</span><br>
+                                            <span class="font-medium">{{ \Carbon\Carbon::parse($jadwal->tanggal_tayang)->format('d M Y') }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600">Jam</span><br>
+                                            <span class="font-medium">{{ \Carbon\Carbon::parse($jadwal->jam_tayang)->format('H:i') }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600">Studio</span><br>
+                                            <span class="font-medium">{{ $jadwal->studio->nama_studio }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600">Kursi</span><br>
+                                            <span class="font-bold text-teal-600 text-lg">
+                                                {{ $kursi?->nomor_kursi ?? 'Kursi tidak ditemukan' }}
+                                            </span>
+                                        </div>
                                     </div>
-                                @endif
+                                    <div class="mt-3 pt-3 border-t border-gray-200 flex justify-between">
+                                        <span class="text-gray-600">Harga per Tiket</span>
+                                        <span class="font-bold">Rp {{ number_format($hargaPerTiket, 0, ',', '.') }}</span>
+                                    </div>
+                                </div>
                             @endforeach
                         </div>
                     </div>

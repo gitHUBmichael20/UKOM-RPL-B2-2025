@@ -16,6 +16,7 @@ return new class extends Migration
             $table->char('kode_booking', 20)->unique();
             $table->string('snap_token')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->longText('qr_code')->nullable();
             $table->string('user_name')->nullable();
             $table->foreignId('jadwal_tayang_id')->constrained('jadwal_tayang')->onDelete('cascade');
             $table->integer('jumlah_tiket');

@@ -1,5 +1,4 @@
 <?php
-// app/Livewire/Admin/PemesananAdmin.php
 
 namespace App\Livewire\Admin;
 
@@ -33,8 +32,13 @@ class PemesananAdmin extends Component
 
     public function viewDetail($pemesananId)
     {
-        $this->selectedPemesanan = Pemesanan::with(['user', 'detailPemesanan.jadwalTayang.film'])
-            ->find($pemesananId);
+        $this->selectedPemesanan = Pemesanan::with([
+            'user',
+            'jadwalTayang.film',
+            'jadwalTayang.studio',
+            'detailPemesanan'
+        ])->findOrFail($pemesananId);
+
         $this->showDetailModal = true;
     }
 
@@ -68,27 +72,26 @@ class PemesananAdmin extends Component
         $this->closeDetailModal();
     }
 
-public function render()
-{
-    $query = Pemesanan::with(['user', 'detailPemesanan']);
+    public function render()
+    {
+        $query = Pemesanan::with(['user', 'detailPemesanan']);
 
-    if ($this->search) {
-        $query->where('kode_booking', 'like', '%' . $this->search . '%')
-            ->orWhereHas('user', function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%');
-            });
+        if ($this->search) {
+            $query->where('kode_booking', 'like', '%' . $this->search . '%')
+                ->orWhereHas('user', function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%');
+                });
+        }
+
+        if ($this->filter !== 'semua') {
+            $query->where('status_pemesanan', $this->filter);
+        }
+
+        $pemesanans = $query->with(['user', 'jadwalTayang.film'])->latest()->paginate($this->perPage);
+
+        return view('livewire.admin.pemesanan-admin', [
+            'pemesanans' => $pemesanans,
+        ])->layout('admin.layouts.app');
     }
-
-    if ($this->filter !== 'semua') {
-        $query->where('status_pemesanan', $this->filter);
-    }
-
-    $pemesanans = $query->latest()->paginate($this->perPage);
-
-    return view('livewire.admin.pemesanan-admin', [
-        'pemesanans' => $pemesanans,
-    ])->layout('admin.layouts.app');
-}
-
 }

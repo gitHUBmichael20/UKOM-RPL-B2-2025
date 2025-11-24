@@ -48,17 +48,30 @@
                 </div>
 
                 <!-- Menu Home & Tiket Saya (hanya desktop) -->
-                    <div class="hidden lg:flex items-center ml-10 space-x-8">
-                        <x-nav-link :href="route('dashboard')"
-                                    :active="request()->routeIs('dashboard')">
-                            Home
-                        </x-nav-link>
-                        <x-nav-link :href="route('pemesanan.my-bookings')"
-                                    :active="request()->routeIs('pemesanan.my-bookings')">
-                            Tiket Saya
-                        </x-nav-link>
-                    </div>
+                <div class="hidden lg:flex items-center ml-10 space-x-8">
+                    <x-nav-link :href="route('dashboard')"
+                                :active="request()->routeIs('dashboard')">
+                        Home
+                    </x-nav-link>
+                    <x-nav-link :href="route('pemesanan.my-bookings')"
+                                :active="request()->routeIs('pemesanan.my-bookings')">
+                        Tiket Saya
+                    </x-nav-link>
+                </div>
             </div>
+            @auth
+                <div class="flex items-center lg:hidden">
+                    <form method="POST"
+                          action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                                class="text-gray-600 hover:text-red-600 transition flex items-center gap-2">
+                            <i class="fas fa-sign-out-alt text-xl"></i>
+                        </button>
+                    </form>
+                </div>
+            @endauth
+
 
             <!-- Profile Dropdown atau Login (Desktop) -->
             <div class="hidden lg:flex items-center space-x-6">

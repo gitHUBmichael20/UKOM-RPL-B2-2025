@@ -22,7 +22,7 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gray-100 pb-20 lg:pb-0">
         @include('layouts.navigation')
 
         <!-- Page Content -->

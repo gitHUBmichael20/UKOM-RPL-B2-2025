@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-4 sm:py-8">
+    <div class="py-4 sm:py-8 ">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Progress Steps - Responsive -->
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
@@ -46,28 +46,28 @@
                         <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-xs">
                             ✓
                         </div>
-                        <span class="font-medium text-green-600 text-xs mt-1 text-center">Movie</span>
+                        <span class="font-medium text-green-600 text-xs mt-1 text-center">Film & Jadwal</span>
                     </div>
                     <div class="h-0.5 w-6 bg-green-500 -mt-4"></div>
                     <div class="flex flex-col items-center flex-1">
                         <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-xs">
                             2
                         </div>
-                        <span class="font-medium text-blue-600 text-xs mt-1 text-center">Seat</span>
+                        <span class="font-medium text-blue-600 text-xs mt-1 text-center">Pilih Kursi</span>
                     </div>
                     <div class="h-0.5 w-6 bg-gray-300 -mt-4"></div>
                     <div class="flex flex-col items-center flex-1">
                         <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-xs">
                             3
                         </div>
-                        <span class="font-medium text-gray-500 text-xs mt-1 text-center">Pay</span>
+                        <span class="font-medium text-gray-500 text-xs mt-1 text-center">Pembayaran</span>
                     </div>
                     <div class="h-0.5 w-6 bg-gray-300 -mt-4"></div>
                     <div class="flex flex-col items-center flex-1">
                         <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-xs">
                             4
                         </div>
-                        <span class="font-medium text-gray-500 text-xs mt-1 text-center">Ticket</span>
+                        <span class="font-medium text-gray-500 text-xs mt-1 text-center">Tiket Anda</span>
                     </div>
                 </div>
             </div>
@@ -294,7 +294,7 @@
                 </div>
 
                 <!-- Right Column - Order Summary (Sticky on desktop, normal on mobile) -->
-                <div class="space-y-4 sm:space-y-6 lg:sticky lg:top-6 lg:h-fit">
+                <div class="space-y-4 sm:space-y-6 bottom-24 lg:sticky lg:top-6 lg:h-fit">
                     <!-- Order Summary - Responsive -->
                     <div class="bg-white rounded-lg shadow-sm p-4 sm:p-5 md:p-6">
                         <h2 class="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Order Summary</h2>

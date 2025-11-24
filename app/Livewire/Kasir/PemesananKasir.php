@@ -88,11 +88,11 @@ class PemesananKasir extends Component
     {
         if (!$this->selectedJadwalId) return;
 
-        $this->bookedSeats = DetailPemesanan::where('jadwal_tayang_id', $this->selectedJadwalId)
+        $this->bookedSeats = DetailPemesanan::whereHas('pemesanan', function ($q) {
+            $q->where('jadwal_tayang_id', $this->selectedJadwalId);
+        })
             ->pluck('kursi_id')
             ->toArray();
-
-        \Log::info('Booked seats for jadwal ' . $this->selectedJadwalId . ':', $this->bookedSeats);
     }
 
     public function toggleKursi($kursiId)
@@ -138,7 +138,7 @@ class PemesananKasir extends Component
         try {
 
             do {
-                $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(\Illuminate\Support\Str::random(4));
+                $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(6));
             } while (Pemesanan::where('kode_booking', $kodeBooking)->exists());
 
             $pemesanan = Pemesanan::create([
@@ -148,6 +148,7 @@ class PemesananKasir extends Component
                 'total_harga' => $this->totalHarga,
                 'tanggal_pemesanan' => now(),
                 'status_pembayaran' => 'lunas',
+                'jenis_pemesanan' => 'offline',
                 'metode_pembayaran' => 'cash',
                 'tanggal_pembayaran' => now(),
                 'kasir_id' => auth()->id(),
@@ -157,7 +158,6 @@ class PemesananKasir extends Component
             foreach ($this->selectedKursi as $kursiId) {
                 DetailPemesanan::create([
                     'pemesanan_id' => $pemesanan->id,
-                    'jadwal_tayang_id' => $this->selectedJadwalId,
                     'kursi_id' => $kursiId,
                     'harga' => $this->hargaTiket->harga
                 ]);
@@ -176,8 +176,13 @@ class PemesananKasir extends Component
 
     public function viewDetail($pemesananId)
     {
-        $this->selectedPemesanan = Pemesanan::with(['user', 'detailPemesanan.jadwalTayang.film', 'detailPemesanan.jadwalTayang.studio'])
-            ->find($pemesananId);
+        $this->selectedPemesanan = Pemesanan::with([
+            'user',
+            'jadwalTayang.film',
+            'jadwalTayang.studio',
+            'detailPemesanan'
+        ])->findOrFail($pemesananId);
+
         $this->showDetailModal = true;
     }
 
@@ -217,7 +222,10 @@ class PemesananKasir extends Component
                 });
         }
 
-        $pemesanans = $query->latest()->paginate($this->perPage);
+        $pemesanans = $query
+            ->with(['user', 'jadwalTayang.film'])
+            ->latest()
+            ->paginate($this->perPage);
 
         return view('livewire.kasir.pemesanan-kasir', [
             'pemesanans' => $pemesanans,

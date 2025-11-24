@@ -66,6 +66,7 @@
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Kode Booking</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Pelanggan</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Tanggal</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Film</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Total Harga</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Jenis Pemesanan</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status Pembayaran</th>
@@ -74,54 +75,61 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @forelse ($pemesanans as $pemesanan)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                {{ $pemesanan->kode_booking }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">
-                                <div class="font-medium">{{ $pemesanan->user->name }}</div>
-                                <div class="text-gray-500">{{ $pemesanan->user->email }}</div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">
-                                {{ $pemesanan->created_at->format('d M Y H:i') }}
-                            </td>
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}
-                            </td>
-                            <td class="px-6 py-4 text-sm">
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full
-                                    @if ($pemesanan->jenis_pemesanan === 'offline')
-                                        bg-yellow-100 text-yellow-800
-                                    @else
-                                        bg-green-100 text-green-800
-                                    @endif
-                                ">
-                                    {{ ucfirst($pemesanan->jenis_pemesanan) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-sm">
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full
-                                    @if ($pemesanan->status_pembayaran === 'lunas')
-                                        bg-green-100 text-green-800
-                                    @elseif ($pemesanan->status_pembayaran === 'pending')
-                                        bg-yellow-100 text-yellow-800
-                                    @else
-                                        bg-red-100 text-red-800
-                                    @endif
-                                ">
-                                    {{ ucfirst($pemesanan->status_pembayaran) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-center text-sm">
-                                <button wire:click="viewDetail({{ $pemesanan->id }})"
-                                        class="text-teal-600 hover:text-teal-900 font-medium">
-                                    Detail
-                                </button>
-                            </td>
-                        </tr>
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                                            {{ $pemesanan->kode_booking }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <div class="font-medium text-gray-900">
+                                                {{ $pemesanan->user?->name ?? $pemesanan->user_name ?? 'Offline' }}
+                                            </div>
+                                            @if($pemesanan->user?->email)
+                                                <div class="text-xs text-gray-500">{{ $pemesanan->user->email }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-700">
+                                            {{ $pemesanan->created_at->format('d M Y H:i') }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-700 font-medium">
+                                            @if($pemesanan->jadwalTayang?->film)
+                                                {{ $pemesanan->jadwalTayang->film->judul }}
+                                            @else
+                                                <span class="text-gray-400">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                                            Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full
+                                                {{ $pemesanan->jenis_pemesanan === 'offline'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-green-100 text-green-800' }}">
+                                                {{ $pemesanan->jenis_pemesanan === 'offline' ? 'Offline' : 'Online' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full
+                                                {{ $pemesanan->status_pembayaran === 'lunas'
+                        ? 'bg-green-100 text-green-800'
+                        : ($pemesanan->status_pembayaran === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800') }}">
+                                                {{ $pemesanan->status_pembayaran === 'lunas' ? 'Lunas' : ucfirst($pemesanan->status_pembayaran) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-center text-sm">
+                                            <button wire:click="viewDetail({{ $pemesanan->id }})"
+                                                    class="text-teal-600 hover:text-teal-800 font-medium transition">
+                                                Detail
+                                            </button>
+                                        </td>
+                                    </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                            <td colspan="8"
+                                class="px-6 py-12 text-center text-gray-500">
+                                <i class="fas fa-inbox text-4xl mb-3 block"></i>
                                 Tidak ada data pemesanan
                             </td>
                         </tr>
@@ -141,7 +149,8 @@
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <!-- Modal Header -->
-                <div class="sticky top-0 bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4 flex items-center justify-between border-b">
+                <div
+                     class="sticky top-0 bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4 flex items-center justify-between border-b">
                     <h2 class="text-xl font-bold text-white">Detail Pemesanan</h2>
                     <button wire:click="closeDetailModal"
                             class="text-white hover:bg-teal-800 p-1 rounded">
@@ -164,21 +173,37 @@
                         </div>
                     </div>
 
-                    <!-- Customer Info -->
+                    <!-- Data Pelanggan -->
                     <div class="border-t pt-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Pelanggan</h3>
-                        <div class="grid grid-cols-2 gap-4">
+                        <h3 class="text-lg font-semibold mb-4">Data Pelanggan</h3>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Nama</label>
-                                <p class="text-gray-900">{{ $selectedPemesanan->user->name }}</p>
+                                <span class="text-gray-600">Nama</span>
+                                <p class="font-semibold">
+                                    {{ $selectedPemesanan->user?->name ?? $selectedPemesanan->user_name ?? 'Offline' }}
+                                </p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Email</label>
-                                <p class="text-gray-900">{{ $selectedPemesanan->user->email }}</p>
+                                <span class="text-gray-600">Email</span>
+                                <p class="font-semibold">
+                                    {{ $selectedPemesanan->user?->email ?? '-' }}
+                                </p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">No. Telepon</label>
-                                <p class="text-gray-900">{{ $selectedPemesanan->user->phone ?? '-' }}</p>
+                                <span class="text-gray-600">No. Telepon</span>
+                                <p class="font-semibold">
+                                    {{ $selectedPemesanan->user?->phone ?? '-' }}
+                                </p>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Jenis Pemesanan</span>
+                                <p class="font-semibold">
+                                    <span
+                                          class="px-3 py-1 text-xs font-semibold rounded-full
+                                {{ $selectedPemesanan->jenis_pemesanan === 'offline' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
+                                        {{ $selectedPemesanan->jenis_pemesanan === 'offline' ? 'Offline (Kasir)' : 'Online' }}
+                                    </span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -187,30 +212,41 @@
                     <div class="border-t pt-4">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Detail Tiket</h3>
                         <div class="space-y-3">
+                            @php
+                                $jadwal = $selectedPemesanan->jadwalTayang;
+                                $hargaPerTiket = $selectedPemesanan->jumlah_tiket > 0
+                                    ? $selectedPemesanan->total_harga / $selectedPemesanan->jumlah_tiket
+                                    : 0;
+                            @endphp
+
                             @foreach ($selectedPemesanan->detailPemesanan as $detail)
+                                @php $kursi = \App\Models\Kursi::find($detail->kursi_id); @endphp
                                 <div class="bg-gray-50 p-4 rounded-lg">
-                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="grid grid-cols-2 gap-4 text-sm">
                                         <div>
                                             <span class="text-gray-600">Film</span>
-                                            <p class="font-semibold">{{ $detail->jadwalTayang->film->judul }}</p>
+                                            <p class="font-semibold">{{ $jadwal->film->judul }}</p>
                                         </div>
                                         <div>
                                             <span class="text-gray-600">Jadwal</span>
                                             <p class="font-semibold">
-                                                {{ $detail->jadwalTayang->tanggal_tayang }} - {{ $detail->jadwalTayang->jam_tayang }}
+                                                {{ \Carbon\Carbon::parse($jadwal->tanggal_tayang)->format('d M Y') }}
+                                                {{ \Carbon\Carbon::parse($jadwal->jam_tayang)->format('H:i') }}
                                             </p>
                                         </div>
                                         <div>
                                             <span class="text-gray-600">Studio</span>
-                                            <p class="font-semibold">{{ $detail->jadwalTayang->studio->nama_studio }}</p>
+                                            <p class="font-semibold">{{ $jadwal->studio->nama_studio }}</p>
                                         </div>
                                         <div>
                                             <span class="text-gray-600">Kursi</span>
-                                            <p class="font-semibold">{{ $detail->kursi_id }}</p>
+                                            <p class="font-bold text-teal-600 text-lg">
+                                                {{ $kursi?->nomor_kursi ?? 'Kursi tidak ditemukan' }}
+                                            </p>
                                         </div>
-                                        <div>
-                                            <span class="text-gray-600">Harga</span>
-                                            <p class="font-semibold">Rp {{ number_format($detail->harga, 0, ',', '.') }}</p>
+                                        <div class="col-span-2">
+                                            <span class="text-gray-600">Harga per Tiket</span>
+                                            <p class="font-semibold">Rp {{ number_format($hargaPerTiket, 0, ',', '.') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -223,28 +259,28 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Status Pemesanan</label>
                             <span class="inline-block mt-1 px-3 py-1 text-xs font-semibold rounded-full
-                                @if ($selectedPemesanan->status_pemesanan === 'pending')
-                                    bg-yellow-100 text-yellow-800
-                                @elseif ($selectedPemesanan->status_pemesanan === 'dikonfirmasi')
-                                    bg-green-100 text-green-800
-                                @else
-                                    bg-red-100 text-red-800
-                                @endif
-                            ">
+                                                    @if ($selectedPemesanan->status_pemesanan === 'pending')
+                                                        bg-yellow-100 text-yellow-800
+                                                    @elseif ($selectedPemesanan->status_pemesanan === 'dikonfirmasi')
+                                                        bg-green-100 text-green-800
+                                                    @else
+                                                        bg-red-100 text-red-800
+                                                    @endif
+                                                ">
                                 {{ ucfirst($selectedPemesanan->status_pemesanan) }}
                             </span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Status Pembayaran</label>
                             <span class="inline-block mt-1 px-3 py-1 text-xs font-semibold rounded-full
-                                @if ($selectedPemesanan->status_pembayaran === 'lunas')
-                                    bg-green-100 text-green-800
-                                @elseif ($selectedPemesanan->status_pembayaran === 'pending')
-                                    bg-yellow-100 text-yellow-800
-                                @else
-                                    bg-red-100 text-red-800
-                                @endif
-                            ">
+                                                    @if ($selectedPemesanan->status_pembayaran === 'lunas')
+                                                        bg-green-100 text-green-800
+                                                    @elseif ($selectedPemesanan->status_pembayaran === 'pending')
+                                                        bg-yellow-100 text-yellow-800
+                                                    @else
+                                                        bg-red-100 text-red-800
+                                                    @endif
+                                                ">
                                 {{ ucfirst($selectedPemesanan->status_pembayaran) }}
                             </span>
                         </div>

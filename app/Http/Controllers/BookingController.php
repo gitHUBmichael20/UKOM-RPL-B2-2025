@@ -150,7 +150,7 @@ class BookingController extends Controller
 
             // Generate kode booking unik
             do {
-                $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(4));
+                $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(6));
             } while (Pemesanan::where('kode_booking', $kodeBooking)->exists());
 
             // MIDTRANS CONFIG
@@ -297,5 +297,29 @@ class BookingController extends Controller
         }
 
         return response()->download($qrPath, 'QR_' . $pemesanan->kode_booking . '.png');
+    }
+
+    // BookingController.php
+    public function cancel(Pemesanan $pemesanan)
+    {
+        if ($pemesanan->user_id !== auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        if ($pemesanan->status_pembayaran !== 'pending') {
+            return response()->json(['success' => false, 'message' => 'Hanya pesanan pending yang bisa dibatalkan'], 400);
+        }
+
+        if ($pemesanan->expired_at && now()->greaterThan($pemesanan->expired_at)) {
+            return response()->json(['success' => false, 'message' => 'Waktu pembayaran sudah habis'], 400);
+        }
+
+        DB::transaction(function () use ($pemesanan) {
+            $pemesanan->update([
+                'status_pembayaran' => 'batal',
+            ]);
+        });
+
+        return response()->json(['success' => true, 'message' => 'Pesanan berhasil dibatalkan']);
     }
 }

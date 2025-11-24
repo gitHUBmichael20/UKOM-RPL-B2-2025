@@ -1,261 +1,262 @@
 <x-app-layout>
-
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Header Section -->
-            <div class="mb-8 px-4 sm:px-0">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div class="py-4 sm:py-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="mb-4 sm:mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">My Bookings</h1>
-                        <p class="text-gray-600 mt-1">Manage and view your movie bookings</p>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Daftar Tiket Saya</h1>
+                        <p class="text-sm text-gray-600 mt-0.5">Kelola semua pemesanan tiket bioskop Anda</p>
                     </div>
+                    <a href="{{ route('dashboard') }}"
+                       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Cari Film Lain
+                    </a>
                 </div>
             </div>
 
-            <!-- Bookings Content -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    @if ($bookings->isEmpty())
-                        <!-- Empty State -->
-                        <div class="text-center py-12">
-                            <div
-                                class="mx-auto w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
-                            <p class="text-gray-500 mb-6">Start by booking your first movie experience!</p>
-                            <a href="{{ route('dashboard') }}"
-                                class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
-                                    </path>
-                                </svg>
-                                Browse Movies
-                            </a>
-                        </div>
-                    @else
-                        <!-- Bookings List -->
-                        <div class="space-y-4">
-                            @foreach ($bookings as $booking)
-                                <div
-                                    class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all duration-300">
-                                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                                        <!-- Booking Info -->
-                                        <div class="flex-1">
-                                            <div
-                                                class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                                                <div class="flex-1">
-                                                    <div class="flex items-center gap-3 mb-3">
-                                                        <h3 class="text-xl font-bold text-gray-900">
-                                                            {{ $booking->jadwalTayang->film->judul ?? 'Movie Title' }}
-                                                        </h3>
-                                                        <span
-                                                            class="px-3 py-1 text-sm font-medium rounded-full 
-                                                    @if ($booking->status_pembayaran === 'paid') bg-green-100 text-green-800
-                                                    @elseif($booking->status_pembayaran === 'pending') bg-yellow-100 text-yellow-800
-                                                    @elseif($booking->status_pembayaran === 'failed') bg-red-100 text-red-800
-                                                    @else bg-gray-100 text-gray-800 @endif">
-                                                            {{ ucfirst($booking->status_pembayaran) }}
+            <!-- Empty State -->
+            @if ($bookings->isEmpty())
+                <div class="text-center py-12 sm:py-16 bg-white rounded-lg shadow-sm">
+                    <div
+                         class="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-calendar-times text-3xl sm:text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Belum ada pemesanan</h3>
+                    <p class="text-sm text-gray-500 mb-6">Ayo pesan tiket film favoritmu sekarang!</p>
+                    <a href="{{ route('dashboard') }}"
+                       class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                        <i class="fas fa-film mr-2"></i>
+                        Jelajahi Film
+                    </a>
+                </div>
+            @else
+                @php
+                    $groupedBookings = $bookings->groupBy(function($booking) {
+                        return $booking->jadwalTayang->tanggal_tayang->format('Y-m-d');
+                    })->sortKeysDesc();
+                @endphp
+
+                <div class="space-y-6">
+                    @foreach ($groupedBookings as $date => $dateBookings)
+                        <!-- Date Header -->
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold text-gray-900 mb-3 flex items-center">
+                                <i class="far fa-calendar-alt mr-2 text-indigo-600"></i>
+                                {{ \Carbon\Carbon::parse($date)->isoFormat('dddd, D MMMM YYYY') }}
+                            </h2>
+                            
+                            <div class="space-y-3 sm:space-y-4">
+                                @foreach ($dateBookings as $booking)
+                                    @php
+                                        $isPending = $booking->status_pembayaran === 'pending';
+                                        $isExpired = $isPending && $booking->expired_at && now()->greaterThan($booking->expired_at);
+                                        $canPay = $isPending && !$isExpired;
+                                        $canCancel = $isPending && !$isExpired;
+                                        $timeLeft = $isPending && $booking->expired_at ? $booking->expired_at->diffForHumans(['parts' => 2]) : null;
+                                    @endphp
+
+                                    <div
+                                         class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                                        <div class="p-4 sm:p-5">
+                                            <!-- Header -->
+                                            <div class="flex items-start justify-between gap-3 mb-3">
+                                                <div class="flex-1 min-w-0">
+                                                    <h3 class="text-base sm:text-lg font-bold text-gray-900 truncate">
+                                                        {{ $booking->jadwalTayang->film->judul }}
+                                                    </h3>
+                                                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full
+                                                                    @if($booking->status_pembayaran === 'lunas') bg-green-100 text-green-800
+                                                                    @elseif($booking->status_pembayaran === 'pending') bg-yellow-100 text-yellow-800
+                                                                    @elseif($booking->status_pembayaran === 'batal') bg-red-100 text-red-800
+                                                                    @else bg-gray-100 text-gray-800 @endif">
+                                                            {{ $booking->status_pembayaran == 'lunas' ? 'Lunas' : ucfirst($booking->status_pembayaran) }}
                                                         </span>
-                                                    </div>
 
-                                                    <!-- Booking Details Grid -->
-                                                    <div
-                                                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
-                                                        <div class="flex items-center gap-2">
-                                                            <svg class="w-4 h-4 text-gray-400" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                                </path>
-                                                            </svg>
-                                                            <span>{{ $booking->tanggal_pemesanan->format('d M Y') }}</span>
-                                                        </div>
-
-                                                        <div class="flex items-center gap-2">
-                                                            <svg class="w-4 h-4 text-gray-400" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
-                                                                </path>
-                                                            </svg>
-                                                            <span>{{ $booking->jadwalTayang->waktu_tayang ?? '--:--' }}</span>
-                                                        </div>
-
-                                                        <div class="flex items-center gap-2">
-                                                            <svg class="w-4 h-4 text-gray-400" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
-                                                                </path>
-                                                            </svg>
-                                                            <span>{{ $booking->jumlah_tiket }} tickets</span>
-                                                        </div>
-
-                                                        <div class="flex items-center gap-2">
-                                                            <svg class="w-4 h-4 text-gray-400" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
-                                                                </path>
-                                                            </svg>
-                                                            <span class="font-semibold text-gray-900">Rp
-                                                                {{ number_format($booking->total_harga, 0, ',', '.') }}</span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Additional Info -->
-                                                    <div
-                                                        class="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                                                        <span
-                                                            class="font-mono bg-gray-100 px-3 py-1 rounded-md text-xs">
-                                                            #{{ $booking->kode_booking }}
-                                                        </span>
-                                                        <span class="flex items-center gap-1">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z">
-                                                                </path>
-                                                            </svg>
-                                                            Seats:
-                                                            @if ($booking->detailPemesanan && $booking->detailPemesanan->count() > 0)
-                                                                {{ $booking->detailPemesanan->pluck('kursi')->join(', ') }}
-                                                            @else
-                                                                Not assigned
-                                                            @endif
-                                                        </span>
+                                                        @if($isPending && $timeLeft)
+                                                            <span class="text-xs text-gray-500 flex items-center">
+                                                                <i class="far fa-clock mr-1"></i>
+                                                                <span class="font-medium text-orange-600"
+                                                                      x-data
+                                                                      x-init="startCountdown('{{ $booking->expired_at }}', $el)">
+                                                                </span>
+                                                            </span>
+                                                        @endif
                                                     </div>
                                                 </div>
+                                                <span class="text-base sm:text-lg font-bold text-gray-900 whitespace-nowrap">
+                                                    Rp {{ number_format($booking->total_harga, 0, ',', '.') }}
+                                                </span>
+                                            </div>
+
+                                            <!-- Info Grid -->
+                                            <div class="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm mb-3">
+                                                <div class="flex items-center gap-1.5 text-gray-600">
+                                                    <i class="far fa-calendar w-4"></i>
+                                                    <span
+                                                          class="truncate">{{ $booking->jadwalTayang->tanggal_tayang->format('d M Y') }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-gray-600">
+                                                    <i class="far fa-clock w-4"></i>
+                                                    <span>{{ \Carbon\Carbon::createFromFormat('H:i:s', $booking->jadwalTayang->jam_tayang)->format('H:i') }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-gray-600">
+                                                    <i class="fas fa-ticket-alt w-4"></i>
+                                                    <span>{{ $booking->jumlah_tiket }} tiket</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-gray-600">
+                                                    <i class="fas fa-chair w-4"></i>
+                                                    <span
+                                                          class="truncate">{{ $booking->detailPemesanan->pluck('kursi.nomor_kursi')->join(', ') }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Booking Code -->
+                                            <div class="mb-3">
+                                                <span class="inline-block font-mono text-xs bg-gray-100 px-2.5 py-1 rounded">
+                                                    {{ $booking->kode_booking }}
+                                                </span>
+                                            </div>
+
+                                            <!-- Actions -->
+                                            <div class="flex flex-wrap gap-2">
+                                                @if($booking->status_pembayaran === 'lunas')
+                                                    <a href="{{ route('pemesanan.ticket', $booking) }}"
+                                                       class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
+                                                        <i class="fas fa-ticket-alt mr-2"></i>
+                                                        Lihat Tiket
+                                                    </a>
+                                                @endif
+
+                                                @if($booking->status_pembayaran === 'batal')
+                                                    <a href="{{ route('pemesanan.ticket', $booking) }}"
+                                                       class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
+                                                        <i class="fas fa-info-circle mr-2"></i>
+                                                        Detail
+                                                    </a>
+                                                @endif
+
+                                                @if($canPay)
+                                                    <button onclick="payNow('{{ $booking->snap_token }}')"
+                                                            class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition">
+                                                        <i class="fas fa-credit-card mr-2"></i>
+                                                        Bayar Sekarang
+                                                    </button>
+                                                @endif
+
+                                                @if($canCancel)
+                                                    <button onclick="cancelBooking('{{ $booking->id }}', this)"
+                                                            class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-50 transition">
+                                                        <i class="fas fa-times mr-2"></i>
+                                                        Batalkan
+                                                    </button>
+                                                @endif
                                             </div>
                                         </div>
-
-                                        <!-- Action Buttons -->
-                                        <div class="flex flex-col sm:flex-row gap-3">
-                                            @if ($booking->status_pembayaran === 'paid')
-                                                <a href="{{ route('pemesanan.view-ticket', $booking->id) }}"
-                                                    class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition shadow-sm">
-                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                                        </path>
-                                                    </svg>
-                                                    View Ticket
-                                                </a>
-                                            @elseif($booking->status_pembayaran === 'pending')
-                                                <a href="#"
-                                                    class="inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition shadow-sm">
-                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
-                                                        </path>
-                                                    </svg>
-                                                    Complete Payment
-                                                </a>
-                                            @endif
-
-                                            <a href="{{ url('/pemesanan/ticket/' . $booking->id) }}"
-                                                class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                                    </path>
-                                                </svg>
-                                                Details
-                                            </a>
-                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <!-- Stats Section -->
-                        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div
-                                class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-blue-500 rounded-lg">
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-gray-600">Total Bookings</p>
-                                        <p class="text-2xl font-bold text-gray-900">{{ $bookings->count() }}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-green-500 rounded-lg">
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-gray-600">Completed</p>
-                                        <p class="text-2xl font-bold text-gray-900">
-                                            {{ $bookings->where('status_pembayaran', 'paid')->count() }}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-yellow-500 rounded-lg">
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-gray-600">Pending</p>
-                                        <p class="text-2xl font-bold text-gray-900">
-                                            {{ $bookings->where('status_pembayaran', 'pending')->count() }}</p>
-                                    </div>
-                                </div>
+                                @endforeach
                             </div>
                         </div>
-                    @endif
+                    @endforeach
                 </div>
-            </div>
+
+                <!-- Stats -->
+                <div class="mt-6 sm:mt-8 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                    <div
+                         class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200 text-center">
+                        <p class="text-xs font-medium text-blue-700">Total</p>
+                        <p class="text-2xl font-bold text-blue-900 mt-1">{{ $bookings->count() }}</p>
+                    </div>
+                    <div
+                         class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200 text-center">
+                        <p class="text-xs font-medium text-green-700">Lunas</p>
+                        <p class="text-2xl font-bold text-green-900 mt-1">
+                            {{ $bookings->where('status_pembayaran', 'lunas')->count() }}</p>
+                    </div>
+                    <div
+                         class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-4 border border-yellow-200 text-center">
+                        <p class="text-xs font-medium text-yellow-700">Pending</p>
+                        <p class="text-2xl font-bold text-yellow-900 mt-1">
+                            {{ $bookings->where('status_pembayaran', 'pending')->count() }}</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200 text-center">
+                        <p class="text-xs font-medium text-red-700">Batal</p>
+                        <p class="text-2xl font-bold text-red-900 mt-1">
+                            {{ $bookings->where('status_pembayaran', 'batal')->count() }}</p>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 
-    <style>
-        .booking-card {
-            transition: all 0.3s ease;
+    <!-- Alpine.js untuk countdown + Snap.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+            defer></script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key="{{ config('midtrans.client_key') }}"></script>
+
+    <script>
+        function startCountdown(expiredAt, el) {
+            const end = new Date(expiredAt).getTime();
+
+            const timer = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = end - now;
+
+                if (distance < 0) {
+                    clearInterval(timer);
+                    el.textContent = 'Waktu habis';
+                    el.closest('.bg-white').querySelector('button[onclick*="payNow"]')?.remove();
+                    return;
+                }
+
+                const hours = Math.floor(distance / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                el.textContent = `${hours}j ${minutes}m ${seconds}d`;
+            }, 1000);
         }
 
-        .booking-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        function payNow(snapToken) {
+            snap.pay(snapToken, {
+                onSuccess: () => location.href = '{{ route("pemesanan.my-bookings") }}',
+                onPending: () => location.reload(),
+                onError: () => alert('Pembayaran gagal, coba lagi'),
+                onClose: () => { }
+            });
         }
-    </style>
+
+        function cancelBooking(bookingId, button) {
+            if (!confirm('Yakin ingin membatalkan pesanan ini? Kursi akan dilepaskan.')) return;
+
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Membatalkan...';
+
+            fetch(`/pemesanan/cancel/${bookingId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Gagal membatalkan');
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fas fa-times mr-2"></i> Batalkan';
+                    }
+                })
+                .catch(() => {
+                    alert('Terjadi kesalahan');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-times mr-2"></i> Batalkan';
+                });
+        }
+    </script>
 </x-app-layout>

@@ -62,7 +62,7 @@ class RedeemTiket extends Component
             return;
         }
 
-        if ($pemesanan->status_redeem === 'redeemed') {
+        if ($pemesanan->status_pembayaran === 'redeemed') {
             $this->message = 'Tiket sudah di-redeem sebelumnya!';
             $this->messageType = 'info';
             $this->scanInput = '';
@@ -84,7 +84,7 @@ class RedeemTiket extends Component
 
         try {
             $this->selectedPemesanan->update([
-                'status_redeem' => 'redeemed',
+                'status_pembayaran' => 'redeemed',
                 'tanggal_redeem' => now()
             ]);
 

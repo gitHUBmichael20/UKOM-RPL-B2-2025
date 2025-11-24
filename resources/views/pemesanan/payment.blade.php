@@ -50,7 +50,7 @@
                      class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-xs">
                     ✓
                 </div>
-                <span class="font-medium text-green-600 text-xs mt-1 text-center">Movie</span>
+                <span class="font-medium text-green-600 text-xs mt-1 text-center">Film & Jadwal</span>
             </div>
             <div class="h-0.5 w-6 bg-green-500 -mt-4"></div>
             <div class="flex flex-col items-center flex-1">
@@ -58,7 +58,7 @@
                      class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-xs">
                     ✓
                 </div>
-                <span class="font-medium text-green-600 text-xs mt-1 text-center">Seat</span>
+                <span class="font-medium text-green-600 text-xs mt-1 text-center">Pilih Kursi</span>
             </div>
             <div class="h-0.5 w-6 bg-green-500 -mt-4"></div>
             <div class="flex flex-col items-center flex-1">
@@ -66,7 +66,7 @@
                      class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-xs">
                     3
                 </div>
-                <span class="font-medium text-blue-600 text-xs mt-1 text-center">Pay</span>
+                <span class="font-medium text-blue-600 text-xs mt-1 text-center">Pembayaran</span>
             </div>
             <div class="h-0.5 w-6 bg-gray-300 -mt-4"></div>
             <div class="flex flex-col items-center flex-1">
@@ -74,7 +74,7 @@
                      class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-xs">
                     4
                 </div>
-                <span class="font-medium text-gray-500 text-xs mt-1 text-center">Ticket</span>
+                <span class="font-medium text-gray-500 text-xs mt-1 text-center">Tiket Anda</span>
             </div>
         </div>
     </div>
@@ -84,39 +84,88 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 <!-- Left Column -->
                 <div class="lg:col-span-2 space-y-4 sm:space-y-6 lg:space-y-8">
-                    <!-- Booking Summary - Responsive -->
+                    <!-- Movie Details Card - Enhanced & Responsive (Mirip dengan Pilih Kursi) -->
                     <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Ringkasan Pemesanan</h2>
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Detail Film</h2>
                         <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                            <!-- Poster -->
                             <div class="flex-shrink-0">
                                 <img src="{{ asset('storage/' . $film->poster) ?? 'storage/default_poster.png' }}"
                                      alt="{{ $film->judul }}"
-                                     class="w-24 sm:w-32 rounded-lg shadow-md mx-auto sm:mx-0">
+                                     class="w-24 h-36 sm:w-32 sm:h-48 md:w-40 md:h-60 object-cover rounded-lg shadow-md mx-auto sm:mx-0">
                             </div>
+
+                            <!-- Movie Details -->
                             <div class="flex-grow">
-                                <h3 class="text-base sm:text-lg font-semibold text-gray-900 text-center sm:text-left">
-                                    {{ $film->judul }}</h3>
-                                <div class="mt-3 space-y-2 text-sm">
-                                    <div class="flex flex-col sm:flex-row sm:items-center">
-                                        <span class="text-gray-500 w-32">Tanggal & Jam:</span>
-                                        <span class="font-medium">
-                                            {{ \Carbon\Carbon::parse($jadwalTayang->tanggal_tayang)->format('d M Y') }},
-                                            {{ \Carbon\Carbon::parse($jadwalTayang->jam_tayang)->format('H:i') }}
+                                <div class="w-full">
+                                    <!-- Judul -->
+                                    <h3
+                                        class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 text-center sm:text-left">
+                                        {{ $film->judul }}
+                                    </h3>
+
+                                    <!-- Rating, Genre, Durasi -->
+                                    <div
+                                         class="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 mt-2">
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded">
+                                            {{ $film->rating }}
                                         </span>
+                                        <span class="text-xs sm:text-sm text-gray-600">
+                                            {{ $film->genres ? $film->genres->pluck('nama_genre')->implode(', ') : 'No genres' }}
+                                        </span>
+                                        <span class="text-xs sm:text-sm text-gray-600">• {{ $film->durasi }} min</span>
                                     </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-center">
-                                        <span class="text-gray-500 w-32">Studio:</span>
-                                        <span class="font-medium">{{ $jadwalTayang->studio->nama_studio }}</span>
+
+                                    <!-- Sutradara & Tahun Rilis -->
+                                    <div
+                                         class="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
+                                        <div class="text-center sm:text-left">
+                                            <span class="text-gray-500">Sutradara:</span>
+                                            <span class="ml-2 font-medium">{{ $film->sutradara->nama_sutradara }}</span>
+                                        </div>
+                                        <div class="text-center sm:text-left">
+                                            <span class="text-gray-500">Tahun Rilis:</span>
+                                            <span class="ml-2 font-medium">{{ $film->tahun_rilis }}</span>
+                                        </div>
                                     </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-center">
-                                        <span class="text-gray-500 w-32">Kursi:</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screening Details - Responsive -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+                        <h2 class="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Detail
+                            Pemesanan</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div class="border border-gray-200 rounded-lg p-3 sm:p-4">
+                                <div class="text-gray-500 text-xs sm:text-sm mb-1">Tanggal & Waktu</div>
+                                <div class="font-semibold text-sm sm:text-base">
+                                    {{ \Carbon\Carbon::parse($jadwalTayang->tanggal_tayang)->locale('id')->isoFormat('dddd, D MMM YYYY') }}
+                                </div>
+                                <div class="font-semibold text-sm sm:text-base text-blue-600">
+                                    {{ \Carbon\Carbon::parse($jadwalTayang->jam_tayang)->format('H:i') }} WIB
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-3 sm:p-4">
+                                <div class="text-gray-500 text-xs sm:text-sm mb-1">Studio</div>
+                                <div class="font-semibold text-sm sm:text-base">{{ $jadwalTayang->studio->nama_studio }}
+                                </div>
+                                <div class="text-xs sm:text-sm text-gray-600 mt-1">
+                                    {{ strtoupper($jadwalTayang->studio->tipe_studio) }}</div>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-3 sm:p-4 sm:col-span-2">
+                                <div class="text-gray-500 text-xs sm:text-sm mb-2">Kursi yang Dipilih</div>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($seats as $seat)
                                         <span
-                                              class="font-medium">{{ $seats->pluck('nomor_kursi')->implode(', ') }}</span>
-                                    </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-center">
-                                        <span class="text-gray-500 w-32">Jumlah Tiket:</span>
-                                        <span class="font-medium">{{ $seats->count() }} tiket</span>
-                                    </div>
+                                              class="bg-blue-100 text-blue-800 px-2 sm:px-3 py-1 rounded-full font-semibold text-xs sm:text-sm">
+                                            {{ $seat->nomor_kursi }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                                <div class="mt-2 text-xs sm:text-sm text-gray-600">
+                                    Total: <span class="font-semibold">{{ $seats->count() }} tiket</span>
                                 </div>
                             </div>
                         </div>
@@ -143,8 +192,6 @@
                                       class="text-base sm:text-2xl">🔵 DANA</span>
                                 <span title="OVO"
                                       class="text-base sm:text-2xl">🟣 OVO</span>
-                                <span title="LinkAja"
-                                      class="text-base sm:text-2xl">🔴 LinkAja</span>
                                 <span title="Kartu Kredit/Debit"
                                       class="text-base sm:text-2xl">💳 Credit</span>
                                 <span title="Virtual Account"
@@ -184,8 +231,15 @@
                         <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Ringkasan Pembayaran</h2>
                         <div class="space-y-3 sm:space-y-4">
                             <div class="flex justify-between text-sm sm:text-base">
-                                <span class="text-gray-600">Tiket ({{ $seats->count() }} x Rp
-                                    {{ number_format($hargaTiket->harga, 0, ',', '.') }})</span>
+                                <span class="text-gray-600">Harga Tiket</span>
+                                <span class="font-medium">Rp {{ number_format($hargaTiket->harga, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm sm:text-base">
+                                <span class="text-gray-600">Jumlah Tiket</span>
+                                <span class="font-medium">{{ $seats->count() }} tiket</span>
+                            </div>
+                            <div class="flex justify-between text-sm sm:text-base">
+                                <span class="text-gray-600">Subtotal</span>
                                 <span class="font-medium">Rp {{ number_format($totalHarga, 0, ',', '.') }}</span>
                             </div>
                             <div class="border-t-2 border-gray-200 pt-3 sm:pt-4">
@@ -198,16 +252,19 @@
                         </div>
                     </div>
 
-                    <!-- Security Info -->
-                    <div
-                         class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 sm:p-6 border border-indigo-200">
-                        <div class="flex items-center mb-2 sm:mb-3">
-                            <i class="fas fa-lock text-indigo-600 text-lg sm:text-xl mr-2"></i>
-                            <span class="font-semibold text-indigo-900 text-sm sm:text-base">Transaksi Aman</span>
+                    <!-- Info Card -->
+                    <div class="bg-blue-50 rounded-lg border border-blue-200 p-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-info-circle text-blue-600 text-lg mt-0.5"></i>
+                            <div class="text-xs sm:text-sm text-blue-900">
+                                <p class="font-semibold mb-1">Informasi Penting:</p>
+                                <ul class="space-y-1 text-blue-800">
+                                    <li>• Tiket tidak dapat direfund</li>
+                                    <li>• Datang 15 menit sebelum film dimulai</li>
+                                    <li>• Tunjukkan QR code di kasir</li>
+                                </ul>
+                            </div>
                         </div>
-                        <p class="text-xs sm:text-sm text-indigo-700">
-                            Semua pembayaran diproses melalui Midtrans dengan enkripsi SSL 256-bit.
-                        </p>
                     </div>
                 </div>
             </div>
