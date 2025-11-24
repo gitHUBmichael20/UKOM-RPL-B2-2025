@@ -20,20 +20,22 @@
                 </select>
             </div>
 
-            <!-- Start Date -->
+            <!-- Start Date - PERBAIKI BAGIAN INI -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
-                <input type="date" wire:model="startDate" 
+                <input type="date" 
+                       wire:model="startDate" 
                        class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                       @if($filterType !== 'custom') disabled @endif>
+                       @disabled($filterType !== 'custom')>
             </div>
 
-            <!-- End Date -->
+            <!-- End Date - PERBAIKI BAGIAN INI -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Akhir</label>
-                <input type="date" wire:model="endDate" 
+                <input type="date" 
+                       wire:model="endDate" 
                        class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                       @if($filterType !== 'custom') disabled @endif>
+                       @disabled($filterType !== 'custom')>
             </div>
 
             <!-- Apply Button -->
@@ -240,60 +242,60 @@
                 </div>
 
             @else
-                <!-- Film Terlaris -->
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800">Top 10 Film Terlaris</h3>
-                </div>
+    <!-- Film Terlaris -->
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Top 10 Film Terlaris</h3>
+    </div>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ranking</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Film</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Transaksi</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Tiket Terjual</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pendapatan</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse($this->filmTerlaris as $index => $item)
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center justify-center w-8 h-8 rounded-full 
-                                            @if($index === 0) bg-yellow-100 text-yellow-600
-                                            @elseif($index === 1) bg-gray-100 text-gray-600
-                                            @elseif($index === 2) bg-orange-100 text-orange-600
-                                            @else bg-blue-100 text-blue-600
-                                            @endif font-bold">
-                                            {{ $index + 1 }}
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                        {{ $item->jadwalTayang->first()->film->judul ?? '-' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ number_format($item->total_transaksi, 0, ',', '.') }} transaksi
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ number_format($item->total_tiket, 0, ',', '.') }} tiket
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                                        Rp {{ number_format($item->total_pendapatan, 0, ',', '.') }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                        <i class="fa-solid fa-inbox text-4xl mb-2"></i>
-                                        <p>Tidak ada data film</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            @endif
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ranking</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Film</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Transaksi</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Tiket Terjual</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pendapatan</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse($this->filmTerlaris as $index => $item)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full 
+                                @if($index === 0) bg-yellow-100 text-yellow-600
+                                @elseif($index === 1) bg-gray-100 text-gray-600
+                                @elseif($index === 2) bg-orange-100 text-orange-600
+                                @else bg-blue-100 text-blue-600
+                                @endif font-bold">
+                                {{ $index + 1 }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                            {{ $item->jadwalTayang->film->judul ?? '-' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ number_format($item->total_transaksi, 0, ',', '.') }} transaksi
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ number_format($item->total_tiket, 0, ',', '.') }} tiket
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                            Rp {{ number_format($item->total_pendapatan, 0, ',', '.') }}
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                            <i class="fa-solid fa-inbox text-4xl mb-2"></i>
+                            <p>Tidak ada data film</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+@endif
         </div>
     </div>
 </div>

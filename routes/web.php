@@ -27,6 +27,9 @@ use App\Livewire\Kasir\PemesananKasir;
 use App\Livewire\Kasir\RedeemTiket;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
+use App\Livewire\Admin\Laporan\Index as LaporanIndex;
+
 
 Route::post('/midtrans/webhook', [MidtransWebhookController::class, 'handle'])
     ->name('midtrans.webhook');
@@ -161,15 +164,12 @@ Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')
 
 
 
-// Laporan - Admin Only
-Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/laporan', \App\Livewire\Admin\Laporan\Index::class)->name('laporan.index');
-    Route::get('/laporan/export-penjualan', [\App\Http\Controllers\LaporanController::class, 'exportPenjualan'])->name('laporan.export-penjualan');
-    Route::get('/laporan/export-transaksi', [\App\Http\Controllers\LaporanController::class, 'exportTransaksi'])->name('laporan.export-transaksi');
-});
+// Route utama
+Route::get('/admin/laporan', LaporanIndex::class)->name('admin.laporan.index');
 
-// Laporan Transaksi Harian - Kasir
-Route::middleware(['role:kasir'])->prefix('admin/kasir')->name('admin.kasir.')->group(function () {
-    Route::get('/laporan', \App\Livewire\Admin\Kasir\LaporanHarian::class)->name('laporan.index');
-    Route::get('/laporan/export', [\App\Http\Controllers\Admin\Kasir\LaporanController::class, 'exportHarian'])->name('laporan.export');
-});
+// Route export - GUNAKAN REQUEST untuk ambil parameter
+Route::get('/admin/laporan/export-penjualan', [LaporanController::class, 'exportPenjualan'])
+    ->name('admin.laporan.export-penjualan');
+    
+Route::get('/admin/laporan/export-transaksi', [LaporanController::class, 'exportTransaksi'])
+    ->name('admin.laporan.export-transaksi');
