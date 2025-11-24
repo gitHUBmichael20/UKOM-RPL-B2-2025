@@ -90,4 +90,11 @@
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
     ),
   ),
+  'spatie/laravel-export' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\Export\\ExportServiceProvider',
+    ),
+  ),
 );
