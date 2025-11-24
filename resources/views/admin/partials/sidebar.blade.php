@@ -12,6 +12,7 @@
         <!-- Navigation -->
         <ul class="space-y-2 font-medium">
             <!-- Dashboard -->
+            @if (isRole('admin'))
             <li>
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700' : '' }}">
@@ -19,6 +20,7 @@
                     <span class="ml-3">Dashboard</span>
                 </a>
             </li>
+            @endif
 
             <!-- Films -->
             <li>
@@ -93,14 +95,6 @@
                         class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.laporan.*') ? 'bg-gray-700' : '' }}">
                         <i class="fa-solid fa-chart-line w-5 text-gray-300"></i>
                         <span class="ml-3">Laporan</span>
-                    </a>
-                </li>
-            @elseif (isRole('kasir'))
-                <li>
-                    <a href="{{ route('admin.kasir.laporan.index') }}"
-                        class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.kasir.laporan.*') ? 'bg-gray-700' : '' }}">
-                        <i class="fa-solid fa-chart-simple w-5 text-gray-300"></i>
-                        <span class="ml-3">Laporan Harian</span>
                     </a>
                 </li>
             @endif

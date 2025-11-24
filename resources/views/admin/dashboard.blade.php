@@ -32,16 +32,16 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Total Film</p>
-                    <p class="text-2xl font-bold text-gray-900">24</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalFilm }}</p>
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-sm text-green-600 font-medium">+3</span>
+                <span class="text-sm text-green-600 font-medium">{{ $newFilmThisMonth }}</span>
                 <span class="text-sm text-gray-500">dari bulan lalu</span>
             </div>
         </div>
 
-        <!-- Total Pemesanan -->
+        <!-- Total Pemesanan Hari Ini -->
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0 bg-green-500 rounded-lg p-3">
@@ -52,16 +52,16 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Pemesanan Hari Ini</p>
-                    <p class="text-2xl font-bold text-gray-900">156</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $bookingsToday }}</p>
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-sm text-green-600 font-medium">+12%</span>
+                <span class="text-sm text-green-600 font-medium">{{ $bookingPercentageChange }}%</span>
                 <span class="text-sm text-gray-500">dari kemarin</span>
             </div>
         </div>
 
-        <!-- Total Pendapatan -->
+        <!-- Total Pendapatan Hari Ini -->
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0 bg-yellow-500 rounded-lg p-3">
@@ -72,11 +72,11 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Pendapatan Hari Ini</p>
-                    <p class="text-2xl font-bold text-gray-900">Rp 15.6 Jt</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ 'Rp ' . number_format($revenueToday, 0, ',', '.') }}</p>
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-sm text-green-600 font-medium">+8%</span>
+                <span class="text-sm text-green-600 font-medium">{{ $revenuePercentageChange }}%</span>
                 <span class="text-sm text-gray-500">dari kemarin</span>
             </div>
         </div>
@@ -91,11 +91,11 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Total Studio</p>
-                    <p class="text-2xl font-bold text-gray-900">6</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalStudio }}</p>
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-sm text-gray-500">2 Premium, 4 Regular</span>
+                <span class="text-sm text-gray-500">{{ $premiumStudio }} IMAX, {{ $regularStudio }} Deluxe, {{ $totalStudio - $premiumStudio - $regularStudio }} Regular</span>
             </div>
         </div>
     </div>
@@ -113,27 +113,47 @@
                         <thead>
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pelanggan</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Film</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pelanggan/Kasir</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode Booking</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-4 py-3 text-sm text-gray-900">#001</td>
-                                <td class="px-4 py-3 text-sm text-gray-900">John Doe</td>
-                                <td class="px-4 py-3 text-sm text-gray-900">Oppenheimer</td>
-                                <td class="px-4 py-3 text-sm text-gray-900">Rp 100.000</td>
-                                <td class="px-4 py-3"><span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Selesai</span></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3 text-sm text-gray-900">#002</td>
-                                <td class="px-4 py-3 text-sm text-gray-900">Jane Smith</td>
-                                <td class="px-4 py-3 text-sm text-gray-900">Barbie</td>
-                                <td class="px-4 py-3 text-sm text-gray-900">Rp 150.000</td>
-                                <td class="px-4 py-3"><span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Pending</span></td>
-                            </tr>
+                            @forelse ($recentBookings as $booking)
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-900">#{{ str_pad($booking->id, 3, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-900">
+                                        @if ($booking->user_name)
+                                            {{ $booking->user_name }}
+                                        @elseif ($booking->kasir_name)
+                                            {{ $booking->kasir_name }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $booking->kode_booking ?? 'N/A' }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-900">Rp {{ number_format($booking->total_harga ?? 0, 0, ',', '.') }}</td>
+                                    <td class="px-4 py-3">
+                                        @php
+                                            $status = strtolower($booking->status_pembayaran ?? 'pending');
+                                        @endphp
+                                        @if ($status === 'lunas')
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Lunas</span>
+                                        @elseif ($status === 'pending')
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                        @elseif ($status === 'dibatalkan')
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Dibatalkan</span>
+                                        @else
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">{{ ucfirst($status) }}</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">Tidak ada pemesanan terbaru</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -146,19 +166,19 @@
                 <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
             </div>
             <div class="p-6 space-y-3">
-                <a href="#" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                <a href="{{ route('admin.film.create') }}" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
                     <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
                     </svg>
                     <span class="ml-3 text-sm font-medium text-gray-900">Tambah Film Baru</span>
                 </a>
-                <a href="#" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition">
+                <a href="{{ route('admin.jadwal-tayang.create') }}" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition">
                     <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
                     </svg>
                     <span class="ml-3 text-sm font-medium text-gray-900">Tambah Jadwal</span>
                 </a>
-                <a href="#" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                <a href="{{ route('admin.laporan.index') }}" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
                     <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
                     </svg>
