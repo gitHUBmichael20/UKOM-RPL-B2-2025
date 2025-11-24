@@ -26,6 +26,7 @@ use App\Livewire\Admin\PemesananAdmin;
 use App\Livewire\Kasir\PemesananKasir;
 use App\Livewire\Kasir\RedeemTiket;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
 Route::post('/midtrans/webhook', [MidtransWebhookController::class, 'handle'])
     ->name('midtrans.webhook');
@@ -36,13 +37,14 @@ require __DIR__ . '/auth.php';
 Route::get('/', fn() => redirect()->route('dashboard'));
 
 Route::get('/dashboard', function () {
-    if (isRole('admin', 'kasir')) {
+    if (isRole('admin')) {
         return redirect()->route('admin.dashboard');
+    } elseif (isRole('kasir')) {
+        return redirect()->route('admin.sutradara.index');
     }
 
     return view('dashboard');
 })->name('dashboard');
-
 
 Route::middleware(['auth'])->group(function () {
 
@@ -80,7 +82,9 @@ Route::middleware(['auth'])->group(function () {
 // Admin & Kasir
 Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')->group(function () {
 
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+   Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
 
     // Studio
     Route::prefix('studio')->name('studio.')->group(function () {
