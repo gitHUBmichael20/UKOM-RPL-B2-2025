@@ -79,7 +79,7 @@
                     <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
                         <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
                             <div class="flex-shrink-0">
-                                <img src="{{ asset('storage/' . $film->poster) ?? 'storage/default_poster.png' }}" 
+                                <img src="{{ $film->poster ? asset('storage/' . $film->poster) : asset('storage/default_poster.png') }}" 
                                      alt="{{ $film->judul }}"
                                      class="w-24 h-36 sm:w-32 sm:h-48 md:w-40 md:h-60 object-cover rounded-lg shadow-md mx-auto sm:mx-0">
                             </div>
