@@ -241,8 +241,7 @@ class DatabaseSeeder extends Seeder
       $user = $isOnline ? User::where('role', 'pelanggan')->inRandomOrder()->first() : null;
       $kasir = $isOnline ? null : User::where('role', 'kasir')->inRandomOrder()->first();
 
-      // Kode booking unik 100%
-      $kodeBooking = 'BK' . date('Ymd') . strtoupper(Str::random(8));
+      $kodeBooking = 'BK' . date('Ymd') . strtoupper(Str::random(6));
 
       $pemesanan = Pemesanan::create([
         'kode_booking'      => $kodeBooking,
