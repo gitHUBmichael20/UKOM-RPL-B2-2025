@@ -72,10 +72,19 @@ class SutradaraManagement extends Controller
     {
         $sutradara = Sutradara::findOrFail($id);
 
+        // Cek apakah sutradara dipakai di film manapun
+        if ($sutradara->films()->exists()) {
+            return redirect()
+                ->route('admin.sutradara.index')
+                ->with('error', 'Sutradara tidak bisa dihapus karena masih digunakan oleh film.');
+        }
+
+        // Hapus foto profil jika ada
         if ($sutradara->foto_profil && Storage::disk('public')->exists($sutradara->foto_profil)) {
             Storage::disk('public')->delete($sutradara->foto_profil);
         }
 
+        // Hapus data sutradara
         $sutradara->delete();
 
         return redirect()
@@ -83,4 +92,3 @@ class SutradaraManagement extends Controller
             ->with('message', 'Sutradara berhasil dihapus');
     }
 }
-

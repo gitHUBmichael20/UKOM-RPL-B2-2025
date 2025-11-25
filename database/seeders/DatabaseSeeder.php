@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Models\User;
@@ -21,12 +23,28 @@ use App\Models\DetailPemesanan;
 
 class DatabaseSeeder extends Seeder
 {
+  private function downloadImage($url, $folder, $filename)
+  {
+    try {
+      $response = Http::timeout(30)->get($url);
+      if ($response->successful()) {
+        $path = $folder . '/' . $filename;
+        Storage::disk('public')->put($path, $response->body());
+        return $path;
+      }
+    } catch (\Exception $e) {
+      // Jika download gagal, gunakan gambar default
+      \Log::error("Failed to download image: " . $e->getMessage());
+    }
+    return null;
+  }
+
   public function run(): void
   {
     DB::disableQueryLog();
-    DB::statement('SET FOREIGN_KEY_CHECKS=0;'); // Penting agar bisa truncate
+    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-    // Truncate semua tabel biar aman dijalankan ulang
+    // Truncate semua tabel
     User::truncate();
     HargaTiket::truncate();
     Genre::truncate();
@@ -38,6 +56,10 @@ class DatabaseSeeder extends Seeder
     JadwalTayang::truncate();
     Pemesanan::truncate();
     DetailPemesanan::truncate();
+
+    // Buat folder untuk penyimpanan gambar
+    Storage::disk('public')->makeDirectory('images/posters');
+    Storage::disk('public')->makeDirectory('images/sutradara');
 
     // ===================================================================
     // 1. USER
@@ -90,24 +112,44 @@ class DatabaseSeeder extends Seeder
     }
 
     // ===================================================================
-    // 4. SUTRADARA (15 orang)
+    // 4. SUTRADARA (15 orang) - Download gambar dari thispersondoesnotexist
     // ===================================================================
     $sutradaraList = ['Joko Anwar', 'Hanung Bramantyo', 'Angga Dwimas Sasongko', 'Gareth Evans', 'Riri Riza', 'Christopher Nolan', 'James Cameron', 'Denis Villeneuve', 'Bong Joon-ho', 'Makoto Shinkai', 'Rako Prijanto', 'Fajar Nugros', 'Upi Avianto', 'Timo Tjahjanto', 'Kamila Andini'];
+
+    $sutradaraModels = [];
     foreach ($sutradaraList as $nama) {
-      Sutradara::create([
+      $sutradara = Sutradara::create([
         'nama_sutradara' => $nama,
         'foto_profil'    => null,
-        'biografi'       => "Sutradara {$nama}."
+        'biografi'       => "Sutradara {$nama} yang telah menyutradarai banyak film terkenal dengan berbagai genre."
       ]);
+      $sutradaraModels[] = $sutradara;
+    }
+
+    // Download foto profil sutradara
+    foreach ($sutradaraModels as $sutradara) {
+      $filename = 'sutradara_' . Str::slug($sutradara->nama_sutradara) . '.jpg';
+      $imagePath = $this->downloadImage(
+        'https://thispersondoesnotexist.com/',
+        'images/sutradara',
+        $filename
+      );
+
+      if ($imagePath) {
+        $sutradara->update(['foto_profil' => $imagePath]);
+      }
+
+      // Delay untuk menghindari rate limiting
+      usleep(500000); // 0.5 detik
     }
 
     // ===================================================================
-    // 5. STUDIO + KURSI (diperbaiki logika baris & kolom)
+    // 5. STUDIO + KURSI
     // ===================================================================
     $studios = [
-      ['nama_studio' => 'Studio 1', 'kapasitas_kursi' => 200, 'tipe_studio' => 'regular'], // 10 baris x 20 kursi
-      ['nama_studio' => 'Studio 2', 'kapasitas_kursi' => 120, 'tipe_studio' => 'deluxe'],  // 6 baris x 20
-      ['nama_studio' => 'Studio 3', 'kapasitas_kursi' => 80,  'tipe_studio' => 'imax'],    // 4 baris x 20
+      ['nama_studio' => 'Studio 1', 'kapasitas_kursi' => 200, 'tipe_studio' => 'regular'],
+      ['nama_studio' => 'Studio 2', 'kapasitas_kursi' => 120, 'tipe_studio' => 'deluxe'],
+      ['nama_studio' => 'Studio 3', 'kapasitas_kursi' => 80,  'tipe_studio' => 'imax'],
     ];
 
     foreach ($studios as $s) {
@@ -120,7 +162,7 @@ class DatabaseSeeder extends Seeder
         default => 10
       };
 
-      $rows = range('A', chr(ord('A') + $maxRows - 1)); // A–J, A–F, A–D
+      $rows = range('A', chr(ord('A') + $maxRows - 1));
 
       foreach ($rows as $rIndex => $row) {
         for ($col = 1; $col <= 20; $col++) {
@@ -134,7 +176,7 @@ class DatabaseSeeder extends Seeder
     }
 
     // ===================================================================
-    // 6. FILM (30 film) — sutradara_id diperbaiki (random 1-15)
+    // 6. FILM (30 film) - Download poster dari Picsum Photos
     // ===================================================================
     $films = [
       // Tayang (15)
@@ -172,6 +214,7 @@ class DatabaseSeeder extends Seeder
       ['Blade', 2025, 'D17+', 'Action'],
     ];
 
+    $filmModels = [];
     foreach ($films as $i => $f) {
       $status = $i < 15 ? 'tayang' : 'segera';
 
@@ -179,11 +222,14 @@ class DatabaseSeeder extends Seeder
         'sutradara_id' => rand(1, 15),
         'judul'        => $f[0],
         'durasi'       => rand(105, 185),
-        'sinopsis'     => "Sinopsis film {$f[0]} ({$f[1]}) - {$status} di Absolute Cinema.",
+        'sinopsis'     => "Sinopsis film {$f[0]} ({$f[1]}) - {$status} di Absolute Cinema. Film ini menceritakan tentang petualangan yang menarik dan penuh dengan kejutan yang tidak terduga.",
         'rating'       => $f[2],
         'tahun_rilis'  => $f[1],
         'status'       => $status,
+        'poster'       => null,
       ]);
+
+      $filmModels[] = $film;
 
       // Genre acak 1-3
       $randomGenres = Genre::inRandomOrder()->limit(rand(1, 3))->pluck('id');
@@ -193,6 +239,23 @@ class DatabaseSeeder extends Seeder
           'genre_id' => $genreId
         ]);
       }
+    }
+
+    // Download poster film
+    foreach ($filmModels as $film) {
+      $filename = 'poster_' . Str::slug($film->judul) . '.jpg';
+      $imagePath = $this->downloadImage(
+        'https://picsum.photos/750/1000?random=' . $film->id,
+        'images/posters',
+        $filename
+      );
+
+      if ($imagePath) {
+        $film->update(['poster' => $imagePath]);
+      }
+
+      // Delay untuk menghindari rate limiting
+      usleep(300000); // 0.3 detik
     }
 
     // ===================================================================
@@ -260,7 +323,7 @@ class DatabaseSeeder extends Seeder
       ]);
 
       // Ambil kursi yang masih kosong untuk jadwal ini
-      $takenSeats = DetailPemesanan::whereHas('pemesanan.jadwalTayang', function ($q) use ($jadwal) {
+      $takenSeats = DetailPemesanan::whereHas('pemesanan', function ($q) use ($jadwal) {
         $q->where('jadwal_tayang_id', $jadwal->id);
       })->pluck('kursi_id');
 
@@ -280,5 +343,9 @@ class DatabaseSeeder extends Seeder
 
     DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     DB::enableQueryLog();
+
+    $this->command->info('Seeder berhasil dijalankan!');
+    $this->command->info('Gambar poster disimpan di: storage/app/public/images/posters/');
+    $this->command->info('Gambar sutradara disimpan di: storage/app/public/images/sutradara/');
   }
 }
