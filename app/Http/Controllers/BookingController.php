@@ -313,32 +313,32 @@ class BookingController extends Controller
 
         return view('pemesanan.ticket-view', compact('pemesanan'));
     }
-
-    /**
-     * Show ticket details
-     */
     public function ticket(Pemesanan $pemesanan)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        if ($pemesanan->user_id !== $user->id) {
-            abort(403);
-        }
+    $isOwner = $pemesanan->user_id && $pemesanan->user_id === $user->id;
+    $isKasir = $user->role === 'kasir' && $pemesanan->jenis_pemesanan === 'offline';
 
-        $pemesanan->load([
-            'jadwalTayang.film',
-            'jadwalTayang.studio',
-            'detailPemesanan.kursi',
-            'user'
-        ]);
-
-        return view('pemesanan.ticket', compact('pemesanan'));
+    if (!$isOwner && !$isKasir) {
+        abort(403);
     }
 
-    /**
-     * Show user's booking history
-     */
+    $pemesanan->load([
+        'jadwalTayang.film',
+        'jadwalTayang.studio',
+        'detailPemesanan.kursi',
+        'user'
+    ]);
+
+    if ($isKasir) {
+        return view('livewire.kasir.tiket-pemesanan', compact('pemesanan'));
+    }
+
+    // User biasa, tampilkan view default
+    return view('pemesanan.ticket', compact('pemesanan'));
+}
+
     public function myBookings()
     {
         /** @var \App\Models\User $user */

@@ -73,7 +73,7 @@ Route::middleware(['auth'])->group(function () {
         // Store endpoint sekarang return JSON untuk AJAX
         Route::post('/{film}/schedule/{jadwalTayang}/store', [BookingController::class, 'store'])->name('store');
 
-        // Success & ticket pages
+        //Halaman tiket
         Route::get('/success/{pemesanan}', [BookingController::class, 'success'])->name('success');
         Route::get('/ticket/{pemesanan}', [BookingController::class, 'ticket'])->name('ticket');
 

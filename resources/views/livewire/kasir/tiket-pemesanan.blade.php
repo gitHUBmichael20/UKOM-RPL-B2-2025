@@ -164,24 +164,39 @@
                     </div>
 
                     <!-- Barcode Area -->
-                    <div class="mt-8 border-t pt-6">
-                        <div class="text-center">
-                            <div class="bg-gray-100 p-4 rounded-lg inline-block">
-                                <!-- Simple Barcode Representation -->
-                                <div class="text-xs font-mono tracking-widest opacity-50">
-                                    {{ $pemesanan->kode_booking }}
-                                </div>
-                                <div class="flex justify-center mt-2 space-x-1">
-                                    @for ($i = 0; $i < 20; $i++)
-                                        <div class="w-1 h-8 bg-black"></div>
-                                    @endfor
-                                </div>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-2">Present this ticket at the cinema</p>
-                        </div>
-                    </div>
+@if ($pemesanan->jenis_pemesanan === 'online')
+    <div class="mt-8 border-t pt-6">
+        <div class="text-center">
+            <div class="bg-gray-100 p-4 rounded-lg inline-block">
+                <!-- Barcode untuk online -->
+                <div class="text-xs font-mono tracking-widest opacity-50">
+                    {{ $pemesanan->kode_booking }}
+                </div>
+                <div class="flex justify-center mt-2 space-x-1">
+                    @for ($i = 0; $i < 20; $i++)
+                        <div class="w-1 h-8 bg-black"></div>
+                    @endfor
                 </div>
             </div>
+            <p class="text-sm text-gray-500 mt-2">Present this ticket at the cinema</p>
+        </div>
+    </div>
+@else
+    <div class="mt-8 border-t pt-6">
+        <div class="text-center">
+            <div class="bg-gray-100 p-6 rounded-lg inline-block">
+                <p class="text-sm text-gray-600 mb-2">Booking Code</p>
+                <div class="text-3xl font-bold font-mono tracking-wider text-gray-800">
+                    {{ $pemesanan->kode_booking }}
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">
+                <i class="fa-solid fa-ticket mr-1"></i>
+                Present this booking code at the cinema counter
+            </p>
+        </div>
+    </div>
+@endif
 
             <!-- Action Buttons -->
             <div class="mt-6 flex justify-center space-x-4 no-print">
