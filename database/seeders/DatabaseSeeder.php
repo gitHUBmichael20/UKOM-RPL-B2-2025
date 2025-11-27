@@ -255,7 +255,7 @@ class DatabaseSeeder extends Seeder
         'status_pembayaran' => $statusPembayaran[array_rand($statusPembayaran)],
         'tanggal_pemesanan' => now()->subHours(rand(1, 500)),
         'kasir_id'          => $kasir?->id,
-        'expired_at'        => $isOnline ? now()->addHours(2) : null,
+        'expired_at'        => $isOnline ? now()->addHours(1) : null,
       ]);
 
       // Ambil kursi yang masih kosong untuk jadwal ini

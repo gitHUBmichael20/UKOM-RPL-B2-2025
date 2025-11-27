@@ -27,7 +27,7 @@ class UserCreate extends Component
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'nullable|string|max:20',
             'role' => 'required|in:admin,kasir,pelanggan',
-            'foto_profil' => 'nullable|image|max:2048', // Max 2MB
+            'foto_profil' => 'nullable|image|max:2048',
         ];
     }
 
@@ -48,11 +48,11 @@ class UserCreate extends Component
     {
         $this->validate();
 
+        // kalo ada foto diupload simpan ke public/storage/profile-photos
         $fotoPath = null;
         if ($this->foto_profil) {
             $fotoPath = $this->foto_profil->store('profile-photos', 'public');
         }
-        
 
         User::create([
             'name' => $this->name,

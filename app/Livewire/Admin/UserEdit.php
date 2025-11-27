@@ -71,12 +71,10 @@ class UserEdit extends Component
             'role' => $this->role,
         ];
 
-        // Update password jika diisi
         if ($this->password) {
             $data['password'] = Hash::make($this->password);
         }
 
-        // Update foto profil jika ada
         if ($this->foto_profil) {
             // Hapus foto lama jika ada dan bukan default
             if ($user->foto_profil && $user->foto_profil !== 'default_profile.jpg') {
@@ -87,7 +85,7 @@ class UserEdit extends Component
 
         $user->update($data);
 
-        session()->flash('message', 'User berhasil diupdate.');
+        session()->flash('success', 'User berhasil diupdate.');
         return redirect()->route('admin.users.index');
     }
 
@@ -95,7 +93,7 @@ class UserEdit extends Component
     {
         $user = User::findOrFail($this->userId);
         
-        if ($user->foto_profil && $user->foto_profil !== 'default-avatar.png') {
+        if ($user->foto_profil && $user->foto_profil !== 'default_profile.png') {
             Storage::disk('public')->delete($user->foto_profil);
             $user->update(['foto_profil' => null]);
             $this->current_foto = null;

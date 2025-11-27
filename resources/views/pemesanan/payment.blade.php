@@ -208,10 +208,6 @@
                                   class="text-sm sm:text-base lg:text-xl">Lanjut ke Pembayaran • Rp
                                 {{ number_format($totalHarga, 0, ',', '.') }}</span>
                         </button>
-
-                        <p class="text-xs sm:text-sm text-gray-500 mt-4 sm:mt-6 px-2">
-                            🔒 Pembayaran aman & terenkripsi oleh Midtrans (Bank Indonesia & PCI DSS certified)
-                        </p>
                     </div>
 
                     <!-- Back Link -->

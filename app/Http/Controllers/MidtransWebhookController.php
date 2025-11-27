@@ -19,8 +19,6 @@ class MidtransWebhookController extends Controller
         $paymentType = $payload['payment_type'] ?? null;
         $fraudStatus = $payload['fraud_status'] ?? null;
 
-        \Log::info("Processing order: $orderId with status: $transactionStatus");
-
         if (!$orderId) {
             return response('Order ID not found', 400);
         }
@@ -28,11 +26,9 @@ class MidtransWebhookController extends Controller
         $pemesanan = Pemesanan::where('kode_booking', $orderId)->first();
 
         if (!$pemesanan) {
-            \Log::error("Booking not found: $orderId");
             return response('Booking not found', 404);
         }
 
-        // Jika pembayaran berhasil
         if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
             if ($fraudStatus == 'accept' || $fraudStatus == null) {
                 $metode = match ($paymentType) {
@@ -55,21 +51,17 @@ class MidtransWebhookController extends Controller
                     $writer = new \Endroid\QrCode\Writer\PngWriter();
                     $result = $writer->write($qrCode);
 
-                    // Simpan ke storage/app/public/qrcodes
+                    // Taroh ke storage/app/public/qrcodes
                     $qrPath = 'qrcodes/' . $pemesanan->kode_booking . '.png';
                     \Storage::disk('public')->put($qrPath, $result->getString());
 
-                    // Update pemesanan dengan QR code dan status
                     $pemesanan->update([
                         'status_pembayaran' => 'lunas',
                         'metode_pembayaran' => $metode,
                         'qr_code' => $qrPath
                     ]);
 
-                    \Log::info("Payment success and QR generated for: $orderId");
                 } catch (\Exception $e) {
-                    \Log::error("QR Code generation failed: " . $e->getMessage());
-
                     // Tetap update status pembayaran meskipun QR gagal
                     $pemesanan->update([
                         'status_pembayaran' => 'lunas',
