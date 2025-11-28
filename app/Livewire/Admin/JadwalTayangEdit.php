@@ -80,7 +80,6 @@ class JadwalTayangEdit extends Component
             $existingStart = Carbon::parse($schedule->jam_tayang);
             $existingEnd = $existingStart->copy()->addMinutes($schedule->film->durasi);
 
-            // Cek overlap: jadwal baru overlap dengan jadwal yang sudah ada
             if ($newStart->lt($existingEnd) && $newEnd->gt($existingStart)) {
                 return "Bentrok dengan film '{$schedule->film->judul}' jam {$existingStart->format('H:i')} - {$existingEnd->format('H:i')}";
             }
@@ -96,7 +95,6 @@ class JadwalTayangEdit extends Component
         try {
             DB::beginTransaction();
 
-            // Check for schedule conflict with duration
             $conflict = $this->checkScheduleConflict();
 
             if ($conflict) {

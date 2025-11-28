@@ -168,7 +168,6 @@
                 onChange: function (value) {
                     @this.set('film_id', value);
 
-                    // Update durasi film
                     if (value) {
                         const option = this.options[value];
                         if (option) {

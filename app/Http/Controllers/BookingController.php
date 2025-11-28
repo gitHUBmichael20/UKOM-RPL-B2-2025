@@ -145,9 +145,6 @@ class BookingController extends Controller
         ));
     }
 
-    /**
-     * Create booking and generate Midtrans payment token
-     */
     public function store(Request $request, Film $film, JadwalTayang $jadwalTayang)
     {
         $bookingData = session('booking_data');
@@ -185,13 +182,47 @@ class BookingController extends Controller
                 $kodeBooking = 'BK' . now()->format('Ymd') . strtoupper(Str::random(6));
             } while (Pemesanan::where('kode_booking', $kodeBooking)->exists());
 
-            // Configure Midtrans
-            $this->configureMidtrans();
+            // Config midtrans
+            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+            \Midtrans\Config::$isSanitized = true;
+            \Midtrans\Config::$is3ds = true;
 
-            // Create Snap transaction
-            $snapToken = $this->createSnapTransaction($kodeBooking, $bookingData['total_harga'], $user);
+            // buat snap token
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $kodeBooking,
+                    'gross_amount' => (int) $bookingData['total_harga'],
+                ],
+                'customer_details' => [
+                    'first_name' => $user->name,
+                    'email' => $user->email,
+                ],
+                'enabled_payments' => [
+                    'credit_card',
+                    'qris',
+                    'gopay',
+                    'shopeepay',
+                    'dana',
+                    'linkaja',
+                    'ovo',
+                    'bca_va',
+                    'bri_va',
+                    'bni_va',
+                    'permata_va',
+                    'mandiri_va',
+                    'cimb_va'
+                ],
+                'expiry' => [
+                    'start_time' => now()->format('Y-m-d H:i:s O'),
+                    'unit' => 'hour',
+                    'duration' => 1
+                ]
+            ];
 
-            // Create booking record
+            $snapToken = \Midtrans\Snap::createTransaction($params)->token;
+
+            // buat pemesannya
             $pemesanan = Pemesanan::create([
                 'kode_booking' => $kodeBooking,
                 'user_id' => $user->id,
@@ -204,7 +235,7 @@ class BookingController extends Controller
                 'status_pembayaran' => 'pending',
                 'tanggal_pemesanan' => now(),
                 'snap_token' => $snapToken,
-                'expired_at' => now()->addHours(2),
+                'expired_at' => now()->addHours(1),
             ]);
 
             // Create seat details
@@ -218,6 +249,7 @@ class BookingController extends Controller
             DB::commit();
             session()->forget('booking_data');
 
+            // Return snap token buat dipake frontend
             return response()->json([
                 'success' => true,
                 'snap_token' => $snapToken,
@@ -356,9 +388,7 @@ class BookingController extends Controller
         return view('pemesanan.my-bookings', compact('bookings'));
     }
 
-    /**
-     * Download QR code for ticket
-     */
+    // Download QR Code untuk tiket
     public function downloadQR(Pemesanan $pemesanan)
     {
         if ($pemesanan->jenis_pemesanan !== 'online' || !$pemesanan->qr_code) {
@@ -383,9 +413,6 @@ class BookingController extends Controller
         return response()->download($qrPath, 'QR_' . $pemesanan->kode_booking . '.png');
     }
 
-    /**
-     * Cancel pending booking
-     */
     public function cancel(Pemesanan $pemesanan)
     {
         /** @var \App\Models\User $user */

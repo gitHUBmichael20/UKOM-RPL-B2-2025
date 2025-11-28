@@ -27,8 +27,6 @@ class PemesananKasir extends Component
     public $perPage = 10;
     public $selectedPemesanan = null;
     public $showDetailModal = false;
-
-    // Form data untuk buat pemesanan
     public $formStep = 1;
     public $selectedJadwal = null;
     public $selectedJadwalId = null;
