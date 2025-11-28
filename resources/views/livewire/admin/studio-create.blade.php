@@ -170,7 +170,7 @@
                         <p class="font-medium mb-1">🪑 Layout dengan Gang:</p>
                         <p>Kursi dibagi dua dengan gang di tengah</p>
                         <p class="text-xs mt-1">Genap: A1-A5 [Gang] A6-A10</p>
-                        <p class="text-xs">Ganjil: A1-A4 [Gang] A5-A9</p>
+                        <p class="text-xs">Ganjil: A1-A5 [Gang] A6-A9</p>
                     </div>
 
                     <div>

@@ -87,9 +87,6 @@ class BookingController extends Controller
         ));
     }
 
-    /**
-     * Show payment page with selected seats
-     */
     public function payment(Request $request, Film $film, JadwalTayang $jadwalTayang)
     {
         $selectedSeatIds = $request->has('selected_seats')
@@ -142,6 +139,54 @@ class BookingController extends Controller
             'seats',
             'totalHarga',
             'hargaTiket'
+        ));
+    }
+
+    public function continuePayment(Pemesanan $pemesanan)
+    {
+        // Security check
+        if (
+            $pemesanan->user_id !== auth()->id() ||
+            $pemesanan->status_pembayaran !== 'pending' ||
+            !$pemesanan->snap_token
+        ) {
+            abort(403);
+        }
+
+        // Kalau expired → otomatis batalkan atau arahkan ke my-bookings
+        if ($pemesanan->expired_at && now()->greaterThan($pemesanan->expired_at)) {
+            return redirect()
+                ->route('pemesanan.my-bookings')
+                ->with('error', 'Waktu pembayaran untuk pesanan #' . $pemesanan->kode_booking . ' sudah habis.');
+        }
+
+        // Load relasi
+        $pemesanan->load([
+            'jadwalTayang.film',
+            'jadwalTayang.studio',
+            'detailPemesanan.kursi'
+        ]);
+
+        $film         = $pemesanan->jadwalTayang->film;
+        $jadwalTayang = $pemesanan->jadwalTayang;
+        $seats        = $pemesanan->detailPemesanan->map->kursi;
+        $totalHarga   = $pemesanan->total_harga;
+
+        // Harga tiket untuk tampilan
+        $isWeekend = in_array(Carbon::parse($jadwalTayang->tanggal_tayang)->dayOfWeek, [0, 6]);
+        $tipeHari  = $isWeekend ? 'weekend' : 'weekday';
+
+        $hargaTiket = HargaTiket::where('tipe_studio', $jadwalTayang->studio->tipe_studio)
+            ->where('tipe_hari', $tipeHari)
+            ->firstOrFail();
+
+        return view('pemesanan.payment', compact(
+            'film',
+            'jadwalTayang',
+            'seats',
+            'totalHarga',
+            'hargaTiket',
+            'pemesanan'
         ));
     }
 
@@ -268,60 +313,7 @@ class BookingController extends Controller
         }
     }
 
-    /**
-     * Configure Midtrans settings
-     */
-    private function configureMidtrans(): void
-    {
-        MidtransConfig::$serverKey = config('midtrans.server_key');
-        MidtransConfig::$isProduction = config('midtrans.is_production', false);
-        MidtransConfig::$isSanitized = true;
-        MidtransConfig::$is3ds = true;
-    }
 
-    /**
-     * Create Snap transaction and return token
-     */
-    private function createSnapTransaction(string $orderId, float $amount, $user): string
-    {
-        $params = [
-            'transaction_details' => [
-                'order_id' => $orderId,
-                'gross_amount' => (int) $amount,
-            ],
-            'customer_details' => [
-                'first_name' => $user->name,
-                'email' => $user->email,
-            ],
-            'enabled_payments' => [
-                'credit_card',
-                'qris',
-                'gopay',
-                'shopeepay',
-                'dana',
-                'linkaja',
-                'ovo',
-                'bca_va',
-                'bri_va',
-                'bni_va',
-                'permata_va',
-                'mandiri_va',
-                'cimb_va'
-            ],
-            'expiry' => [
-                'start_time' => now()->format('Y-m-d H:i:s O'),
-                'unit' => 'hour',
-                'duration' => 2
-            ]
-        ];
-
-        $snapResponse = MidtransSnap::createTransaction($params);
-        return $snapResponse->token;
-    }
-
-    /**
-     * Show success page after payment
-     */
     public function success(Pemesanan $pemesanan)
     {
         /** @var \App\Models\User $user */
@@ -346,30 +338,30 @@ class BookingController extends Controller
         return view('pemesanan.ticket-view', compact('pemesanan'));
     }
     public function ticket(Pemesanan $pemesanan)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $isOwner = $pemesanan->user_id && $pemesanan->user_id === $user->id;
-    $isKasir = $user->role === 'kasir' && $pemesanan->jenis_pemesanan === 'offline';
+        $isOwner = $pemesanan->user_id && $pemesanan->user_id === $user->id;
+        $isKasir = $user->role === 'kasir' && $pemesanan->jenis_pemesanan === 'offline';
 
-    if (!$isOwner && !$isKasir) {
-        abort(403);
+        if (!$isOwner && !$isKasir) {
+            abort(403);
+        }
+
+        $pemesanan->load([
+            'jadwalTayang.film',
+            'jadwalTayang.studio',
+            'detailPemesanan.kursi',
+            'user'
+        ]);
+
+        if ($isKasir) {
+            return view('livewire.kasir.tiket-pemesanan', compact('pemesanan'));
+        }
+
+        // User biasa, tampilkan view default
+        return view('pemesanan.ticket', compact('pemesanan'));
     }
-
-    $pemesanan->load([
-        'jadwalTayang.film',
-        'jadwalTayang.studio',
-        'detailPemesanan.kursi',
-        'user'
-    ]);
-
-    if ($isKasir) {
-        return view('livewire.kasir.tiket-pemesanan', compact('pemesanan'));
-    }
-
-    // User biasa, tampilkan view default
-    return view('pemesanan.ticket', compact('pemesanan'));
-}
 
     public function myBookings()
     {

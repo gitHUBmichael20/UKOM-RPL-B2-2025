@@ -139,11 +139,11 @@
                                                 @endif
 
                                                 @if($canPay)
-                                                    <button onclick="payNow('{{ $booking->snap_token }}')"
-                                                            class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition">
+                                                    <a href="{{ route('payment.continue', $booking) }}"
+                                                    class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition">
                                                         <i class="fas fa-credit-card mr-2"></i>
                                                         Bayar Sekarang
-                                                    </button>
+                                                    </a>
                                                 @endif
 
                                                 @if($canCancel)
@@ -229,34 +229,61 @@
             });
         }
 
-        function cancelBooking(bookingId, button) {
-            if (!confirm('Yakin ingin membatalkan pesanan ini? Kursi akan dilepaskan.')) return;
+async function cancelBooking(bookingId, button) {
+        const originalHTML = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Membatalkan...';
 
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Membatalkan...';
+        const { isConfirmed } = await Swal.fire({
+            title: 'Batalkan Pesanan?',
+            text: 'Kursi akan dilepaskan dan tidak bisa dikembalikan.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Batalkan',
+            cancelButtonText: 'Tidak Jadi',
+            reverseButtons: true
+        });
 
-            fetch(`/pemesanan/cancel/${bookingId}`, {
+        if (!isConfirmed) {
+            button.disabled = false;
+            button.innerHTML = originalHTML;
+            return;
+        }
+
+        try {
+            const response = await fetch(`/pemesanan/cancel/${bookingId}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
-            })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Gagal membatalkan');
-                        button.disabled = false;
-                        button.innerHTML = '<i class="fas fa-times mr-2"></i> Batalkan';
-                    }
-                })
-                .catch(() => {
-                    alert('Terjadi kesalahan');
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-times mr-2"></i> Batalkan';
-                });
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Dibatalkan!',
+                    text: 'Pesanan berhasil dibatalkan.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            } else {
+                throw new Error(data.message || 'Gagal membatalkan pesanan');
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: error.message || 'Terjadi kesalahan jaringan'
+            });
+            button.disabled = false;
+            button.innerHTML = originalHTML;
         }
+    }
     </script>
 </x-app-layout>

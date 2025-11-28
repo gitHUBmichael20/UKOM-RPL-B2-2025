@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,5 +25,7 @@ class AppServiceProvider extends ServiceProvider
         if (request()->header('x-forwarded-proto') === 'https') {
             URL::forceScheme('https');
         }
+
+        Carbon::setLocale('id');
     }
 }

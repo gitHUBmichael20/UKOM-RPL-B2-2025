@@ -40,9 +40,9 @@ class UserManagement extends Component
 
             $user->delete();
 
-            $this->dispatch('user-deleted', ['message' => 'User berhasil dihapus']);
+            $this->dispatch('user-deleted', ['success' => 'User berhasil dihapus']);
         } else {
-            $this->dispatch('user-delete-failed', ['message' => 'Tidak dapat menghapus user ini']);
+            $this->dispatch('user-delete-failed', ['success' => 'Tidak dapat menghapus user ini']);
         }
     }
 

@@ -70,13 +70,14 @@ Route::middleware(['auth', 'role:pelanggan'])->prefix('pemesanan')->name('pemesa
     Route::post('/{film}/schedule/{jadwalTayang}/payment', [BookingController::class, 'payment'])->name('payment.post');
 
     Route::post('/{film}/schedule/{jadwalTayang}/store', [BookingController::class, 'store'])->name('store');
-
     Route::get('/success/{pemesanan}', [BookingController::class, 'success'])->name('success');
-    Route::get('/ticket/{pemesanan}', [BookingController::class, 'ticket'])->name('ticket');
-
+    
     Route::post('/cancel/{pemesanan}', [BookingController::class, 'cancel'])
-        ->name('cancel');
+    ->name('cancel');
 });
+Route::get('/pemesanan/ticket/{pemesanan}', [BookingController::class, 'ticket'])->name('pemesanan.ticket');
+Route::get('/payment/continue/{pemesanan}', [BookingController::class, 'continuePayment'])
+->name('payment.continue');
 
 // Admin & Kasir
 Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->name('admin.')->group(function () {
