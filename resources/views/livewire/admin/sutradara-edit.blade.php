@@ -22,7 +22,7 @@
                   method="POST"
                   enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
+                @method('PATCH')
     
                 <!-- Foto Profil -->
                 <div class="mb-6">

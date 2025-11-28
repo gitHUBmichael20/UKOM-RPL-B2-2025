@@ -130,7 +130,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/create', [SutradaraManagement::class, 'create'])->name('create');
         Route::post('/', [SutradaraManagement::class, 'store'])->name('store');
         Route::get('/{id}/edit', [SutradaraManagement::class, 'edit'])->name('edit');
-        Route::put('/{id}', [SutradaraManagement::class, 'update'])->name('update');
+        Route::patch('/{id}', [SutradaraManagement::class, 'update'])->name('update');
         Route::delete('/{id}', [SutradaraManagement::class, 'destroy'])->name('destroy');
     });
 
