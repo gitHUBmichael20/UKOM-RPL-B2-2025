@@ -216,19 +216,6 @@
                                         {{ $pemesanan->kode_booking }}
                                     </div>
                                 </div>
-
-                                <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3 no-print">
-                                    <button onclick="downloadTicketFixed()"
-                                            id="download-btn"
-                                            class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2">
-                                        Unduh Tiket
-                                    </button>
-                                    <button onclick="window.print()"
-                                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2">
-                                        Cetak Tiket
-                                    </button>
-                                </div>
-
                                 <p class="text-xs sm:text-sm text-gray-600 mt-4">
                                     Tunjukkan QR code ini ke kasir untuk masuk studio
                                 </p>

@@ -148,12 +148,12 @@
                                                     </a>
                                                 @endif
 
-                                                @if ($canPay)
-                                                    <button onclick="payNow('{{ $booking->snap_token }}')"
-                                                        class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition">
+                                                @if($canPay)
+                                                    <a href="{{ route('payment.continue', $booking) }}"
+                                                    class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition">
                                                         <i class="fas fa-credit-card mr-2"></i>
                                                         Bayar Sekarang
-                                                    </button>
+                                                    </a>
                                                 @endif
 
                                                 @if ($canCancel)
@@ -317,109 +317,61 @@
             });
         }
 
-        function showCancelConfirmation(bookingId, movieTitle, button) {
-            currentBookingId = bookingId;
-            currentButton = button;
+async function cancelBooking(bookingId, button) {
+        const originalHTML = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Membatalkan...';
 
-            // Update modal content
-            document.getElementById('modalSubtitle').textContent = movieTitle;
-
-            // Show modal
-            const modal = document.getElementById('cancelModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.style.opacity = '1';
-            }, 10);
-        }
-
-        function hideCancelModal() {
-            const modal = document.getElementById('cancelModal');
-            modal.style.opacity = '0';
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
-        function showSuccessToast() {
-            const toast = document.getElementById('successToast');
-            toast.classList.remove('hidden');
-            toast.classList.add('translate-x-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.add('translate-x-full', 'opacity-0');
-                setTimeout(() => {
-                    toast.classList.add('hidden');
-                    toast.classList.remove('translate-x-full', 'opacity-0');
-                }, 300);
-            }, 3000);
-        }
-
-        function showError(message) {
-            const toast = document.getElementById('errorToast');
-            document.getElementById('errorMessage').textContent = message;
-
-            toast.classList.remove('hidden');
-            toast.classList.add('translate-x-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.add('translate-x-full', 'opacity-0');
-                setTimeout(() => {
-                    toast.classList.add('hidden');
-                    toast.classList.remove('translate-x-full', 'opacity-0');
-                }, 300);
-            }, 3000);
-        }
-
-        function cancelBooking() {
-            if (!currentBookingId || !currentButton) return;
-
-            // Update button state
-            currentButton.disabled = true;
-            currentButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Membatalkan...';
-
-            // Hide modal
-            hideCancelModal();
-
-            // Send cancellation request
-            fetch(`/pemesanan/cancel/${currentBookingId}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showSuccessToast();
-                        // Reload after a short delay to show the toast
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1500);
-                    } else {
-                        showError(data.message || 'Gagal membatalkan pemesanan');
-                        currentButton.disabled = false;
-                        currentButton.innerHTML = '<i class="fas fa-times mr-2"></i> Batalkan';
-                    }
-                })
-                .catch(() => {
-                    showError('Terjadi kesalahan jaringan');
-                    currentButton.disabled = false;
-                    currentButton.innerHTML = '<i class="fas fa-times mr-2"></i> Batalkan';
-                });
-        }
-
-        // Event listeners for modal
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('cancelConfirmBtn').addEventListener('click', cancelBooking);
-            document.getElementById('cancelCloseBtn').addEventListener('click', hideCancelModal);
-
-            // Close modal when clicking outside
-            document.getElementById('cancelModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    hideCancelModal();
-                }
-            });
+        const { isConfirmed } = await Swal.fire({
+            title: 'Batalkan Pesanan?',
+            text: 'Kursi akan dilepaskan dan tidak bisa dikembalikan.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Batalkan',
+            cancelButtonText: 'Tidak Jadi',
+            reverseButtons: true
         });
+
+        if (!isConfirmed) {
+            button.disabled = false;
+            button.innerHTML = originalHTML;
+            return;
+        }
+
+        try {
+            const response = await fetch(`/pemesanan/cancel/${bookingId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Dibatalkan!',
+                    text: 'Pesanan berhasil dibatalkan.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            } else {
+                throw new Error(data.message || 'Gagal membatalkan pesanan');
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: error.message || 'Terjadi kesalahan jaringan'
+            });
+            button.disabled = false;
+            button.innerHTML = originalHTML;
+        }
+    }
     </script>
 </x-app-layout>

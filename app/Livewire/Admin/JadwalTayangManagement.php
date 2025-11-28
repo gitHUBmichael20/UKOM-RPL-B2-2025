@@ -24,7 +24,6 @@ class JadwalTayangManagement extends Component
 
     public function mount()
     {
-        // Set filter tanggal default ke hari ini jika belum ada di query string
         if (empty($this->filterTanggal)) {
             $this->filterTanggal = now()->format('Y-m-d');
         }
@@ -50,10 +49,9 @@ class JadwalTayangManagement extends Component
         try {
             $jadwal = JadwalTayang::findOrFail($id);
 
-            // Check if there are existing bookings
             if ($jadwal->pemesanan()->exists()) {
                 $this->dispatch('error', 'Tidak dapat menghapus jadwal karena sudah ada pemesanan');
-                return; // Tambahkan return agar tidak lanjut delete
+                return;
             }
 
             $jadwal->delete();

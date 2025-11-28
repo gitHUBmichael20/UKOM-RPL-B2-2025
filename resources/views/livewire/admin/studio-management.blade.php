@@ -172,13 +172,11 @@
                                     return (int) substr($kursi->nomor_kursi, 1);
                                 });
 
-                                // Hitung posisi gang (setelah kursi ke berapa)
                                 $gangPosition = ceil($totalKolom / 2);
                             @endphp
 
                             @foreach($kursiByBaris as $baris => $kursiList)
                                 <div class="flex items-center justify-center gap-2">
-                                    <!-- Row Label Left -->
                                     <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
                                         {{ $baris }}
                                     </div>
@@ -208,7 +206,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Gang setelah kursi ke-gangPosition -->
                                             @if($nomorKolom == $gangPosition)
                                                 <div class="w-6 flex items-center justify-center text-gray-400 flex-shrink-0">
                                                     <i class="fa-solid fa-grip-lines-vertical text-sm"></i>
@@ -217,7 +214,6 @@
                                         @endforeach
                                     </div>
 
-                                    <!-- Row Label Right -->
                                     <div class="w-6 text-center font-bold text-gray-700 text-sm flex-shrink-0">
                                         {{ $baris }}
                                     </div>
@@ -225,7 +221,6 @@
                             @endforeach
                         </div>
 
-                        <!-- Legend -->
                         <div class="mt-8 pt-6 border-t flex justify-center gap-8">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 bg-green-500 rounded-t-lg"></div>

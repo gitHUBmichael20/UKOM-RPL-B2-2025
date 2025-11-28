@@ -27,8 +27,6 @@ class PemesananKasir extends Component
     public $perPage = 10;
     public $selectedPemesanan = null;
     public $showDetailModal = false;
-
-    // Form data untuk buat pemesanan
     public $formStep = 1;
     public $selectedJadwal = null;
     public $selectedJadwalId = null;
@@ -164,10 +162,8 @@ class PemesananKasir extends Component
             }
 
             $this->resetForm();
-            $this->tab = 'hari-ini';
+            return redirect()->route('pemesanan.ticket', ['pemesanan' => $pemesanan->id]);
 
-            session()->flash('success', 'Pemesanan berhasil! Kode: ' . $pemesanan->kode_booking);
-            $this->dispatch('$refresh');
         } catch (\Exception $e) {
             \Log::error('Error simpan pemesanan offline: ' . $e->getMessage());
             session()->flash('error', 'Error: ' . $e->getMessage());
