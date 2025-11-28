@@ -139,7 +139,7 @@ class Index extends Component
                 DB::raw('SUM(total_harga) as total_pendapatan')
             )
             ->groupBy('jadwal_tayang_id')
-            ->orderBy('total_pendapatan', 'desc')
+            ->orderBy('total_tiket', 'desc')
             ->limit(10)
             ->get();
 

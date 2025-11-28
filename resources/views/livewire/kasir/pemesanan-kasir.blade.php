@@ -258,7 +258,7 @@
                         @endif
                     </div>
 
-                    <!-- Summary -->
+                    <!-- Ringkasan pemesanan -->
                     <div class="bg-white rounded-lg shadow p-6 h-fit">
                         <h3 class="font-bold text-gray-900 mb-4">Ringkasan</h3>
                         
@@ -314,12 +314,12 @@
 
             <!-- STEP 3: Konfirmasi -->
             @if ($formStep === 3 && $selectedJadwal)
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+             <div class="flex justify-center">
                     <!-- Empty left side -->
                     <div class="lg:col-span-2"></div>
 
-                    <!-- Summary Final -->
-                    <div class="bg-white rounded-lg shadow p-6 h-fit">
+                    <!-- Rangkuman  -->
+                        <div class="bg-white rounded-lg shadow p-6 w-full max-w-md">
                         <h3 class="font-bold text-gray-900 mb-4">Ringkasan Pemesanan</h3>
 
                         <div class="space-y-3 text-sm mb-4">
