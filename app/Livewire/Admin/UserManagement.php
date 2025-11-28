@@ -34,16 +34,14 @@ class UserManagement extends Component
 
         if ($user && $user->id !== auth()->id()) {
             // Hapus foto profil jika ada dan bukan default
-            if ($user->foto_profil && $user->foto_profil !== 'default-avatar.png') {
+            if ($user->foto_profil && $user->foto_profil !== '/storage/default_profile.jpg') {
                 Storage::disk('public')->delete($user->foto_profil);
             }
 
             $user->delete();
 
-            // Dispatch event untuk SweetAlert
             $this->dispatch('user-deleted', ['message' => 'User berhasil dihapus']);
         } else {
-            // Dispatch event untuk error
             $this->dispatch('user-delete-failed', ['message' => 'Tidak dapat menghapus user ini']);
         }
     }

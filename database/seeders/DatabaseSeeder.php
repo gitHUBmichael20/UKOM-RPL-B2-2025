@@ -304,8 +304,7 @@ class DatabaseSeeder extends Seeder
       $user = $isOnline ? User::where('role', 'pelanggan')->inRandomOrder()->first() : null;
       $kasir = $isOnline ? null : User::where('role', 'kasir')->inRandomOrder()->first();
 
-      // Kode booking unik 100%
-      $kodeBooking = 'BK' . date('Ymd') . strtoupper(Str::random(8));
+      $kodeBooking = 'BK' . date('Ymd') . strtoupper(Str::random(6));
 
       $pemesanan = Pemesanan::create([
         'kode_booking'      => $kodeBooking,
@@ -319,7 +318,7 @@ class DatabaseSeeder extends Seeder
         'status_pembayaran' => $statusPembayaran[array_rand($statusPembayaran)],
         'tanggal_pemesanan' => now()->subHours(rand(1, 500)),
         'kasir_id'          => $kasir?->id,
-        'expired_at'        => $isOnline ? now()->addHours(2) : null,
+        'expired_at'        => $isOnline ? now()->addHours(1) : null,
       ]);
 
       // Ambil kursi yang masih kosong untuk jadwal ini

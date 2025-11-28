@@ -73,7 +73,7 @@ class StudioCreate extends Component
         $kursiData = [];
         $hurufBaris = range('A', 'Z');
 
-        // Jika ganjil, sisi kiri lebih banyak 1
+        // Jika ganjil, yang kiri lebih banyak 1
         $kolomKiri = ceil($this->jumlah_kolom / 2);
 
         for ($baris = 0; $baris < $this->jumlah_baris; $baris++) {

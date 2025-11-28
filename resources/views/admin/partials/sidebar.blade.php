@@ -12,7 +12,6 @@
         <!-- Navigation -->
         <ul class="space-y-2 font-medium">
             <!-- Dashboard -->
-            @if (isRole('admin'))
             <li>
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center p-3 rounded-lg text-white hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700' : '' }}">
@@ -20,7 +19,6 @@
                     <span class="ml-3">Dashboard</span>
                 </a>
             </li>
-            @endif
 
             <!-- Films -->
             <li>

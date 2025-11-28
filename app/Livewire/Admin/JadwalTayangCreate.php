@@ -20,7 +20,6 @@ class JadwalTayangCreate extends Component
 
     public function mount()
     {
-        // Set default tanggal ke hari ini
         $this->tanggal_tayang = now()->format('Y-m-d');
     }
 
