@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Models\User;
@@ -34,7 +35,7 @@ class DatabaseSeeder extends Seeder
       }
     } catch (\Exception $e) {
       // Jika download gagal, gunakan gambar default
-      \Log::error("Failed to download image: " . $e->getMessage());
+      Log::error("Failed to download image: " . $e->getMessage());
     }
     return null;
   }
